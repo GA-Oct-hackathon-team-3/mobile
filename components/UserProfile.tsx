@@ -13,7 +13,7 @@ import {
 import * as WebBrowser from "expo-web-browser";
 import { ScrollView } from "react-native-gesture-handler";
 import { useLocalSearchParams } from "expo-router";
-import { DATA } from "./MainScreen";
+import * as friendService from "../utilities/friends-service";
 
 function UserProfile() {
   const [about, setAbout] = useState("Software Developer at XYZ Company");
@@ -25,12 +25,32 @@ function UserProfile() {
   const [loading, setLoading] = useState<boolean>(false);
   const { id } = useLocalSearchParams();
 
+  const [user, setUser] = useState(null);
+
   const addTag = () => {
     if (tag) {
       setTags([...tags, tag]);
       setTag("");
     }
   };
+
+  const fetchUser = async () => {
+    try {
+      console.log("This is the id", id);
+      const friend = await friendService.retrieveFriend(id);
+
+      if (friend) {
+        setUser(friend);
+        console.log("FRIEND", friend);
+      }
+    } catch (error) {
+      console.error("Error fetching user: ", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
 
   function stringToArray(inputString) {
     try {
@@ -110,7 +130,7 @@ function UserProfile() {
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
       method: "POST",
       headers: {
-        Authorization: "Bearer " + process.env.OPEN_AI_KEY,
+        Authorization: "Bearer " + "",
         "Content-Type": "application/json",
       },
       body: JSON.stringify(apiRequestBody),
@@ -133,7 +153,7 @@ function UserProfile() {
         value={about}
         onChangeText={setAbout}
         multiline
-        placeholder={`About ${DATA[Number(id) - 1].first_name}`}
+        placeholder={`About`}
       />
 
       <View style={styles.tagInputContainer}>

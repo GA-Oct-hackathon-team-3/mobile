@@ -1,7 +1,3 @@
-import React from "react";
-import { StyleSheet, View, Text, Image, ScrollView } from "react-native";
-import { FontAwesome } from "@expo/vector-icons";
-
 const DUMMY_PROFILE = {
   first_name: "Alex",
   last_name: "Turner",
@@ -11,94 +7,179 @@ const DUMMY_PROFILE = {
   tags: ["Sushi Lover", "49ers Fan", "Programmer"],
   image: "https://via.placeholder.com/150", // A dummy image. Replace with a real one if needed.
 };
+// Import necessary components and libraries
+import React, { useEffect, useState } from "react";
+import { StyleSheet, View, Text, TouchableOpacity, Image } from "react-native";
+import Gifts from "./Gifts";
+import ProfileContent from "./ProfileContent";
+import { ScrollView } from "react-native-gesture-handler";
+import { FontAwesome } from "@expo/vector-icons";
+import * as friendService from "../utilities/friends-service";
+import { useLocalSearchParams } from "expo-router";
 
-export default function Profile() {
+export default function UserProfileScreen() {
+  const [selected, setSelected] = useState("profile");
+  const [user, setUser] = useState(null);
+  const { id } = useLocalSearchParams();
+
+  const fetchUser = async () => {
+    try {
+      console.log("This is the id", id);
+      const friend = await friendService.retrieveFriend(id);
+
+      if (friend) {
+        setUser(friend);
+        console.log("FRIEND", friend);
+      }
+    } catch (error) {
+      console.error("Error fetching user: ", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
+  const handleSelect = (value: string) => {
+    setSelected(value);
+  };
   return (
-    <ScrollView style={styles.container}>
-      <Image
-        source={require("../assets/images/alex.jpg")}
-        style={styles.profileImage}
-      />
-      <Text style={styles.name}>
-        {DUMMY_PROFILE.first_name} {DUMMY_PROFILE.last_name}
-      </Text>
-      <Text style={styles.birthday}>{DUMMY_PROFILE.birthday}</Text>
-      <View style={styles.aboutSection}>
-        <Text style={styles.aboutTitle}>About Me</Text>
-        <Text style={styles.aboutText}>{DUMMY_PROFILE.about}</Text>
+    <View style={styles.container}>
+      <View style={styles.backgroundCover}></View>
+      <View style={styles.header}>
+        <Image
+          source={require("../assets/images/alex.jpg")}
+          style={styles.avatar}
+        />
+        <Text>{user && user.name}</Text>
+        <Text>Friend</Text>
       </View>
-      <View style={styles.tagsSection}>
-        {DUMMY_PROFILE.tags.map((tag) => (
-          <View style={styles.tag} key={tag}>
-            <FontAwesome name="tag" size={16} color="white" />
-            <Text style={styles.tagText}>{tag}</Text>
-          </View>
-        ))}
+      <View style={styles.info}>
+        <View style={styles.infoDescription}>
+          <Text style={{ color: "#804C46", fontWeight: "bold" }}>10</Text>
+          <Text>January</Text>
+        </View>
+        <View
+          style={{ height: 30, width: 1, backgroundColor: "lightgray" }}
+        ></View>
+        <View style={styles.infoDescription}>
+          <Text style={{ color: "#804C46", fontWeight: "bold" }}>180 </Text>
+          <Text>Days left</Text>
+        </View>
+        <View
+          style={{ height: 30, width: 1, backgroundColor: "lightgray" }}
+        ></View>
+
+        <View style={styles.infoDescription}>
+          <Text style={{ color: "#804C46", fontWeight: "bold" }}>27</Text>
+          <Text>Age</Text>
+        </View>
+        <FontAwesome
+          name="pencil"
+          size={20}
+          color="black"
+          style={{ position: "relative", right: -40, top: 0 }}
+        />
       </View>
-    </ScrollView>
+      <View style={styles.actionButtons}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => handleSelect("profile")}
+        >
+          <Text
+            style={selected == "profile" ? styles.selected : styles.unselected}
+          >
+            Profile
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => handleSelect("gifts")}
+        >
+          <Text
+            style={selected == "profile" ? styles.unselected : styles.selected}
+          >
+            Explore Gifts
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {selected == "profile" ? (
+        <ScrollView>
+          <ProfileContent />
+        </ScrollView>
+      ) : (
+        <Gifts isExplore={true} />
+      )}
+
+      {/* You can add the "Favorited Gifts" section similarly */}
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f5f5f5",
-    padding: 20,
-  },
-  profileImage: {
-    width: 150,
-    height: 150,
-    borderRadius: 75,
-    alignSelf: "center",
-    marginBottom: 15,
-  },
-  name: {
-    fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 5,
-  },
-  birthday: {
-    fontSize: 16,
-    textAlign: "center",
-    marginBottom: 25,
-    color: "gray",
-  },
-  aboutSection: {
-    backgroundColor: "white",
     padding: 15,
-    borderRadius: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.25,
-    shadowRadius: 2,
-    marginBottom: 20,
+    backgroundColor: "#FFFFFF",
+    paddingTop: 120,
   },
-  aboutTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 10,
+  header: {
+    flexDirection: "column",
+    alignItems: "center",
+    gap: 4,
   },
-  aboutText: {
-    fontSize: 16,
-    lineHeight: 24,
+  avatar: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
   },
-  tagsSection: {
+  info: {
     flexDirection: "row",
-    flexWrap: "wrap",
+    justifyContent: "center",
+    gap: 20,
+    marginVertical: 10,
   },
-  tag: {
+  actionButtons: {
     flexDirection: "row",
-    backgroundColor: "purple",
-    borderRadius: 20,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    margin: 5,
+    justifyContent: "center",
+    gap: 30,
+    marginVertical: 10,
+    paddingTop: 10,
+  },
+  giftType: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginVertical: 10,
+  },
+  tags: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginVertical: 10,
+  },
+  button: {
+    padding: 10,
+    borderRadius: 5,
+  },
+  infoDescription: {
+    flexDirection: "column",
+    justifyContent: "center",
     alignItems: "center",
   },
-  tagText: {
-    color: "white",
-    marginLeft: 5,
-    fontSize: 14,
+  selected: {
+    color: "black",
+    textDecorationLine: "underline",
+  },
+
+  unselected: {
+    color: "gray",
+  },
+  backgroundCover: {
+    position: "absolute",
+    left: 0,
+    height: 140,
+    right: 0,
+    top: 0,
+    backgroundColor: "#F5F5F5",
   },
 });

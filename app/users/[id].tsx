@@ -1,6 +1,6 @@
 import { Stack, useLocalSearchParams } from "expo-router";
 import UserProfile from "../../components/UserProfile";
-import { DATA } from "../../components/MainScreen";
+import UserProfileScreen from "../../components/Profile";
 const Page = () => {
   const params = useLocalSearchParams();
 
@@ -9,9 +9,9 @@ const Page = () => {
   console.log(params.id, "PARAMS");
   return (
     <>
-      <Stack.Screen options={{ title: `${DATA[Number(id) - 1].first_name}` }} />
+      <Stack.Screen options={{ title: `User` }} />
 
-      <UserProfile />
+      <UserProfileScreen />
     </>
   );
 };
