@@ -14,6 +14,7 @@ import Gifts from "./Gifts";
 import ProfileContent from "./ProfileContent";
 import { ScrollView } from "react-native-gesture-handler";
 import { FontAwesome } from "@expo/vector-icons";
+import { colors } from "../constants/Theme";
 
 export default function CurrentUserProfileScreen() {
   const [selected, setSelected] = useState("profile");
@@ -29,34 +30,32 @@ export default function CurrentUserProfileScreen() {
           source={require("../assets/images/alex.jpg")}
           style={styles.avatar}
         />
-        <Text>Anthony Sudol</Text>
-        <Text>Friend</Text>
+        <Text style={styles.name}>Anthony Sudol</Text>
+        <Text style={styles.subText}>Friend</Text>
       </View>
       <View style={styles.info}>
         <View style={styles.infoDescription}>
-          <Text style={{ color: "#804C46", fontWeight: "bold" }}>10</Text>
-          <Text>January</Text>
+          <Text style={styles.numberText}>10</Text>
+          <Text style={styles.subText}>January</Text>
         </View>
         <View
           style={{ height: 30, width: 1, backgroundColor: "lightgray" }}
         ></View>
         <View style={styles.infoDescription}>
-          <Text style={{ color: "#804C46", fontWeight: "bold" }}>180 </Text>
-          <Text>Days left</Text>
+          <Text style={styles.numberText}>180</Text>
+          <Text style={styles.subText}>Days left</Text>
         </View>
         <View
           style={{ height: 30, width: 1, backgroundColor: "lightgray" }}
         ></View>
 
         <View style={styles.infoDescription}>
-          <Text style={{ color: "#804C46", fontWeight: "bold" }}>27</Text>
-          <Text>Age</Text>
+          <Text style={styles.numberText}>27</Text>
+          <Text style={styles.subText}>Age</Text>
         </View>
-        <FontAwesome
-          name="pencil"
-          size={20}
-          color="black"
-          style={{ position: "relative", right: -40, top: 0 }}
+        <Image
+          source={require("../assets/images/pencil.png")}
+          style={{ height: 20, width: 20, right: -40 }}
         />
       </View>
       <View style={styles.actionButtons}>
@@ -99,7 +98,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 15,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.cream,
     paddingTop: 120,
   },
   header: {
@@ -147,10 +146,14 @@ const styles = StyleSheet.create({
   selected: {
     color: "black",
     textDecorationLine: "underline",
+    fontFamily: "PilcrowMedium",
+    fontSize: 20,
   },
 
   unselected: {
     color: "gray",
+    fontFamily: "PilcrowRounded",
+    fontSize: 18,
   },
   backgroundCover: {
     position: "absolute",
@@ -158,6 +161,21 @@ const styles = StyleSheet.create({
     height: 140,
     right: 0,
     top: 0,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: colors.orange,
+    borderBottomLeftRadius: 8,
+    borderBottomRightRadius: 8,
+  },
+  name: {
+    fontFamily: "PilcrowMedium",
+    fontSize: 24,
+  },
+  subText: {
+    fontFamily: "PilcrowRounded",
+    fontSize: 16,
+  },
+  numberText: {
+    fontFamily: "PilcrowRounded",
+    fontSize: 18,
+    color: colors.orange,
   },
 });

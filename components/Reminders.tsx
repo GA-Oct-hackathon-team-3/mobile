@@ -2,6 +2,7 @@ import React from "react";
 import { View, useWindowDimensions } from "react-native";
 import BirthdayNotification from "./BirthdayNotification";
 import { ScrollView } from "react-native-gesture-handler";
+import { colors } from "../constants/Theme";
 
 const dummyReminders = [
   {
@@ -39,7 +40,7 @@ const dummyReminders = [
 const Reminders = () => {
   const { height } = useWindowDimensions();
   return (
-    <ScrollView style={{ height: height }}>
+    <ScrollView style={{ height: height, backgroundColor: colors.cream }}>
       {dummyReminders.map((reminder) => (
         <BirthdayNotification
           name={reminder.name}

@@ -31,6 +31,8 @@ export default function RootLayout() {
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     PilcrowRounded: require("../assets/fonts/PilcrowRounded-Regular.ttf"),
+    PilcrowBold: require("../assets/fonts/PilcrowRounded-Bold.otf"),
+    PilcrowMedium: require("../assets/fonts/PilcrowRounded-Medium.otf"),
 
     ...FontAwesome.font,
   });
@@ -85,13 +87,13 @@ function RootLayoutNav() {
             name="settings"
             options={{ headerShown: true, title: "Settings" }}
           />
-          <Stack.Screen
+          {/* <Stack.Screen
             name="add-tags"
             options={{
               headerShown: true,
               title: "Add Tags",
             }}
-          />
+          /> */}
         </Stack>
       </AuthProvider>
     </ThemeProvider>

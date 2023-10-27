@@ -1,7 +1,8 @@
 import { FontAwesome } from "@expo/vector-icons";
 import React from "react";
-import { View, StyleSheet, Text } from "react-native";
+import { View, StyleSheet, Text, Image } from "react-native";
 import Gifts from "./Gifts";
+import { colors } from "../constants/Theme";
 
 const ProfileContent = () => {
   return (
@@ -9,40 +10,59 @@ const ProfileContent = () => {
       <View style={styles.giftTypeContainer}>
         {/* Gift Type Top */}
         <View style={styles.giftTop}>
-          <Text>Gift Type</Text>
-          <FontAwesome name="pencil" size={20} color="black" />
+          <Text style={styles.text}>Gift Type</Text>
+          <Image
+            source={require("../assets/images/pencil.png")}
+            style={{ height: 20, width: 20 }}
+          />
         </View>
         {/* Gift Type Bottom */}
         <View style={styles.giftSquareContainer}>
           <View style={styles.giftTypeSquare}>
-            <FontAwesome name="music" size={34} color="black" />
-            <Text>Experience</Text>
+            <Image
+              source={require("../assets/images/experiences.png")}
+              style={{ width: 40, height: 40 }}
+            />
+            <Text style={styles.lightText}>Experience</Text>
           </View>
           <View style={styles.giftTypeSquare}>
-            <FontAwesome name="gift" size={34} color="black" />
-            <Text>Presents</Text>
+            <Image
+              source={require("../assets/images/pinkpresent.png")}
+              style={{ width: 40, height: 40 }}
+            />
+            <Text style={styles.lightText}>Presents</Text>
+          </View>
+          <View style={styles.giftTypeSquare}>
+            <Image
+              source={require("../assets/images/donations.png")}
+              style={{ width: 40, height: 40 }}
+            />
+            <Text style={styles.lightText}>Presents</Text>
           </View>
         </View>
       </View>
 
       <View style={styles.giftTypeContainer}>
         <View style={styles.giftTop}>
-          <Text>Selected Tags</Text>
-          <FontAwesome name="pencil" size={20} color="black" />
+          <Text style={styles.text}>Selected Tags</Text>
+          <Image
+            source={require("../assets/images/pencil.png")}
+            style={{ height: 20, width: 20 }}
+          />
         </View>
         <View style={styles.tagsSection}>
           <View style={styles.tag}>
-            <Text>Reading</Text>
+            <Text style={styles.selectTagText}>Reading</Text>
           </View>
           <View style={styles.tag}>
-            <Text>Outdoor Activities</Text>
+            <Text style={styles.selectTagText}>Outdoor Activities</Text>
           </View>
 
           <View style={styles.tag}>
-            <Text>Arts and Crafts</Text>
+            <Text style={styles.selectTagText}>Arts and Crafts</Text>
           </View>
           <View style={styles.tag}>
-            <Text>Games</Text>
+            <Text style={styles.selectTagText}>Games</Text>
           </View>
         </View>
       </View>
@@ -60,10 +80,11 @@ const styles = StyleSheet.create({
     gap: 28,
   },
   giftTypeContainer: {
-    borderColor: "gray",
+    borderColor: "lightgray",
     borderWidth: 1,
     borderRadius: 10,
     minHeight: 150,
+    backgroundColor: colors.brightWhite,
   },
   giftTop: {
     flexDirection: "row",
@@ -73,7 +94,9 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   giftTypeSquare: {
-    backgroundColor: "lightgray",
+    backgroundColor: colors.cream,
+    borderColor: "lightgray",
+    borderWidth: 1,
     height: 80,
     width: 80,
     borderRadius: 10,
@@ -97,13 +120,24 @@ const styles = StyleSheet.create({
   },
   tag: {
     flexDirection: "row",
-    borderColor: "gray",
     height: 40,
     borderRadius: 10,
-    borderWidth: 1,
-    paddingLeft: 8,
-    paddingRight: 8,
+    padding: 12,
     alignItems: "center",
+    backgroundColor: colors.green,
+  },
+  text: {
+    fontFamily: "PilcrowMedium",
+    fontSize: 16,
+  },
+  lightText: {
+    fontFamily: "PilcrowRounded",
+    fontSize: 16,
+  },
+  selectTagText: {
+    fontSize: 16,
+    fontFamily: "PilcrowBold",
+    color: colors.brightWhite,
   },
 });
 

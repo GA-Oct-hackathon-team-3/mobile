@@ -7,6 +7,7 @@ import {
   TextInput,
   ScrollView,
   Button,
+  Image,
 } from "react-native";
 import { useRouter } from "expo-router";
 import TitleBack from "./TitleBack";
@@ -58,8 +59,42 @@ export default function AddTags() {
 
   return (
     <View style={styles.container}>
-      <TitleBack title={"Add Tags"} />
-      <View>
+      <View style={{ flexDirection: "column", gap: 8, maxHeight: 160 }}>
+        <TitleBack title={"Add Tags"} marginLeft={-100} />
+        <Text style={{ textAlign: "center" }}>
+          What’s your friend into? Adding tags helps Presently give more
+          accurate gift suggestions.
+        </Text>
+        <View
+          style={{
+            flexDirection: "row",
+            maxHeight: 200,
+            justifyContent: "center",
+          }}
+        >
+          <Image
+            source={require("../assets/images/singer.png")}
+            style={{ height: 100, width: 100 }}
+          />
+          <Image
+            source={require("../assets/images/biker.png")}
+            style={{
+              height: 130,
+              width: 100,
+              transform: [{ rotateY: "180deg" }],
+            }}
+          />
+          <Image
+            source={require("../assets/images/gardner.png")}
+            style={{
+              height: 100,
+              width: 100,
+              transform: [{ rotateY: "180deg" }],
+            }}
+          />
+        </View>
+      </View>
+      <View style={styles.topContainer}>
         <TextInput
           placeholder="Type to create custom tag"
           value={searchTag}
@@ -85,22 +120,28 @@ export default function AddTags() {
           </View>
         </ScrollView>
 
-        {Object.entries(tagCategories).map(([category, tags]) => (
-          <View key={category}>
-            <Text>{category}</Text>
-            <View style={styles.tagList}>
-              {tags.map((tag) => (
-                <TouchableOpacity
-                  key={tag}
-                  onPress={() => handleTagPress(tag)}
-                  style={styles.tagButton}
-                >
-                  <Text>{tag} +</Text>
-                </TouchableOpacity>
-              ))}
+        <ScrollView
+          contentContainerStyle={{ maxHeight: 240, paddingBottom: 100 }}
+        >
+          {Object.entries(tagCategories).map(([category, tags]) => (
+            <View key={category}>
+              <Text>{category}</Text>
+              <View style={styles.tagList}>
+                {tags.map((tag) => (
+                  <TouchableOpacity
+                    key={tag}
+                    onPress={() => handleTagPress(tag)}
+                    style={styles.tagButton}
+                  >
+                    <Text style={{ fontFamily: "PilcrowRounded" }}>
+                      {tag} +
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
             </View>
-          </View>
-        ))}
+          ))}
+        </ScrollView>
       </View>
       <View>
         <TouchableOpacity
@@ -120,10 +161,13 @@ export default function AddTags() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+
     flexDirection: "column",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
     backgroundColor: colors.cream,
+  },
+  topContainer: {
+    padding: 20,
   },
   header: {
     flexDirection: "row",
@@ -139,6 +183,8 @@ const styles = StyleSheet.create({
     borderColor: "#E0E0E0",
     padding: 10,
     marginBottom: 20,
+    backgroundColor: colors.brightWhite,
+    borderRadius: 10,
   },
   addedTagsContainer: {
     flexDirection: "row",
@@ -162,6 +208,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderColor: "#D9D9D9",
     margin: 5,
+    backgroundColor: colors.brightWhite,
   },
   tagSelectButton: {
     borderWidth: 1,
@@ -169,16 +216,23 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderColor: "#D9D9D9",
     margin: 5,
-    backgroundColor: "#D9D9D9",
+    backgroundColor: colors.purple,
+    color: colors.brightWhite,
+    fontFamily: "PilcrowRounded",
+    opacity: 0.95,
   },
   button: {
     borderRadius: 20,
-    backgroundColor: "#747474",
+    backgroundColor: colors.green,
     alignItems: "center",
     justifyContent: "center",
-    padding: 20,
+    height: 60,
+    width: "60%",
+    alignSelf: "center",
   },
   buttonText: {
     color: "white",
+    fontSize: 20,
+    fontFamily: "PilcrowRounded",
   },
 });

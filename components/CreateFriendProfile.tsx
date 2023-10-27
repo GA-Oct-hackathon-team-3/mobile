@@ -13,7 +13,11 @@ import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { colors } from "../constants/Theme";
 import TitleBack from "./TitleBack";
+
 import * as friendsService from '../utilities/friends-service';
+
+import { FontAwesome } from "@expo/vector-icons";
+
 
 export default function CreateFriendsProfile() {
   const [formInput, setFormInput] = useState({
@@ -104,7 +108,7 @@ export default function CreateFriendsProfile() {
                   style={{ width: 100, height: 100, borderRadius: 50 }}
                 />
               ) : (
-                <Text>Add profile photo</Text>
+                <FontAwesome name="plus" size={40} color="white" />
               )}
             </TouchableOpacity>
           </View>
@@ -246,7 +250,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: "#E0E0E0",
+    backgroundColor: "#53CF85",
     justifyContent: "center",
     alignItems: "center",
   },
