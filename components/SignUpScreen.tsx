@@ -11,6 +11,7 @@ import {
 import Picker from "@react-native-picker/picker";
 import { colors } from "../constants/Theme";
 import { useRouter } from "expo-router";
+import * as usersService from "../utilities/users-service";
 
 export default function SignUpScreen() {
   const [name, setName] = useState("");
@@ -38,6 +39,26 @@ export default function SignUpScreen() {
     console.log(data); // Just for demonstration purposes
 
     // Make your API request here
+  };
+
+  const submitHandler = async (evt) => {
+    evt.preventDefault();
+    const data = {
+        name: name,
+        tel: phoneNumber,
+        email: email,
+        password: password,
+        confirmPassword: password,
+        dob: dob,
+        gender: 'female',
+        location: location
+      };
+    try {
+      const userData = await usersService.register(data);
+      router.replace("/");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -132,7 +153,7 @@ export default function SignUpScreen() {
       </View>
       <TouchableOpacity
         disabled={false}
-        onPress={handleSubmit}
+        onPress={submitHandler}
         style={styles.submitButton}
       >
         <Text style={{ color: "white", fontSize: 24 }}>Create account</Text>

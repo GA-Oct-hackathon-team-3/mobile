@@ -39,7 +39,7 @@ export const AuthProvider = ({ children }) => {
   // For simplicity, we're just tracking a user object. Set to null for no user.
 
   useEffect(() => {
-    // getUserToken();
+    getUserToken();
   }, []);
 
   const getUserToken = async () => {
@@ -59,7 +59,7 @@ export const AuthProvider = ({ children }) => {
     console.log(token, "this is the token");
   };
 
-  // useProtectedRoute(token);
+  useProtectedRoute(token);
 
   // Dummy login/logout functions. In real-world, you'll integrate actual auth logic here.
   const login = (dummyUser) => {};
@@ -83,3 +83,4 @@ export const useAuth = () => {
   }
   return context;
 };
+
