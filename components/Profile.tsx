@@ -14,11 +14,13 @@ const DUMMY_PROFILE = {
   import ProfileContent from "./ProfileContent";
   import { ScrollView } from "react-native-gesture-handler";
   import { FontAwesome } from "@expo/vector-icons";
+  import { useRouter } from "expo-router";
   import * as friendService from "../utilities/friends-service";
   import { calculateAge, daysUntilBirthday, splitDOB } from "../utilities/helpers";
   import { useLocalSearchParams } from "expo-router";
   
   export default function UserProfileScreen() {
+    const router = useRouter();
     const [selected, setSelected] = useState("profile");
     const [friend, setFriend] = useState(null);
     const [dobObject, setDobObject] = useState(null);
@@ -89,6 +91,7 @@ const DUMMY_PROFILE = {
             size={20}
             color="black"
             style={{ position: "relative", right: -40, top: 0 }}
+            onPress={() => router.push(`/users/${id}/update`)}
           />
         </View>
         <View style={styles.actionButtons}>
