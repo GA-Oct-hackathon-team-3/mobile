@@ -12,3 +12,8 @@ export async function retrieveFriend(id) {
   const friend = await sendRequest(url, "GET", null);
   return friend;
 }
+
+export async function createFriend(friendData) {
+    const newFriend = await sendRequest(`${BASE_URL}/create`, "POST", friendData);
+    return newFriend;
+  }
