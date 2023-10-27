@@ -18,7 +18,7 @@ export function useProtectedRoute(token) {
         if (!token) {
           router.replace("/landing");
         } else if (token) {
-          router.replace("/landing");
+          router.replace("/");
         }
       }, 1);
     } else {
@@ -83,4 +83,3 @@ export const useAuth = () => {
   }
   return context;
 };
-

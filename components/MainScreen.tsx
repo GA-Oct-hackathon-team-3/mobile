@@ -15,13 +15,13 @@ import { Link, useRouter } from "expo-router";
 import * as friendsService from "../utilities/friends-service";
 import { useAuth } from "./AuthContext";
 import { colors } from "../constants/Theme";
-import { daysUntilBirthday } from '../utilities/helpers';
+import { daysUntilBirthday } from "../utilities/helpers";
 import AddButton from "./AddButton";
 
 export default function MainScreen() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredData, setFilteredData] = useState([]);
+  const [filteredData, setFilteredData] = useState(null);
   const [upcomingBirthdays, setUpcomingBirthdays] = useState([]);
   const [laterBirthdays, setLaterBirthdays] = useState([]);
   const [birthdays, setBirthdays] = useState([]);
@@ -39,11 +39,20 @@ export default function MainScreen() {
         setFilteredData(friends);
       } catch (error) {
         console.error("Error fetching friends: ", error);
+        setFilteredData(null);
       }
     };
     fetchFriends();
     console.log("THIS IS ONBOARDED: ", onboarded);
   }, []);
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (!onboarded) {
+        setShowTutorial(true);
+      }
+    }, 1000);
+  }, [filteredData]);
 
   function formatDate(dateString) {
     const months = [
@@ -69,17 +78,17 @@ export default function MainScreen() {
   }
 
   const handleSearch = (query) => {
-    setSearchQuery(query);
-    if (query) {
-      console.log(query, "THIS IS THE QUERY");
-      setFilteredData(
-        DATA.filter((item) =>
-          item.first_name.toLowerCase().includes(query.toLowerCase())
-        )
-      );
-    } else {
-      setFilteredData(DATA);
-    }
+    // setSearchQuery(query);
+    // if (query) {
+    //   console.log(query, "THIS IS THE QUERY");
+    //   setFilteredData(
+    //     DATA.filter((item) =>
+    //       item.first_name.toLowerCase().includes(query.toLowerCase())
+    //     )
+    //   );
+    // } else {
+    //   setFilteredData(DATA);
+    // }
   };
 
   const Item = ({ name, last_name, dob, _id }) => (
@@ -162,6 +171,24 @@ export default function MainScreen() {
         </View>
 
         <View style={styles.remindTextContainer}>
+          <View
+            style={{
+              position: "absolute",
+              top: -25,
+              right: -12,
+              height: 30,
+              width: 30,
+              justifyContent: "center",
+              alignItems: "center",
+              backgroundColor: colors.green,
+              borderRadius: 20,
+            }}
+          >
+            <Image
+              source={require("../assets/images/close.png")}
+              style={{ height: 18, width: 18 }}
+            />
+          </View>
           <Text
             style={{
               fontFamily: "Helvetica Neue",
@@ -191,12 +218,15 @@ export default function MainScreen() {
       <Modal
         animationType="fade"
         transparent={true}
-        visible={!showTutorial}
+        visible={showTutorial}
         onRequestClose={() => setShowTutorial(false)}
       >
         <TouchableOpacity
           style={[styles.modalBackground, { height: height, borderWidth: 2 }]}
-          onPress={() => setShowTutorial(true)}
+          onPress={() => {
+            setShowNext(false);
+            setShowTutorial(false);
+          }}
         >
           {showNext ? (
             <>
@@ -248,27 +278,25 @@ export default function MainScreen() {
                   transform: [{ rotate: "15deg" }],
                 }}
               />
-              <Link href="/add-friend" asChild>
-                <TouchableOpacity
-                  onPress={() => {
-                    setShowTutorial(true);
-                    // router.push("/add-friend");
+              <TouchableOpacity
+                onPress={() => {
+                  setShowTutorial(true);
+                  router.push("/add-friend");
+                }}
+                style={styles.floatingButtonContainer}
+              >
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    gap: 12,
                   }}
-                  style={styles.floatingButtonContainer}
                 >
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: 12,
-                    }}
-                  >
-                    <FontAwesome name="plus" size={20} color="white" />
-                    <Text style={styles.addText}>Add Friend</Text>
-                  </View>
-                </TouchableOpacity>
-              </Link>
+                  <FontAwesome name="plus" size={20} color="white" />
+                  <Text style={styles.addText}>Add Friend</Text>
+                </View>
+              </TouchableOpacity>
             </>
           ) : (
             <View
@@ -500,12 +528,13 @@ const styles = StyleSheet.create({
   getStartedButton: {
     backgroundColor: "#53CF85",
     borderRadius: 20,
-    height: 40,
-    width: 300,
+    height: 50,
+    width: 240,
     alignItems: "center",
     justifyContent: "center",
-    padding: 30,
+    padding: 20,
     marginTop: 20,
+    paddingHorizontal: 40,
   },
   text: {
     color: "white",

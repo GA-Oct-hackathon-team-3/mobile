@@ -66,10 +66,14 @@ const Filters = () => {
             Budget
           </Text>
           <TouchableOpacity onPress={() => handlePress("budget")}>
-            <Image
-              source={require("../assets/images/blackplus.png")}
-              style={{ height: 30, width: 30 }}
-            />
+            {show === "budget" ? (
+              <Image source={require("../assets/images/minus.png")} />
+            ) : (
+              <Image
+                source={require("../assets/images/blackplus.png")}
+                style={{ height: 30, width: 30 }}
+              />
+            )}
           </TouchableOpacity>
         </View>
 

@@ -1,10 +1,13 @@
 import { FontAwesome } from "@expo/vector-icons";
 import React from "react";
-import { View, StyleSheet, Text, Image } from "react-native";
+import { View, StyleSheet, Text, Image, Touchable } from "react-native";
 import Gifts from "./Gifts";
 import { colors } from "../constants/Theme";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import { useRouter } from "expo-router";
 
 const ProfileContent = () => {
+  const router = useRouter();
   return (
     <View style={styles.container}>
       <View style={styles.giftTypeContainer}>
@@ -45,10 +48,12 @@ const ProfileContent = () => {
       <View style={styles.giftTypeContainer}>
         <View style={styles.giftTop}>
           <Text style={styles.text}>Selected Tags</Text>
-          <Image
-            source={require("../assets/images/pencil.png")}
-            style={{ height: 20, width: 20 }}
-          />
+          <TouchableOpacity onPress={() => router.push("/users/edit-tags")}>
+            <Image
+              source={require("../assets/images/pencil.png")}
+              style={{ height: 20, width: 20 }}
+            />
+          </TouchableOpacity>
         </View>
         <View style={styles.tagsSection}>
           <View style={styles.tag}>

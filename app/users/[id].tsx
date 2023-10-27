@@ -9,7 +9,7 @@ const Page = () => {
   console.log(params.id, "PARAMS");
   return (
     <>
-      <Stack.Screen options={{ title: `User` }} />
+      <Stack.Screen options={{ title: `User`, headerShown: false }} />
 
       <UserProfileScreen />
     </>
