@@ -86,12 +86,7 @@ const Gifts = ({ isExplore }) => {
   );
 
   return (
-    <View
-      style={[
-        styles.container,
-        { backgroundColor: isExplore ? colors.brightWhite : colors.cream },
-      ]}
-    >
+    <View style={[styles.container, { backgroundColor: colors.brightWhite }]}>
       {isExplore ? (
         <View style={styles.exploreHeader}>
           <View style={styles.textRec}>

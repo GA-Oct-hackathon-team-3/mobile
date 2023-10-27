@@ -64,7 +64,14 @@ export const AuthProvider = ({ children }) => {
   // Dummy login/logout functions. In real-world, you'll integrate actual auth logic here.
   const login = (dummyUser) => {};
 
-  const logout = () => {};
+  const logout = async () => {
+    setToken(null);
+    if (Platform.OS === "web") {
+      localStorage.removeItem("token");
+    } else {
+      await SecureStore.deleteItemAsync("token");
+    }
+  };
 
   return (
     <AuthContext.Provider

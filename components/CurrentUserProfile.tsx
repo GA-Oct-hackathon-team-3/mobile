@@ -15,15 +15,38 @@ import ProfileContent from "./ProfileContent";
 import { ScrollView } from "react-native-gesture-handler";
 import { FontAwesome } from "@expo/vector-icons";
 import { colors } from "../constants/Theme";
+import { useAuth } from "./AuthContext";
 
 export default function CurrentUserProfileScreen() {
   const [selected, setSelected] = useState("profile");
+  const { logout } = useAuth();
 
   const handleSelect = (value: string) => {
     setSelected(value);
   };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error(error);
+    }
+  };
   return (
     <View style={styles.container}>
+      <TouchableOpacity
+        style={{
+          position: "absolute",
+          top: 60,
+          right: 0,
+          height: 40,
+          width: 40,
+          zIndex: 1,
+        }}
+        onPress={logout}
+      >
+        <FontAwesome name="power-off" size={24} color={colors.brightWhite} />
+      </TouchableOpacity>
       <View style={styles.backgroundCover}></View>
       <View style={styles.header}>
         <Image

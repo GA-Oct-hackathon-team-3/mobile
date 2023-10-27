@@ -59,23 +59,27 @@ export default function LoginScreen() {
       <View
         style={{
           position: "absolute",
-          width: "100%",
-          height: 70,
+          width: width,
+          height: 100,
           alignItems: "center",
           justifyContent: "center",
-          top: 20,
+          top: 40,
         }}
       >
         <Image
           source={require("../assets/images/Prently1.png")}
-          style={{ width: 240, height: 80, resizeMode: "contain" }}
+          style={{
+            width: 240,
+            height: 80,
+            resizeMode: "contain",
+          }}
         />
       </View>
       <View
         style={{
           flexDirection: "row",
           justifyContent: "space-between",
-          paddingTop: 80,
+          paddingTop: 100,
         }}
       >
         <TouchableOpacity
@@ -98,7 +102,7 @@ export default function LoginScreen() {
         />
       </View>
       <View style={{ gap: 12 }}>
-        <Text>Email</Text>
+        <Text style={styles.text}>Email</Text>
         <TextInput
           style={styles.textInput}
           label="Email"
@@ -111,7 +115,7 @@ export default function LoginScreen() {
       </View>
 
       <View style={{ gap: 12 }}>
-        <Text>Password</Text>
+        <Text style={styles.text}>Password</Text>
         <TextInput
           style={styles.textInput}
           label="Password"
@@ -124,7 +128,13 @@ export default function LoginScreen() {
         />
       </View>
 
-      <Text style={{ textDecorationLine: "underline", fontWeight: "bold" }}>
+      <Text
+        style={{
+          textDecorationLine: "underline",
+          fontWeight: "bold",
+          fontFamily: "PilcrowRounded",
+        }}
+      >
         Forgot Password?
       </Text>
 
@@ -133,7 +143,24 @@ export default function LoginScreen() {
         onPress={signInWithEmail}
         style={styles.signInButton}
       >
-        <Text style={{ color: "white", fontSize: 24 }}>Login</Text>
+        <View
+          style={{
+            height: 100,
+            width: 240,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Text
+            style={{
+              color: "white",
+              fontSize: 24,
+              fontFamily: "PilcrowMedium",
+            }}
+          >
+            Login
+          </Text>
+        </View>
       </TouchableOpacity>
     </View>
   );
@@ -198,9 +225,12 @@ const styles = StyleSheet.create({
   },
   loginText: {
     color: "#3D3C3C",
-    fontFamily: "Pilcrow Rounded",
+    fontFamily: "PilcrowBold",
     fontSize: 24,
-    fontWeight: "bold",
     lineHeight: 24 * 1.2,
+  },
+  text: {
+    fontFamily: "PilcrowRounded",
+    fontSize: 16,
   },
 });
