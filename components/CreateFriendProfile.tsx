@@ -13,7 +13,6 @@ import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { colors } from "../constants/Theme";
 import TitleBack from "./TitleBack";
-import DatePicker from 'react-native-datepicker';
 import * as friendsService from '../utilities/friends-service';
 
 export default function CreateFriendsProfile() {
@@ -28,6 +27,7 @@ export default function CreateFriendsProfile() {
   const { width, height } = useWindowDimensions;
   const [selectedGender, setSelectedGender] = useState("");
   const [selectedPreferences, setSelectedPreferences] = useState([]);
+  const [uploadedPhoto, setUploadedPhoto] = useState(null);
   const router = useRouter();
 
   const [image, setImage] = useState(null);
@@ -53,8 +53,6 @@ export default function CreateFriendsProfile() {
       quality: 1,
     });
 
-    console.log(result);
-
     if (!result.canceled) {
       setImage(result.assets[0].uri);
     }
@@ -73,14 +71,14 @@ export default function CreateFriendsProfile() {
         giftPreferences: selectedPreferences.map((p) => p.toLowerCase())
     }
     const friendData = await friendsService.createFriend(data);
-    // if (uploadedFile) {
-    //   try {
-    //       const response = await friendsService.uploadPhoto(friendData._id, uploadedFile);
-    //       if (response.ok && friendData) navigate("/friends");
-    //   } catch (error) {
-    //       console.log(error);
-    //   }
-    // }
+    if (image) {
+      try {
+          const response = await friendsService.uploadPhoto(friendData._id, uploadedPhoto);
+          if (response!.ok && friendData) router.replace("/");
+      } catch (error) {
+          console.log(error);
+      }
+    }
     if (friendData) router.replace('/');
   }
 
