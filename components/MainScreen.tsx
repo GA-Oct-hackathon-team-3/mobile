@@ -105,6 +105,7 @@ export default function MainScreen() {
         router.push(`/users/${_id}`);
       }}
       key={_id}
+      style={{ marginTop: 40 }}
     >
       <View style={styles.background}>
         <View style={{ height: 90 }}></View>
