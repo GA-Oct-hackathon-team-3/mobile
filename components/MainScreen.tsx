@@ -37,7 +37,6 @@ export default function MainScreen() {
       try {
         const friends = await friendsService.retrieveFriends();
         setFilteredData(friends);
-        console.log(friends);
       } catch (error) {
         console.error("Error fetching friends: ", error);
       }
