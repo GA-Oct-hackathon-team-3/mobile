@@ -7,6 +7,7 @@ import {
   Text,
   Image,
   TouchableOpacity,
+  useWindowDimensions,
 } from "react-native";
 import Picker from "@react-native-picker/picker";
 import { colors } from "../constants/Theme";
@@ -23,6 +24,7 @@ export default function SignUpScreen() {
   const [gender, setGender] = useState("Not Specified");
   const [location, setLocation] = useState("");
   const router = useRouter();
+  const { width } = useWindowDimensions();
 
   const handleSubmit = () => {
     // You can send the object data to your backend here
@@ -44,15 +46,15 @@ export default function SignUpScreen() {
   const submitHandler = async (evt) => {
     evt.preventDefault();
     const data = {
-        name: name,
-        tel: phoneNumber,
-        email: email,
-        password: password,
-        confirmPassword: password,
-        dob: dob,
-        gender: 'female',
-        location: location
-      };
+      name: name,
+      tel: phoneNumber,
+      email: email,
+      password: password,
+      confirmPassword: password,
+      dob: dob,
+      gender: "female",
+      location: location,
+    };
     try {
       const userData = await usersService.register(data);
       router.replace("/");
@@ -63,7 +65,17 @@ export default function SignUpScreen() {
 
   return (
     <View style={styles.container}>
-      <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+      <View
+        style={{
+          position: "absolute",
+          flexDirection: "row",
+          width: width,
+          height: 100,
+          alignItems: "center",
+          justifyContent: "space-between",
+          top: 40,
+        }}
+      >
         <TouchableOpacity
           onPress={() =>
             router.canGoBack() ? router.back() : router.replace("/landing")
@@ -73,19 +85,21 @@ export default function SignUpScreen() {
             style={{
               flexDirection: "column",
               justifyContent: "center",
-              height: "100%",
             }}
           >
             <Image
               source={require("../assets/images/arrow-left.png")}
-              style={{ height: 24, width: 24 }}
+              style={{ height: 24, width: 24, left: 20 }}
             />
           </View>
         </TouchableOpacity>
-        <Image source={require("../assets/images/Prently1.png")} />
+        <Image
+          source={require("../assets/images/Prently1.png")}
+          style={{ width: 240, height: 80, resizeMode: "contain" }}
+        />
         <View></View>
       </View>
-      <View style={{ alignSelf: "center" }}>
+      <View style={{ alignSelf: "center", paddingTop: 120 }}>
         <Text style={[styles.text, { fontSize: 24 }]}>Sign Up</Text>
       </View>
 
@@ -156,7 +170,26 @@ export default function SignUpScreen() {
         onPress={submitHandler}
         style={styles.submitButton}
       >
-        <Text style={{ color: "white", fontSize: 24 }}>Create account</Text>
+        <View
+          style={{
+            width: 240,
+            height: 80,
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <Text
+            style={{
+              color: "white",
+              fontSize: 24,
+              fontFamily: "PilcrowMedium",
+
+              textAlign: "center",
+            }}
+          >
+            Create account
+          </Text>
+        </View>
       </TouchableOpacity>
     </View>
   );
