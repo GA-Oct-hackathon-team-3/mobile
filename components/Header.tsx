@@ -7,7 +7,7 @@ const Header = () => {
     <View
       style={{
         width: "100%",
-        height: 80,
+        height: 120,
         alignItems: "center",
         justifyContent: "center",
         backgroundColor: colors.cream,
@@ -17,7 +17,7 @@ const Header = () => {
     >
       <Image
         source={require("../assets/images/Prently1.png")}
-        style={{ width: 200, height: 80, resizeMode: "contain" }}
+        style={{ width: 140, height: 60, marginTop: 40, resizeMode: "contain" }}
       />
     </View>
   );

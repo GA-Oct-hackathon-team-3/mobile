@@ -9,6 +9,8 @@ import {
   Button,
 } from "react-native";
 import { useRouter } from "expo-router";
+import TitleBack from "./TitleBack";
+import { colors } from "../constants/Theme";
 
 export default function AddTags() {
   const [searchTag, setSearchTag] = useState("");
@@ -56,6 +58,7 @@ export default function AddTags() {
 
   return (
     <View style={styles.container}>
+      <TitleBack title={"Add Tags"} />
       <View>
         <TextInput
           placeholder="Type to create custom tag"
@@ -120,7 +123,7 @@ const styles = StyleSheet.create({
     padding: 20,
     flexDirection: "column",
     justifyContent: "space-between",
-    backgroundColor: "white",
+    backgroundColor: colors.cream,
   },
   header: {
     flexDirection: "row",
