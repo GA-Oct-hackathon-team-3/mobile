@@ -1,7 +1,15 @@
 import { FontAwesome } from "@expo/vector-icons";
 import React from "react";
-import { View, Image, Text, StyleSheet, FlatList } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import {
+  View,
+  Image,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+} from "react-native";
+import { colors } from "../constants/Theme";
+import { useRouter } from "expo-router";
 
 const giftData = {
   gifts: [
@@ -58,6 +66,7 @@ const giftData = {
 };
 
 const Gifts = ({ isExplore }) => {
+  const router = useRouter();
   const GiftItem = ({ item }) => (
     <View style={styles.itemContainer}>
       <View>
@@ -81,15 +90,38 @@ const Gifts = ({ isExplore }) => {
       {isExplore ? (
         <View style={styles.exploreHeader}>
           <View style={styles.textRec}>
-            <Text>Personalized Recommendations</Text>
+            <Text style={styles.headerText}>Personalized Recommendations</Text>
           </View>
-          <FontAwesome name="refresh" size={20} color="black" />
-          <FontAwesome name="filter" size={20} color="black" />
+          <TouchableOpacity>
+            <View
+              style={{ flexDirection: "column", alignItems: "center", gap: 2 }}
+            >
+              <Image
+                source={require("../assets/images/refresh.png")}
+                style={{ height: 20, width: 20 }}
+              />
+              <Text style={{ fontFamily: "PilcrowRounded" }}>Refresh</Text>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity onPress={() => router.push("/filters")}>
+            <View
+              style={{ flexDirection: "column", alignItems: "center", gap: 2 }}
+            >
+              <Image
+                source={require("../assets/images/filter1.png")}
+                style={{ height: 20, width: 20 }}
+              />
+              <Text style={{ fontFamily: "PilcrowRounded" }}>Filter</Text>
+            </View>
+          </TouchableOpacity>
         </View>
       ) : (
         <View style={styles.giftTop}>
-          <Text>Favorited Gifts</Text>
-          <FontAwesome name="pencil" size={20} color="black" />
+          <Text style={styles.text}>Favorited Gifts</Text>
+          <Image
+            source={require("../assets/images/pencil.png")}
+            style={{ width: 20, height: 20 }}
+          />
         </View>
       )}
       <FlatList
@@ -105,10 +137,11 @@ const Gifts = ({ isExplore }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    borderColor: "gray",
+    borderColor: "lightgray",
     borderWidth: 1,
     borderRadius: 10,
     paddingTop: 10,
+    backgroundColor: colors.brightWhite,
   },
   title: {
     fontSize: 24,
@@ -132,13 +165,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   giftName: {
-    fontSize: 12,
+    fontSize: 16,
     textAlign: "left",
     marginBottom: 4,
+    fontFamily: "PilcrowRounded",
   },
   giftPrice: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontFamily: "PilcrowBold",
     textAlign: "left",
   },
   exploreHeader: {
@@ -156,6 +190,14 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     paddingRight: 20,
     paddingTop: 20,
+  },
+  text: {
+    fontFamily: "PilcrowMedium",
+    fontSize: 16,
+  },
+  headerText: {
+    fontFamily: "PilcrowMedium",
+    fontSize: 16,
   },
 });
 

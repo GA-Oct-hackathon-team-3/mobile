@@ -4,6 +4,7 @@ export const colors = {
   green: "#53CF85",
   creamRgba: "rgba(253, 247, 237, 1)",
   purple: "#AF95E7",
+  orange: "#FA7F39",
 };
 
 export const buttons = {
