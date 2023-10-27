@@ -6,7 +6,9 @@ import { decode as atob, encode as btoa } from "base-64";
 export async function register(userData) {
   const userDataReturned = await usersAPI.register(userData);
   const token = userDataReturned.accessToken;
-  localStorage.setItem("token", token);
+  Platform.OS === "web"
+    ? localStorage.setItem("token", token)
+    : await SecureStore.setItemAsync("token", token);
   return getUser();
 }
 
@@ -53,4 +55,3 @@ export function logOut() {
     ? localStorage.removeItem("token")
     : SecureStore.deleteItemAsync("token");
 }
-

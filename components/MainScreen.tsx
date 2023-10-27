@@ -294,7 +294,7 @@ export default function MainScreen() {
               />
               <TouchableOpacity
                 onPress={() => {
-                  setShowTutorial(true);
+                  setShowTutorial(false);
                   router.push("/add-friend");
                   // showToasts();
                 }}
