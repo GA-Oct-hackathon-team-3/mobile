@@ -86,7 +86,12 @@ const Gifts = ({ isExplore }) => {
   );
 
   return (
-    <View style={styles.container}>
+    <View
+      style={[
+        styles.container,
+        { backgroundColor: isExplore ? colors.brightWhite : colors.cream },
+      ]}
+    >
       {isExplore ? (
         <View style={styles.exploreHeader}>
           <View style={styles.textRec}>
@@ -118,10 +123,14 @@ const Gifts = ({ isExplore }) => {
       ) : (
         <View style={styles.giftTop}>
           <Text style={styles.text}>Favorited Gifts</Text>
-          <Image
-            source={require("../assets/images/pencil.png")}
-            style={{ width: 20, height: 20 }}
-          />
+          {isExplore ? (
+            <Image
+              source={require("../assets/images/pencil.png")}
+              style={{ width: 20, height: 20 }}
+            />
+          ) : (
+            <View></View>
+          )}
         </View>
       )}
       <FlatList
@@ -137,11 +146,10 @@ const Gifts = ({ isExplore }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    borderColor: "lightgray",
-    borderWidth: 1,
+
     borderRadius: 10,
     paddingTop: 10,
-    backgroundColor: colors.brightWhite,
+    // backgroundColor: colors.cream,
   },
   title: {
     fontSize: 24,

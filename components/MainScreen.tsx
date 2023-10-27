@@ -17,6 +17,8 @@ import { useAuth } from "./AuthContext";
 import { colors } from "../constants/Theme";
 import { daysUntilBirthday } from "../utilities/helpers";
 import AddButton from "./AddButton";
+// import { Skeleton } from "moti/skeleton";
+import ToastManager, { Toast } from "toastify-react-native";
 
 export default function MainScreen() {
   const router = useRouter();
@@ -29,6 +31,7 @@ export default function MainScreen() {
   const [showTutorial, setShowTutorial] = useState(false);
   const { width, height } = useWindowDimensions();
   const [showNext, setShowNext] = useState(false);
+  const [showReminders, setShowReminders] = useState(true);
 
   const createSortedBirthdays = () => {};
 
@@ -53,6 +56,10 @@ export default function MainScreen() {
       }
     }, 1000);
   }, [filteredData]);
+
+  const showToasts = () => {
+    Toast.success("Friend Created");
+  };
 
   function formatDate(dateString) {
     const months = [
@@ -158,49 +165,55 @@ export default function MainScreen() {
           placeholder="Search by name, data, month..."
         />
       </View>
-      <View style={styles.remindersContainer}>
-        <View style={styles.peopleContainer}>
-          <Image
-            source={require("../assets/images/man.png")}
-            style={{ width: 80, height: 180 }}
-          />
-          <Image
-            source={require("../assets/images/woman.png")}
-            style={{ width: 60, height: 160 }}
-          />
-        </View>
 
-        <View style={styles.remindTextContainer}>
-          <View
-            style={{
-              position: "absolute",
-              top: -25,
-              right: -12,
-              height: 30,
-              width: 30,
-              justifyContent: "center",
-              alignItems: "center",
-              backgroundColor: colors.green,
-              borderRadius: 20,
-            }}
-          >
+      <ToastManager />
+
+      {showReminders && (
+        <View style={styles.remindersContainer}>
+          <View style={styles.peopleContainer}>
             <Image
-              source={require("../assets/images/close.png")}
-              style={{ height: 18, width: 18 }}
+              source={require("../assets/images/man.png")}
+              style={{ width: 80, height: 180 }}
+            />
+            <Image
+              source={require("../assets/images/woman.png")}
+              style={{ width: 60, height: 160 }}
             />
           </View>
-          <Text
-            style={{
-              fontFamily: "Helvetica Neue",
-              fontSize: 24,
-              paddingTop: 10,
-              fontWeight: "300",
-            }}
-          >
-            Your reminders will show up here!
-          </Text>
+
+          <View style={styles.remindTextContainer}>
+            <TouchableOpacity
+              onPress={() => setShowReminders(false)}
+              style={{
+                position: "absolute",
+                top: -25,
+                right: -12,
+                height: 30,
+                width: 30,
+                justifyContent: "center",
+                alignItems: "center",
+                backgroundColor: colors.green,
+                borderRadius: 20,
+              }}
+            >
+              <Image
+                source={require("../assets/images/close.png")}
+                style={{ height: 18, width: 18 }}
+              />
+            </TouchableOpacity>
+            <Text
+              style={{
+                fontFamily: "Helvetica Neue",
+                fontSize: 24,
+                paddingTop: 10,
+                fontWeight: "300",
+              }}
+            >
+              Your reminders will show up here!
+            </Text>
+          </View>
         </View>
-      </View>
+      )}
       <View>
         <Text
           style={{ fontFamily: "Helvetica Neue", fontSize: 24, paddingTop: 40 }}
@@ -282,6 +295,7 @@ export default function MainScreen() {
                 onPress={() => {
                   setShowTutorial(true);
                   router.push("/add-friend");
+                  // showToasts();
                 }}
                 style={styles.floatingButtonContainer}
               >
