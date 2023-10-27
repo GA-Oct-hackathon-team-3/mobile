@@ -13,17 +13,30 @@ import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { colors } from "../constants/Theme";
 import TitleBack from "./TitleBack";
+
+import * as friendsService from '../utilities/friends-service';
+
 import { FontAwesome } from "@expo/vector-icons";
 
+
 export default function CreateFriendsProfile() {
-  const [gender, setGender] = useState("");
-  const [giftCost, setGiftCost] = useState("");
+  const [formInput, setFormInput] = useState({
+    name: "",
+    dob: "",
+    gender: "",
+    location: "",
+    giftPreferences: [],
+    giftCost: ""
+  });
   const { width, height } = useWindowDimensions;
   const [selectedGender, setSelectedGender] = useState("");
   const [selectedPreferences, setSelectedPreferences] = useState([]);
+  const [uploadedPhoto, setUploadedPhoto] = useState(null);
   const router = useRouter();
 
   const [image, setImage] = useState(null);
+
+  const currentDate = new Date();
 
   const togglePreference = (preference) => {
     if (selectedPreferences.includes(preference)) {
@@ -44,12 +57,34 @@ export default function CreateFriendsProfile() {
       quality: 1,
     });
 
-    console.log(result);
-
     if (!result.canceled) {
       setImage(result.assets[0].uri);
     }
   };
+
+  const handleChange = (fieldName : string, value : string) => {
+    setFormInput((prev) => ({
+        ...prev,
+        [fieldName]: value
+    }));
+  }
+
+  const handleSubmit = async () => {
+    const data = {
+        ...formInput,
+        giftPreferences: selectedPreferences.map((p) => p.toLowerCase())
+    }
+    const friendData = await friendsService.createFriend(data);
+    if (image) {
+      try {
+          const response = await friendsService.uploadPhoto(friendData._id, uploadedPhoto);
+          if (response!.ok && friendData) router.replace("/");
+      } catch (error) {
+          console.log(error);
+      }
+    }
+    if (friendData) router.replace('/');
+  }
 
   return (
     <View style={styles.container}>
@@ -79,9 +114,9 @@ export default function CreateFriendsProfile() {
           </View>
           <View style={styles.inputContainer}>
             <Text>Name</Text>
-            <TextInput placeholder="Name" style={styles.input} />
-            <Text>Birthday</Text>
-            <TextInput placeholder="DOB" style={styles.input} />
+            <TextInput placeholder="Name" style={styles.input} value={formInput.name} onChangeText={text => handleChange('name', text)}/>
+            <Text>Date of Birth</Text>
+            <TextInput placeholder="yyyy-mm-dd" style={styles.input} value={formInput.dob} onChangeText={text => handleChange('dob', text)}/>
             <Text>Gender</Text>
             <View style={styles.genderContainer}>
               <TouchableOpacity
@@ -89,7 +124,10 @@ export default function CreateFriendsProfile() {
                   styles.genderButton,
                   selectedGender === "Male" ? styles.selected : {},
                 ]}
-                onPress={() => setSelectedGender("Male")}
+                onPress={() =>{
+                    setSelectedGender('Male');
+                    handleChange('gender', 'male');
+                }}
               >
                 <Text>Male</Text>
               </TouchableOpacity>
@@ -99,7 +137,10 @@ export default function CreateFriendsProfile() {
                   styles.genderButton,
                   selectedGender === "Female" ? styles.selected : {},
                 ]}
-                onPress={() => setSelectedGender("Female")}
+                onPress={() => {
+                    setSelectedGender('Female');
+                    handleChange('gender', 'female')
+                }}
               >
                 <Text>Female</Text>
               </TouchableOpacity>
@@ -109,14 +150,17 @@ export default function CreateFriendsProfile() {
                   styles.genderButton,
                   selectedGender === "Other" ? styles.selected : {},
                 ]}
-                onPress={() => setSelectedGender("Other")}
+                onPress={() => {
+                    setSelectedGender('Other');
+                    handleChange('gender', 'other')
+                }}
               >
                 <Text>Other</Text>
               </TouchableOpacity>
             </View>
 
             <Text>Location</Text>
-            <TextInput placeholder="Location" style={styles.input} />
+            <TextInput placeholder="Location" style={styles.input} value={formInput.location} onChangeText={text => handleChange('location', text)} />
 
             <Text>Gift type Preferences (choose all that apply)</Text>
             <View style={styles.checkboxContainer}>
@@ -129,7 +173,7 @@ export default function CreateFriendsProfile() {
                     : {},
                 ]}
                 onPress={() => togglePreference("Present")}
-              >
+                >
                 <Text>Present</Text>
               </TouchableOpacity>
 
@@ -163,8 +207,8 @@ export default function CreateFriendsProfile() {
               <TextInput
                 placeholder="Gift Cost"
                 style={styles.input}
-                value={giftCost}
-                onChangeText={setGiftCost}
+                value={formInput.giftCost}
+                onChangeText={text => handleChange('giftCost', text)}
               />
             </View>
           </View>
@@ -176,7 +220,7 @@ export default function CreateFriendsProfile() {
           }}
         >
           <View style={styles.button}>
-            <Text style={styles.buttonText}>Continue to add tags</Text>
+            <Text style={styles.buttonText} onPress={handleSubmit}>Continue to add tags</Text>
           </View>
         </TouchableOpacity>
       </View>

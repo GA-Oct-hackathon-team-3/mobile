@@ -15,32 +15,8 @@ import { Link, useRouter } from "expo-router";
 import * as friendsService from "../utilities/friends-service";
 import { useAuth } from "./AuthContext";
 import { colors } from "../constants/Theme";
+import { daysUntilBirthday } from '../utilities/helpers';
 import AddButton from "./AddButton";
-
-function daysUntilBirthday(dob) {
-  const birthday = new Date(dob);
-  const currentDate = new Date();
-
-  const nextBirthday = new Date(
-    currentDate.getFullYear(),
-    birthday.getMonth(),
-    birthday.getDate()
-  );
-
-  // If the next birthday is before the current date, set it to next year
-  if (nextBirthday < currentDate) {
-    nextBirthday.setFullYear(currentDate.getFullYear() + 1);
-  }
-
-  // Calculate the time difference in milliseconds
-  const timeDifference = nextBirthday - currentDate;
-
-  // Convert milliseconds to days
-  const days = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
-  return days;
-}
-// Usage example:
-const userBirthday = new Date(1990, 4, 15); // e.g., May 15th
 
 export default function MainScreen() {
   const router = useRouter();
@@ -61,7 +37,6 @@ export default function MainScreen() {
       try {
         const friends = await friendsService.retrieveFriends();
         setFilteredData(friends);
-        console.log(friends);
       } catch (error) {
         console.error("Error fetching friends: ", error);
       }
