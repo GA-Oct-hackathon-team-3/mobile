@@ -8,7 +8,7 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 
-const TitleBack = ({ title }) => {
+const TitleBack = ({ title, marginLeft }) => {
   const router = useRouter();
   const { width } = useWindowDimensions();
   return (
@@ -18,10 +18,17 @@ const TitleBack = ({ title }) => {
       <TouchableOpacity onPress={() => router.back()}>
         <Image
           source={require("../assets/images/arrow-left.png")}
-          style={{ height: 24, width: 24, left: -40 }}
+          style={{ height: 24, width: 24, left: marginLeft ? marginLeft : -40 }}
         />
       </TouchableOpacity>
-      <Text style={{ fontSize: 24, fontWeight: "bold" }}>{title}</Text>
+      <Text
+        style={{
+          fontSize: 24,
+          fontFamily: "PilcrowMedium",
+        }}
+      >
+        {title}
+      </Text>
     </View>
   );
 };
