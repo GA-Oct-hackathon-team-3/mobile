@@ -12,6 +12,7 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { colors } from "../constants/Theme";
+import TitleBack from "./TitleBack";
 
 export default function CreateFriendsProfile() {
   const [gender, setGender] = useState("");
@@ -51,111 +52,133 @@ export default function CreateFriendsProfile() {
 
   return (
     <View style={styles.container}>
-      <View style={{ width: width, alignItems: "center" }}>
-        <TouchableOpacity style={styles.photoPlaceholder} onPress={pickImage}>
-          {image ? (
-            <Image
-              source={{ uri: image }}
-              style={{ width: 100, height: 100, borderRadius: 50 }}
-            />
-          ) : (
-            <Text>Add profile photo</Text>
-          )}
-        </TouchableOpacity>
-      </View>
-      <Text>Name</Text>
-      <TextInput placeholder="Name" style={styles.input} />
-      <Text>Birthday</Text>
-      <TextInput placeholder="DOB" style={styles.input} />
-      <Text>Gender</Text>
-      <View style={styles.genderContainer}>
-        <TouchableOpacity
-          style={[
-            styles.genderButton,
-            selectedGender === "Male" ? styles.selected : {},
-          ]}
-          onPress={() => setSelectedGender("Male")}
-        >
-          <Text>Male</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            styles.genderButton,
-            selectedGender === "Female" ? styles.selected : {},
-          ]}
-          onPress={() => setSelectedGender("Female")}
-        >
-          <Text>Female</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            styles.genderButton,
-            selectedGender === "Other" ? styles.selected : {},
-          ]}
-          onPress={() => setSelectedGender("Other")}
-        >
-          <Text>Other</Text>
-        </TouchableOpacity>
-      </View>
-
-      <Text>Location</Text>
-      <TextInput placeholder="Location" style={styles.input} />
-
-      <Text>Gift type Preferences (choose all that apply)</Text>
-      <View style={styles.checkboxContainer}>
-        {/* You can replace these with actual checkboxes or other components */}
-        <TouchableOpacity
-          style={[
-            styles.preferenceButton,
-            selectedPreferences.includes("Present") ? styles.selected : {},
-          ]}
-          onPress={() => togglePreference("Present")}
-        >
-          <Text>Present</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            styles.preferenceButton,
-            selectedPreferences.includes("Experience") ? styles.selected : {},
-          ]}
-          onPress={() => togglePreference("Experience")}
-        >
-          <Text>Experience</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[
-            styles.preferenceButton,
-            selectedPreferences.includes("Donation") ? styles.selected : {},
-          ]}
-          onPress={() => togglePreference("Donation")}
-        >
-          <Text>Donation</Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.pickerContainer}>
-        <Text>Gift Cost</Text>
-        <TextInput
-          placeholder="Gift Cost"
-          style={styles.input}
-          value={giftCost}
-          onChangeText={setGiftCost}
-        />
-      </View>
-
-      <TouchableOpacity
-        onPress={() => {
-          router.push("/add-tags");
+      <TitleBack title={"Create Friend Profile"} />
+      <View
+        style={{
+          flexDirection: "column",
+          justifyContent: "space-around",
+          flex: 1,
         }}
       >
-        <View style={styles.button}>
-          <Text style={styles.buttonText}>Continue to add tags</Text>
+        <View style={styles.topContainer}>
+          <View style={{ width: width, alignItems: "center" }}>
+            <TouchableOpacity
+              style={styles.photoPlaceholder}
+              onPress={pickImage}
+            >
+              {image ? (
+                <Image
+                  source={{ uri: image }}
+                  style={{ width: 100, height: 100, borderRadius: 50 }}
+                />
+              ) : (
+                <Text>Add profile photo</Text>
+              )}
+            </TouchableOpacity>
+          </View>
+          <View style={styles.inputContainer}>
+            <Text>Name</Text>
+            <TextInput placeholder="Name" style={styles.input} />
+            <Text>Birthday</Text>
+            <TextInput placeholder="DOB" style={styles.input} />
+            <Text>Gender</Text>
+            <View style={styles.genderContainer}>
+              <TouchableOpacity
+                style={[
+                  styles.genderButton,
+                  selectedGender === "Male" ? styles.selected : {},
+                ]}
+                onPress={() => setSelectedGender("Male")}
+              >
+                <Text>Male</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.genderButton,
+                  selectedGender === "Female" ? styles.selected : {},
+                ]}
+                onPress={() => setSelectedGender("Female")}
+              >
+                <Text>Female</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.genderButton,
+                  selectedGender === "Other" ? styles.selected : {},
+                ]}
+                onPress={() => setSelectedGender("Other")}
+              >
+                <Text>Other</Text>
+              </TouchableOpacity>
+            </View>
+
+            <Text>Location</Text>
+            <TextInput placeholder="Location" style={styles.input} />
+
+            <Text>Gift type Preferences (choose all that apply)</Text>
+            <View style={styles.checkboxContainer}>
+              {/* You can replace these with actual checkboxes or other components */}
+              <TouchableOpacity
+                style={[
+                  styles.preferenceButton,
+                  selectedPreferences.includes("Present")
+                    ? styles.selected
+                    : {},
+                ]}
+                onPress={() => togglePreference("Present")}
+              >
+                <Text>Present</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.preferenceButton,
+                  selectedPreferences.includes("Experience")
+                    ? styles.selected
+                    : {},
+                ]}
+                onPress={() => togglePreference("Experience")}
+              >
+                <Text>Experience</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={[
+                  styles.preferenceButton,
+                  selectedPreferences.includes("Donation")
+                    ? styles.selected
+                    : {},
+                ]}
+                onPress={() => togglePreference("Donation")}
+              >
+                <Text>Donation</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={styles.pickerContainer}>
+              <Text>Gift Cost</Text>
+              <TextInput
+                placeholder="Gift Cost"
+                style={styles.input}
+                value={giftCost}
+                onChangeText={setGiftCost}
+              />
+            </View>
+          </View>
         </View>
-      </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => {
+            router.push("/add-tags");
+          }}
+        >
+          <View style={styles.button}>
+            <Text style={styles.buttonText}>Continue to add tags</Text>
+          </View>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
@@ -167,15 +190,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     padding: 20,
+    width: "70%",
+    alignSelf: "center",
   },
   buttonText: {
     color: "white",
   },
   container: {
-    flex: 1,
-    padding: 20,
     backgroundColor: colors.cream,
-    paddingTop: 60,
+
+    flex: 1,
   },
   photoPlaceholder: {
     width: 100,
@@ -184,26 +208,22 @@ const styles = StyleSheet.create({
     backgroundColor: "#E0E0E0",
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 20,
   },
   input: {
     borderWidth: 1,
     borderColor: "#E0E0E0",
     padding: 10,
-    marginVertical: 10,
     backgroundColor: colors.brightWhite,
   },
   pickerContainer: {
     borderWidth: 1,
     borderColor: "#E0E0E0",
     padding: 10,
-    marginVertical: 10,
   },
   genderContainer: {
     borderWidth: 1,
     borderColor: "#E0E0E0",
     padding: 10,
-    marginVertical: 10,
     flexDirection: "row",
     gap: 20,
     alignItems: "center",
@@ -211,11 +231,9 @@ const styles = StyleSheet.create({
   checkboxContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginVertical: 10,
   },
   genderButton: {
     padding: 10,
-    margin: 5,
     borderWidth: 1,
     borderColor: "#E0E0E0",
     borderRadius: 5,
@@ -226,9 +244,17 @@ const styles = StyleSheet.create({
   },
   preferenceButton: {
     padding: 10,
-    margin: 5,
     borderWidth: 1,
     borderColor: "#E0E0E0",
     borderRadius: 5,
+  },
+  inputContainer: {
+    flexDirection: "column",
+    paddingHorizontal: 20,
+    gap: 6,
+  },
+  topContainer: {
+    flexDirection: "column",
+    justifyContent: "space-between",
   },
 });

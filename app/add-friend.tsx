@@ -11,12 +11,13 @@ export default function Page() {
     <>
       <Stack.Screen
         options={{
-          headerShown: false,
+          headerShown: true,
           headerTitle: "Add Friend",
+          header: () => <Header />,
         }}
       />
-      <View style={{ height: 40, backgroundColor: colors.cream }}></View>
-      <Header />
+      {/* <View style={{ height: 40, backgroundColor: colors.cream }}></View> */}
+      {/* <Header /> */}
 
       <CreateFriendsProfile />
     </>
