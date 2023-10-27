@@ -1,4 +1,6 @@
 import sendRequest from "./send-request";
+import { getToken } from "./users-service";
+
 const BASE_URL = "http://localhost:3010/api/friends";
 
 export async function retrieveFriends() {
@@ -16,4 +18,20 @@ export async function retrieveFriend(id) {
 export async function createFriend(friendData) {
     const newFriend = await sendRequest(`${BASE_URL}/create`, "POST", friendData);
     return newFriend;
-  }
+}
+
+export async function uploadPhoto(id, file) {
+    const formData = new FormData();
+    formData.append('photo', file);
+    const token = getToken();
+
+    const response = await fetch(`${BASE_URL}/${id}/upload`, {
+        method: 'POST',
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+    });
+    console.log('this is the response: ', response)
+    if (response.status === 200) return response;
+}
