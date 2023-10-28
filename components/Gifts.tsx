@@ -65,9 +65,21 @@ const giftData = {
   ],
 };
 
-const Gifts = ({ isExplore }) => {
+interface GiftProps {
+  isExplore: boolean;
+}
+
+interface GiftItemProps {
+  item: {
+    gift_name: string;
+    gift_price: string | number;
+    id: string;
+  };
+}
+
+const Gifts = ({ isExplore }: GiftProps) => {
   const router = useRouter();
-  const GiftItem = ({ item }) => (
+  const GiftItem = ({ item }: GiftItemProps) => (
     <View style={styles.itemContainer}>
       <View>
         <Image

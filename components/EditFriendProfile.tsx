@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   TextInput,
@@ -87,6 +87,8 @@ export default function EditFriendProfile() {
     }
     if (friendData) router.replace("/");
   };
+
+  // useEffect()
 
   return (
     <View style={styles.container}>
