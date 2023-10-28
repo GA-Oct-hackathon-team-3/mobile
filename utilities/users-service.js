@@ -20,7 +20,9 @@ export async function getToken() {
   if (!token) return null;
   const payload = JSON.parse(atob(token.split(".")[1]));
   if (payload.exp < Date.now() / 1000) {
-    localStorage.removeItem("token");
+    Platform.OS === "web"
+      ? localStorage.removeItem("token")
+      : await SecureStore.deleteItemAsync("token");
     return null;
   }
   return token;

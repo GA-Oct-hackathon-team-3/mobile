@@ -42,6 +42,7 @@ export default function UserProfileScreen() {
             : "https://i.imgur.com/hCwHtRc.png"
         }?timestamp=${uniqueTimestamp}`;
         setFriend(friendData);
+        console.log(friendData);
         setDobObject(splitDOB(friendData.dob));
       }
     } catch (error) {

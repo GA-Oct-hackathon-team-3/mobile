@@ -3,6 +3,7 @@ import { Platform } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { useRouter, useSegments } from "expo-router";
 import { getOnboarded } from "../utilities/storage";
+import { getToken } from "../utilities/users-service";
 
 const AuthContext = createContext(null);
 
@@ -44,13 +45,13 @@ export const AuthProvider = ({ children }) => {
 
   const getUserToken = async () => {
     if (Platform.OS === "web") {
-      let token = localStorage.getItem("token");
+      let token = await getToken();
       if (token) {
         setToken(token);
         getOnboarded();
       }
     } else {
-      let token = await SecureStore.getItemAsync("token");
+      let token = await getToken();
       if (token) {
         setToken(token);
         getOnboarded();

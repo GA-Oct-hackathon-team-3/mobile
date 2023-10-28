@@ -8,6 +8,7 @@ import {
 } from "react-native-calendars";
 
 import { names } from "../constants/Data";
+import { colors } from "../constants/Theme";
 
 interface State {
   items?: AgendaSchedule;
@@ -58,6 +59,7 @@ export default class Calendar extends Component<State> {
         renderEmptyDate={this.renderEmptyDate}
         rowHasChanged={this.rowHasChanged}
         showClosingKnob={true}
+
         // markingType={'period'}
         // markedDates={{
         //    '2017-05-08': {textColor: '#43515c'},

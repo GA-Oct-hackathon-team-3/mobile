@@ -20,6 +20,29 @@ import AddButton from "./AddButton";
 // import { Skeleton } from "moti/skeleton";
 import ToastManager, { Toast } from "toastify-react-native";
 
+const itemColors = [
+  "#FE6797",
+  "#418BFA",
+  "#EDB600",
+  "#FA7F39",
+  "#53CF85",
+  "#FE6797",
+  "#418BFA",
+  "#EDB600",
+  "#FA7F39",
+  "#53CF85",
+  "#FE6797",
+  "#418BFA",
+  "#EDB600",
+  "#FA7F39",
+  "#53CF85",
+  "#FE6797",
+  "#418BFA",
+  "#EDB600",
+  "#FA7F39",
+  "#53CF85",
+];
+
 export default function MainScreen() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
@@ -32,6 +55,7 @@ export default function MainScreen() {
   const { width, height } = useWindowDimensions();
   const [showNext, setShowNext] = useState(false);
   const [showReminders, setShowReminders] = useState(true);
+  const [data, setData] = useState([]);
 
   const createSortedBirthdays = () => {};
 
@@ -40,6 +64,7 @@ export default function MainScreen() {
       try {
         const friends = await friendsService.retrieveFriends();
         setFilteredData(friends);
+        setData(friends);
       } catch (error) {
         console.error("Error fetching friends: ", error);
         setFilteredData(null);
@@ -55,7 +80,7 @@ export default function MainScreen() {
         setShowTutorial(true);
       }
     }, 1000);
-  }, [filteredData]);
+  }, []);
 
   const showToasts = () => {
     Toast.success("Friend Created");
@@ -85,20 +110,20 @@ export default function MainScreen() {
   }
 
   const handleSearch = (query) => {
-    // setSearchQuery(query);
-    // if (query) {
-    //   console.log(query, "THIS IS THE QUERY");
-    //   setFilteredData(
-    //     DATA.filter((item) =>
-    //       item.first_name.toLowerCase().includes(query.toLowerCase())
-    //     )
-    //   );
-    // } else {
-    //   setFilteredData(DATA);
-    // }
+    setSearchQuery(query);
+    if (query) {
+      console.log(query, "THIS IS THE QUERY");
+      setFilteredData(
+        data.filter((item) =>
+          item.name.toLowerCase().includes(query.toLowerCase())
+        )
+      );
+    } else {
+      setFilteredData(data);
+    }
   };
 
-  const Item = ({ name, last_name, dob, _id }) => (
+  const Item = ({ name, last_name, dob, _id, index }) => (
     <TouchableOpacity
       onPress={() => {
         console.log("THIS IS THE ID: ", _id);
@@ -107,7 +132,7 @@ export default function MainScreen() {
       key={_id}
       style={{ marginTop: 40 }}
     >
-      <View style={styles.background}>
+      <View style={[styles.background, { backgroundColor: itemColors[index] }]}>
         <View style={{ height: 90 }}></View>
         <View
           style={{
@@ -139,16 +164,22 @@ export default function MainScreen() {
       <View style={styles.item}>
         <View style={styles.itemTextContainer}>
           <View style={{ flexDirection: "row", gap: 10 }}>
-            <FontAwesome name="birthday-cake" size={30} color="purple" />
+            <FontAwesome
+              name="birthday-cake"
+              size={30}
+              color={itemColors[index]}
+            />
             <View style={{ flexDirection: "column" }}>
               <Text style={styles.name}>{name}</Text>
-              <Text style={styles.birthday}>{formatDate(dob)}</Text>
+              <Text style={[styles.birthday]}>{formatDate(dob)}</Text>
             </View>
           </View>
         </View>
         <View style={styles.card}>
           <View style={styles.content}>
-            <Text style={styles.days}>{daysUntilBirthday(dob)}</Text>
+            <Text style={[styles.days, { color: itemColors[index] }]}>
+              {daysUntilBirthday(dob)}
+            </Text>
             <Text style={styles.label}>Days Left</Text>
           </View>
         </View>
@@ -217,15 +248,19 @@ export default function MainScreen() {
       )}
       <View>
         <Text
-          style={{ fontFamily: "Helvetica Neue", fontSize: 24, paddingTop: 40 }}
+          style={{
+            fontFamily: "Helvetica Neue",
+            fontSize: 24,
+            paddingTop: showReminders ? 40 : 20,
+          }}
         >
-          This Week
+          Upcoming
         </Text>
       </View>
       <FlatList
         style={{ zIndex: 99 }}
         data={filteredData}
-        renderItem={({ item }) => <Item {...item} />}
+        renderItem={({ item, index }) => <Item {...item} index={index} />}
         keyExtractor={(item) => item._id}
       />
 
@@ -267,7 +302,7 @@ export default function MainScreen() {
                       "Add a new friend profile\nto get personalized\ngift ideas."
                     }
                   </Text>
-                  <TouchableOpacity onPress={() => setShowTutorial(true)}>
+                  <TouchableOpacity onPress={() => setShowTutorial(false)}>
                     <Text
                       style={{
                         textDecorationLine: "underline",
@@ -336,7 +371,7 @@ export default function MainScreen() {
                   alignItems: "center",
                 }}
               >
-                <Text style={[styles.welcomeText, { fontSize: 24 }]}>
+                <Text style={[{ fontSize: 24, fontFamily: "PilcrowBold" }]}>
                   Welcome to your Presently Dashboard!
                 </Text>
                 <View>
@@ -412,7 +447,6 @@ const styles = StyleSheet.create({
     letterSpacing: -0.72,
   },
   birthday: {
-    color: "#000",
     fontSize: 16,
     fontStyle: "normal",
     fontWeight: "400",
