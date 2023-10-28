@@ -14,10 +14,9 @@ import { useRouter } from "expo-router";
 import { colors } from "../constants/Theme";
 import TitleBack from "./TitleBack";
 
-import * as friendsService from '../utilities/friends-service';
+import * as friendsService from "../utilities/friends-service";
 
 import { FontAwesome } from "@expo/vector-icons";
-
 
 export default function CreateFriendsProfile() {
   const [formInput, setFormInput] = useState({
@@ -26,7 +25,7 @@ export default function CreateFriendsProfile() {
     gender: "",
     location: "",
     giftPreferences: [],
-    giftCost: ""
+    giftCost: "",
   });
   const { width, height } = useWindowDimensions;
   const [selectedGender, setSelectedGender] = useState("");
@@ -62,29 +61,29 @@ export default function CreateFriendsProfile() {
     }
   };
 
-  const handleChange = (fieldName : string, value : string) => {
+  const handleChange = (fieldName: string, value: string) => {
     setFormInput((prev) => ({
-        ...prev,
-        [fieldName]: value
+      ...prev,
+      [fieldName]: value,
     }));
-  }
+  };
 
   const handleSubmit = async () => {
     const data = {
-        ...formInput,
-        giftPreferences: selectedPreferences.map((p) => p.toLowerCase())
-    }
+      ...formInput,
+      giftPreferences: selectedPreferences.map((p) => p.toLowerCase()),
+    };
     const friendData = await friendsService.createFriend(data);
-    if (image) {
-      try {
-          const response = await friendsService.uploadPhoto(friendData._id, uploadedPhoto);
-          if (response!.ok && friendData) router.replace("/");
-      } catch (error) {
-          console.log(error);
-      }
-    }
-    if (friendData) router.replace('/');
-  }
+    // if (image) {
+    //   try {
+    //       const response = await friendsService.uploadPhoto(friendData._id, uploadedPhoto);
+    //       if (response!.ok && friendData) router.replace("/");
+    //   } catch (error) {
+    //       console.log(error);
+    //   }
+    // }
+    if (friendData) router.replace("/");
+  };
 
   return (
     <View style={styles.container}>
@@ -114,9 +113,19 @@ export default function CreateFriendsProfile() {
           </View>
           <View style={styles.inputContainer}>
             <Text>Name</Text>
-            <TextInput placeholder="Name" style={styles.input} value={formInput.name} onChangeText={text => handleChange('name', text)}/>
+            <TextInput
+              placeholder="Name"
+              style={styles.input}
+              value={formInput.name}
+              onChangeText={(text) => handleChange("name", text)}
+            />
             <Text>Date of Birth</Text>
-            <TextInput placeholder="yyyy-mm-dd" style={styles.input} value={formInput.dob} onChangeText={text => handleChange('dob', text)}/>
+            <TextInput
+              placeholder="yyyy-mm-dd"
+              style={styles.input}
+              value={formInput.dob}
+              onChangeText={(text) => handleChange("dob", text)}
+            />
             <Text>Gender</Text>
             <View style={styles.genderContainer}>
               <TouchableOpacity
@@ -124,9 +133,9 @@ export default function CreateFriendsProfile() {
                   styles.genderButton,
                   selectedGender === "Male" ? styles.selected : {},
                 ]}
-                onPress={() =>{
-                    setSelectedGender('Male');
-                    handleChange('gender', 'male');
+                onPress={() => {
+                  setSelectedGender("Male");
+                  handleChange("gender", "male");
                 }}
               >
                 <Text>Male</Text>
@@ -138,8 +147,8 @@ export default function CreateFriendsProfile() {
                   selectedGender === "Female" ? styles.selected : {},
                 ]}
                 onPress={() => {
-                    setSelectedGender('Female');
-                    handleChange('gender', 'female')
+                  setSelectedGender("Female");
+                  handleChange("gender", "female");
                 }}
               >
                 <Text>Female</Text>
@@ -151,8 +160,8 @@ export default function CreateFriendsProfile() {
                   selectedGender === "Other" ? styles.selected : {},
                 ]}
                 onPress={() => {
-                    setSelectedGender('Other');
-                    handleChange('gender', 'other')
+                  setSelectedGender("Other");
+                  handleChange("gender", "other");
                 }}
               >
                 <Text>Other</Text>
@@ -160,7 +169,12 @@ export default function CreateFriendsProfile() {
             </View>
 
             <Text>Location</Text>
-            <TextInput placeholder="Location" style={styles.input} value={formInput.location} onChangeText={text => handleChange('location', text)} />
+            <TextInput
+              placeholder="Location"
+              style={styles.input}
+              value={formInput.location}
+              onChangeText={(text) => handleChange("location", text)}
+            />
 
             <Text>Gift type Preferences (choose all that apply)</Text>
             <View style={styles.checkboxContainer}>
@@ -173,7 +187,7 @@ export default function CreateFriendsProfile() {
                     : {},
                 ]}
                 onPress={() => togglePreference("Present")}
-                >
+              >
                 <Text>Present</Text>
               </TouchableOpacity>
 
@@ -208,7 +222,7 @@ export default function CreateFriendsProfile() {
                 placeholder="Gift Cost"
                 style={styles.input}
                 value={formInput.giftCost}
-                onChangeText={text => handleChange('giftCost', text)}
+                onChangeText={(text) => handleChange("giftCost", text)}
               />
             </View>
           </View>
@@ -220,7 +234,9 @@ export default function CreateFriendsProfile() {
           }}
         >
           <View style={styles.button}>
-            <Text style={styles.buttonText} onPress={handleSubmit}>Continue to add tags</Text>
+            <Text style={styles.buttonText} onPress={handleSubmit}>
+              Continue to add tags
+            </Text>
           </View>
         </TouchableOpacity>
       </View>
