@@ -101,7 +101,7 @@ export default function UserProfileScreen() {
           </Text>
           <Text style={styles.subText}>Age</Text>
         </View>
-        <TouchableOpacity onPress={() => router.push(`/users/update`)}>
+        <TouchableOpacity onPress={() => router.push(`/users/${id}/update`)}>
           <Image
             source={require("../assets/images/pencil.png")}
             style={{ height: 20, width: 20, right: -40 }}

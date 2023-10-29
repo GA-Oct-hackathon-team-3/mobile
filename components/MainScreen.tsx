@@ -19,6 +19,10 @@ import { daysUntilBirthday } from "../utilities/helpers";
 import AddButton from "./AddButton";
 // import { Skeleton } from "moti/skeleton";
 import ToastManager, { Toast } from "toastify-react-native";
+import { Skeleton } from "moti/skeleton";
+import BirthdaySkeleton from "./skeletons/BirthdaySkeleton";
+import ReminderSkeleton from "./skeletons/ReminderSkeleton";
+import SearchBarSkeleton from "./skeletons/SearchBarSkeleton";
 
 const itemColors = [
   "#FE6797",
@@ -56,8 +60,7 @@ export default function MainScreen() {
   const [showNext, setShowNext] = useState(false);
   const [showReminders, setShowReminders] = useState(true);
   const [data, setData] = useState([]);
-
-  const createSortedBirthdays = () => {};
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchFriends = async () => {
@@ -75,12 +78,20 @@ export default function MainScreen() {
   }, []);
 
   useEffect(() => {
-    setTimeout(() => {
-      if (!onboarded) {
-        setShowTutorial(true);
-      }
-    }, 1000);
+    // setTimeout(() => {
+    //   if (!onboarded) {
+    //     setShowTutorial(true);
+    //   }
+    // }, 1000);
   }, []);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setIsLoading(false);
+    }, 5000);
+  }, []);
+
+  const colorMode = "light";
 
   const showToasts = () => {
     Toast.success("Friend Created");
@@ -190,84 +201,110 @@ export default function MainScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.searchContainer}>
-        <TextInput
-          style={styles.searchBar}
-          value={searchQuery}
-          onChangeText={handleSearch}
-          placeholder="Search by name, data, month..."
-        />
+        {isLoading ? (
+          <SearchBarSkeleton />
+        ) : (
+          <TextInput
+            style={styles.searchBar}
+            value={searchQuery}
+            onChangeText={handleSearch}
+            placeholder="Search by name, data, month..."
+          />
+        )}
       </View>
 
       <ToastManager />
 
-      {showReminders && (
-        <View style={styles.remindersContainer}>
-          <View style={styles.peopleContainer}>
-            <Image
-              source={require("../assets/images/man.png")}
-              style={{ width: 80, height: 180 }}
-            />
-            <Image
-              source={require("../assets/images/woman.png")}
-              style={{ width: 60, height: 160 }}
-            />
-          </View>
-
-          <View style={styles.remindTextContainer}>
-            <TouchableOpacity
-              onPress={() => setShowReminders(false)}
-              style={{
-                position: "absolute",
-                top: -25,
-                right: -12,
-                height: 30,
-                width: 30,
-                justifyContent: "center",
-                alignItems: "center",
-                backgroundColor: colors.green,
-                borderRadius: 20,
-              }}
-            >
+      {showReminders &&
+        (isLoading ? (
+          <ReminderSkeleton />
+        ) : (
+          <View style={styles.remindersContainer}>
+            <View style={styles.peopleContainer}>
               <Image
-                source={require("../assets/images/close.png")}
-                style={{ height: 18, width: 18 }}
+                source={require("../assets/images/man.png")}
+                style={{ width: 80, height: 180 }}
               />
-            </TouchableOpacity>
-            <Text
-              style={{
-                fontFamily: "Helvetica Neue",
-                fontSize: 24,
-                paddingTop: 10,
-                fontWeight: "300",
-              }}
-            >
-              Your reminders will show up here!
-            </Text>
-          </View>
-        </View>
-      )}
-      <View>
-        <Text
-          style={{
-            fontFamily: "Helvetica Neue",
-            fontSize: 24,
-            paddingTop: showReminders ? 40 : 20,
-          }}
-        >
-          Upcoming
-        </Text>
-      </View>
-      <FlatList
-        style={{ zIndex: 99 }}
-        data={filteredData}
-        renderItem={({ item, index }) => <Item {...item} index={index} />}
-        keyExtractor={(item) => item._id}
-      />
+              <Image
+                source={require("../assets/images/woman.png")}
+                style={{ width: 60, height: 160 }}
+              />
+            </View>
 
-      <Modal
+            <View style={styles.remindTextContainer}>
+              <TouchableOpacity
+                onPress={() => setShowReminders(false)}
+                style={{
+                  position: "absolute",
+                  top: -25,
+                  right: -12,
+                  height: 30,
+                  width: 30,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: colors.green,
+                  borderRadius: 20,
+                }}
+              >
+                <Image
+                  source={require("../assets/images/close.png")}
+                  style={{ height: 18, width: 18 }}
+                />
+              </TouchableOpacity>
+              <Text
+                style={{
+                  fontFamily: "Helvetica Neue",
+                  fontSize: 24,
+                  paddingTop: 10,
+                  fontWeight: "300",
+                }}
+              >
+                Your reminders will show up here!
+              </Text>
+            </View>
+          </View>
+        ))}
+      <View>
+        {isLoading ? (
+          <View style={{ marginTop: 20 }}>
+            <Skeleton
+              height={40}
+              width={200}
+              colorMode={colorMode}
+              radius={"square"}
+            />
+          </View>
+        ) : (
+          <Text
+            style={{
+              fontFamily: "Helvetica Neue",
+              fontSize: 24,
+              paddingTop: showReminders ? 40 : 20,
+            }}
+          >
+            Upcoming
+          </Text>
+        )}
+      </View>
+
+      {isLoading ? (
+        <>
+          <BirthdaySkeleton />
+          <BirthdaySkeleton />
+          <BirthdaySkeleton />
+        </>
+      ) : (
+        <FlatList
+          style={{ zIndex: 99 }}
+          data={filteredData}
+          renderItem={({ item, index }) => <Item {...item} index={index} />}
+          keyExtractor={(item) => item._id}
+        />
+      )}
+      {/* <Modal
         animationType="fade"
         transparent={true}
-        visible={showTutorial}
+        visible={!showTutorial}
         onRequestClose={() => setShowTutorial(false)}
       >
         <TouchableOpacity
@@ -411,7 +448,48 @@ export default function MainScreen() {
             </View>
           )}
         </TouchableOpacity>
-      </Modal>
+      </Modal> */}
+      {isLoading ? (
+        <View style={styles.modalBackground}>
+          <View style={styles.skelButtonContainer}>
+            <View
+              style={{
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 12,
+              }}
+            >
+              <Skeleton
+                width={80}
+                height={60}
+                colorMode="light"
+                radius={"square"}
+              />
+            </View>
+          </View>
+        </View>
+      ) : (
+        <TouchableOpacity
+          onPress={() => router.push("/add-friend")}
+          style={styles.floatingButtonContainer}
+        >
+          <View
+            style={{
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: 12,
+            }}
+          >
+            <Image
+              source={require("../assets/images/plus.png")}
+              style={{ height: 24, width: 24 }}
+            />
+            <Text style={styles.addText}>Add Friend</Text>
+          </View>
+        </TouchableOpacity>
+      )}
     </View>
   );
 }
@@ -607,7 +685,7 @@ const styles = StyleSheet.create({
   },
   floatingButtonContainer: {
     position: "absolute",
-    bottom: 80,
+    bottom: 20,
     right: 0,
     width: 120,
     height: 80,
@@ -617,5 +695,19 @@ const styles = StyleSheet.create({
     borderColor: "white",
     borderWidth: 2,
     backgroundColor: "#53CF85",
+    zIndex: 99,
+  },
+  skelButtonContainer: {
+    position: "absolute",
+    bottom: 100,
+    right: 0,
+    width: 120,
+    height: 80,
+    borderRadius: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    borderColor: "white",
+    borderWidth: 2,
+    backgroundColor: colors.brightWhite,
   },
 });

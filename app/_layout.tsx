@@ -13,6 +13,7 @@ import { Pressable, View, useColorScheme, Image, Text } from "react-native";
 import Colors from "../constants/Colors";
 import { colors } from "../constants/Theme";
 import { AuthProvider } from "../components/AuthContext";
+import "react-native-gesture-handler";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -36,6 +37,9 @@ export default function RootLayout() {
 
     ...FontAwesome.font,
   });
+  // if (Platform.OS === 'web') {
+  //   global._frameTimestamp = null
+  // }
 
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {

@@ -11,7 +11,7 @@ export default function TabOneScreen() {
   return (
     <>
       <MainScreen />
-      <TouchableOpacity
+      {/* <TouchableOpacity
         onPress={() => router.push("/add-friend")}
         style={styles.floatingButtonContainer}
       >
@@ -29,7 +29,7 @@ export default function TabOneScreen() {
           />
           <Text style={styles.addText}>Add Friend</Text>
         </View>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </>
   );
 }

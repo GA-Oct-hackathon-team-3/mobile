@@ -15,8 +15,21 @@ import { colors } from "../constants/Theme";
 import TitleBack from "./TitleBack";
 
 import * as friendsService from "../utilities/friends-service";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 import { FontAwesome } from "@expo/vector-icons";
+
+function convertDateFormat(dateString) {
+  let date = new Date(dateString);
+  let year = date.getUTCFullYear();
+
+  // Months in JavaScript are 0-indexed, so January is 0 and December is 11
+  // Adding 1 to get the month in the format 01-12
+  let month = ("0" + (date.getUTCMonth() + 1)).slice(-2);
+  let day = ("0" + date.getUTCDate()).slice(-2);
+
+  return `${year}-${month}-${day}`;
+}
 
 export default function CreateFriendsProfile() {
   const [formInput, setFormInput] = useState({
@@ -27,15 +40,32 @@ export default function CreateFriendsProfile() {
     giftPreferences: [],
     giftCost: "",
   });
-  const { width, height } = useWindowDimensions;
+  const { width, height } = useWindowDimensions();
   const [selectedGender, setSelectedGender] = useState("");
   const [selectedPreferences, setSelectedPreferences] = useState([]);
   const [uploadedPhoto, setUploadedPhoto] = useState(null);
   const router = useRouter();
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [birthday, setBirthday] = useState(new Date().toDateString());
 
   const [image, setImage] = useState(null);
 
   const currentDate = new Date();
+
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+  const handleConfirm = (date) => {
+    console.warn("A date has been picked: ", date);
+    setBirthday(date.toDateString());
+    setFormInput({ ...formInput, dob: convertDateFormat(date) });
+    hideDatePicker();
+  };
 
   const togglePreference = (preference) => {
     if (selectedPreferences.includes(preference)) {
@@ -82,7 +112,7 @@ export default function CreateFriendsProfile() {
     //       console.log(error);
     //   }
     // }
-    if (friendData) router.replace("/");
+    if (friendData) router.push("/add-tags");
   };
 
   return (
@@ -120,12 +150,50 @@ export default function CreateFriendsProfile() {
               onChangeText={(text) => handleChange("name", text)}
             />
             <Text>Date of Birth</Text>
-            <TextInput
+            <DateTimePickerModal
+              isVisible={isDatePickerVisible}
+              mode="date"
+              onConfirm={handleConfirm}
+              onCancel={hideDatePicker}
+            />
+
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                backgroundColor: colors.brightWhite,
+                padding: 10,
+                borderRadius: 5,
+                borderWidth: 1,
+                borderColor: "#E0E0E0",
+              }}
+            >
+              <Text>{birthday}</Text>
+              <TouchableOpacity
+                onPress={showDatePicker}
+                style={{
+                  backgroundColor: colors.orange,
+                  padding: 5,
+                  borderRadius: 5,
+                }}
+              >
+                <Text
+                  style={{
+                    fontFamily: "PilcrowMedium",
+                    color: colors.brightWhite,
+                  }}
+                >
+                  Set Birthday
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* <TextInput
               placeholder="yyyy-mm-dd"
               style={styles.input}
               value={formInput.dob}
               onChangeText={(text) => handleChange("dob", text)}
-            />
+            /> */}
             <Text>Gender</Text>
             <View style={styles.genderContainer}>
               <TouchableOpacity

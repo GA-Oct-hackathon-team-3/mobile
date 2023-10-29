@@ -16,22 +16,31 @@ export async function retrieveFriend(id) {
 }
 
 export async function createFriend(friendData) {
-    const newFriend = await sendRequest(`${BASE_URL}/create`, "POST", friendData);
-    return newFriend;
+  const newFriend = await sendRequest(`${BASE_URL}/create`, "POST", friendData);
+  return newFriend;
+}
+
+export async function updateFriend(id, friendInput) {
+  const response = await sendRequest(
+    `${BASE_URL}/${id}/update`,
+    "PUT",
+    friendInput
+  );
+  return response;
 }
 
 export async function uploadPhoto(id, file) {
-    const formData = new FormData();
-    formData.append('photo', file);
-    const token = getToken();
+  const formData = new FormData();
+  formData.append("photo", file);
+  const token = getToken();
 
-    const response = await fetch(`${BASE_URL}/${id}/upload`, {
-        method: 'POST',
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
-        body: formData,
-    });
-    console.log('this is the response: ', response)
-    if (response.status === 200) return response;
+  const response = await fetch(`${BASE_URL}/${id}/upload`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+  console.log("this is the response: ", response);
+  if (response.status === 200) return response;
 }

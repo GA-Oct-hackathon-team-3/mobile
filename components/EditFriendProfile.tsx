@@ -8,18 +8,39 @@ import {
   TouchableOpacity,
   useWindowDimensions,
   Image,
+  ActivityIndicator,
+  Platform,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { colors } from "../constants/Theme";
 import TitleBack from "./TitleBack";
+import { UserProfile } from "../constants/interfaces";
+import ToastManager, { Toast } from "toastify-react-native";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 import * as friendsService from "../utilities/friends-service";
 
 import { FontAwesome } from "@expo/vector-icons";
 
+function capitalizeFirstLetter(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function convertDateFormat(dateString) {
+  let date = new Date(dateString);
+  let year = date.getUTCFullYear();
+
+  // Months in JavaScript are 0-indexed, so January is 0 and December is 11
+  // Adding 1 to get the month in the format 01-12
+  let month = ("0" + (date.getUTCMonth() + 1)).slice(-2);
+  let day = ("0" + date.getUTCDate()).slice(-2);
+
+  return `${year}-${month}-${day}`;
+}
+
 export default function EditFriendProfile() {
-  const [formInput, setFormInput] = useState({
+  const [formInput, setFormInput] = useState<UserProfile>({
     name: "",
     dob: "",
     gender: "",
@@ -31,11 +52,64 @@ export default function EditFriendProfile() {
   const [selectedGender, setSelectedGender] = useState("");
   const [selectedPreferences, setSelectedPreferences] = useState([]);
   const [uploadedPhoto, setUploadedPhoto] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [friend, setFriend] = useState(null);
   const router = useRouter();
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [birthday, setBirthday] = useState(new Date().toDateString());
 
   const [image, setImage] = useState(null);
 
   const currentDate = new Date();
+
+  const { id } = useLocalSearchParams();
+
+  const showToasts = () => {
+    Toast.success("Profile Updated");
+  };
+
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+  const handleConfirm = (date) => {
+    console.warn("A date has been picked: ", date);
+    setBirthday(date.toDateString());
+    setFormInput({ ...formInput, dob: convertDateFormat(date) });
+    hideDatePicker();
+  };
+
+  const fetchFriend = async () => {
+    try {
+      const friendData = await friendsService.retrieveFriend(id);
+      if (friendData) {
+        const uniqueTimestamp = Date.now();
+        friendData.photo = `${
+          friendData.photo
+            ? friendData.photo
+            : "https://i.imgur.com/hCwHtRc.png"
+        }?timestamp=${uniqueTimestamp}`;
+        setFriend(friendData);
+        console.log(friendData);
+        setFormInput(friendData);
+        setSelectedGender(capitalizeFirstLetter(friendData.gender));
+
+        if (friendData.giftPreferences.length > 0) {
+          let giftPrefs = friendData.giftPreferences.map((p) =>
+            capitalizeFirstLetter(p)
+          );
+          setSelectedPreferences(giftPrefs);
+        }
+        setImage(friendData.photo);
+      }
+    } catch (error) {
+      console.error("Error fetching friend: ", error);
+    }
+  };
 
   const togglePreference = (preference) => {
     if (selectedPreferences.includes(preference)) {
@@ -69,29 +143,31 @@ export default function EditFriendProfile() {
   };
 
   const handleSubmit = async () => {
+    setLoading(true);
     const data = {
       ...formInput,
       giftPreferences: selectedPreferences.map((p) => p.toLowerCase()),
     };
-    const friendData = await friendsService.createFriend(data);
-    if (image) {
-      try {
-        const response = await friendsService.uploadPhoto(
-          friendData._id,
-          uploadedPhoto
-        );
-        if (response!.ok && friendData) router.replace("/");
-      } catch (error) {
-        console.log(error);
-      }
+
+    try {
+      await friendsService.updateFriend(id, data);
+    } catch (error) {
+      console.error("Error updating friend: ", error);
+    } finally {
+      setLoading(false);
+      showToasts();
     }
-    if (friendData) router.replace("/");
+
+    // if (friendData) router.replace("/");
   };
 
-  // useEffect()
+  useEffect(() => {
+    fetchFriend();
+  }, []);
 
   return (
     <View style={styles.container}>
+      <ToastManager />
       <TitleBack title={"Edit Friend Profile"} />
       <View
         style={{
@@ -125,12 +201,43 @@ export default function EditFriendProfile() {
               onChangeText={(text) => handleChange("name", text)}
             />
             <Text style={styles.text}>Date of Birth</Text>
-            <TextInput
-              placeholder="yyyy-mm-dd"
-              style={styles.input}
-              value={formInput.dob}
-              onChangeText={(text) => handleChange("dob", text)}
+            <DateTimePickerModal
+              isVisible={isDatePickerVisible}
+              mode="date"
+              onConfirm={handleConfirm}
+              onCancel={hideDatePicker}
             />
+
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                backgroundColor: colors.brightWhite,
+                padding: 10,
+                borderRadius: 5,
+                borderWidth: 1,
+                borderColor: "#E0E0E0",
+              }}
+            >
+              <Text>{convertDateFormat(formInput.dob)}</Text>
+              <TouchableOpacity
+                onPress={showDatePicker}
+                style={{
+                  backgroundColor: colors.orange,
+                  padding: 5,
+                  borderRadius: 5,
+                }}
+              >
+                <Text
+                  style={{
+                    fontFamily: "PilcrowMedium",
+                    color: colors.brightWhite,
+                  }}
+                >
+                  Set Birthday
+                </Text>
+              </TouchableOpacity>
+            </View>
             <Text style={styles.text}>Gender</Text>
             <View style={styles.genderContainer}>
               <TouchableOpacity
@@ -237,13 +344,22 @@ export default function EditFriendProfile() {
 
         <TouchableOpacity
           onPress={() => {
-            router.push("/add-tags");
+            handleSubmit();
+            // router.replace("/");
           }}
         >
           <View style={styles.button}>
-            <Text style={styles.buttonText} onPress={handleSubmit}>
-              Confirm
-            </Text>
+            {loading ? (
+              <ActivityIndicator
+                animating={loading}
+                size="large"
+                color={colors.brightWhite}
+              />
+            ) : (
+              <Text style={styles.buttonText} onPress={handleSubmit}>
+                Update
+              </Text>
+            )}
           </View>
         </TouchableOpacity>
       </View>
