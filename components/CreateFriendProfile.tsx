@@ -112,7 +112,7 @@ export default function CreateFriendsProfile() {
     //       console.log(error);
     //   }
     // }
-    if (friendData) router.push("/add-tags");
+    if (friendData) router.push(`/users/${friendData._id}/add-tags`);
   };
 
   return (

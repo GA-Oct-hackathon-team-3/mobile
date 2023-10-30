@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -9,11 +9,18 @@ import {
   Button,
   Image,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import TitleBack from "./TitleBack";
 import { colors } from "../constants/Theme";
+import * as tagsService from "../utilities/tags-service";
+import * as friendsService from "../utilities/friends-service";
+import { useNavigation } from "expo-router";
 
 export default function AddTags() {
+  const params = useLocalSearchParams();
+  const navigation = useNavigation();
+
+  console.log(params, "ADD TAG PARAMS");
   const [searchTag, setSearchTag] = useState("");
   const [addedTags, setAddedTags] = useState([
     "Pokemon",
@@ -36,8 +43,27 @@ export default function AddTags() {
       "Gaming",
     ],
   };
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
   const scrollViewRef = useRef<ScrollView>();
+  const [friend, setFriend] = useState(null);
+
+  const fetchTags = async () => {
+    const friendData = await friendsService.retrieveFriend(params.id);
+
+    console.log(friendData, "FRIEND");
+
+    setAddedTags(friendData.tags);
+    setFriend(friendData);
+  };
+
+  useEffect(() => {
+    fetchTags();
+  }, []);
+
+  useEffect(() => {
+    console.log(addedTags);
+  }, [addedTags]);
 
   const handleTagPress = (tag) => {
     if (!addedTags.includes(tag)) {
@@ -56,6 +82,26 @@ export default function AddTags() {
     // y since we want to scroll vertically, use x and the width-value if you want to scroll horizontally
     scrollViewRef.current?.scrollTo({ y: height, animated: true });
   }
+
+  const handleSubmit = async () => {
+    setLoading(true);
+
+    try {
+      addedTags.forEach(async (tag) => {
+        await tagsService.addTag(friend._id, {
+          title: tag,
+          category: "Popular",
+        });
+      });
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
+
+    router.replace("/");
+    setLoading(false);
+  };
 
   return (
     <View style={styles.container}>
@@ -146,7 +192,7 @@ export default function AddTags() {
       <View>
         <TouchableOpacity
           onPress={() => {
-            router.push("/");
+            handleSubmit();
           }}
         >
           <View style={styles.button}>

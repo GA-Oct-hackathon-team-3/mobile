@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -9,11 +9,18 @@ import {
   Button,
   Image,
 } from "react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useLocalSearchParams } from "expo-router";
 import TitleBack from "./TitleBack";
 import { colors } from "../constants/Theme";
+import * as friendsService from "../utilities/friends-service";
+import * as tagsService from "../utilities/tags-service";
+import { capitalizeFirstLetter } from "./EditFriendProfile.web";
+import ToastManager, { Toast } from "toastify-react-native";
 
 export default function EditTags() {
+  const params = useLocalSearchParams();
+  const [loading, setLoading] = useState(false);
+
   const [searchTag, setSearchTag] = useState("");
   const [addedTags, setAddedTags] = useState([
     "Pokemon",
@@ -21,6 +28,12 @@ export default function EditTags() {
     "Chicago",
     "Male",
   ]);
+  const [friend, setFriend] = useState(null);
+
+  const showToasts = () => {
+    Toast.success("Tags Updated");
+  };
+
   const tagCategories = {
     "Popular Tags": ["Movie Buff", "Minimal", "Quirky"],
     Aesthetic: ["Grunge", "Minimal", "Quirky"],
@@ -38,6 +51,22 @@ export default function EditTags() {
   };
   const router = useRouter();
   const scrollViewRef = useRef<ScrollView>();
+
+  const fetchTags = async () => {
+    console.log(params, "PARAMS");
+    const friendData = await friendsService.retrieveFriend(params.id);
+
+    console.log(friendData, "FRIEND");
+
+    setAddedTags(
+      friendData.tags.map((tag) => capitalizeFirstLetter(tag.title))
+    );
+    setFriend(friendData);
+  };
+
+  useEffect(() => {
+    fetchTags();
+  }, []);
 
   const handleTagPress = (tag) => {
     if (!addedTags.includes(tag)) {
@@ -57,8 +86,30 @@ export default function EditTags() {
     scrollViewRef.current?.scrollTo({ y: height, animated: true });
   }
 
+  const handleSubmit = async () => {
+    setLoading(true);
+
+    try {
+      addedTags.forEach(async (tag) => {
+        await tagsService.addTag(friend._id, {
+          title: tag,
+          category: "Popular",
+        });
+      });
+      showToasts();
+    } catch (err) {
+      console.log(err);
+    } finally {
+      setLoading(false);
+    }
+
+    setLoading(false);
+  };
+
   return (
     <View style={styles.container}>
+      <ToastManager />
+
       <View style={{ flexDirection: "column", gap: 8, maxHeight: 160 }}>
         <TitleBack title={"Edit Tags"} marginLeft={-100} />
         <Text style={{ textAlign: "center" }}>
@@ -148,7 +199,7 @@ export default function EditTags() {
       <View>
         <TouchableOpacity
           onPress={() => {
-            router.push("/");
+            handleSubmit();
           }}
         >
           <View style={styles.button}>

@@ -9,6 +9,7 @@ import {
   Modal,
   useWindowDimensions,
   TouchableOpacity,
+  Pressable,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
@@ -134,69 +135,153 @@ export default function MainScreen() {
     }
   };
 
-  const Item = ({ name, last_name, dob, _id, index }) => (
-    <TouchableOpacity
-      onPress={() => {
-        console.log("THIS IS THE ID: ", _id);
-        router.push(`/users/${_id}`);
-      }}
-      key={_id}
-      style={{ marginTop: 40 }}
-    >
-      <View style={[styles.background, { backgroundColor: itemColors[index] }]}>
-        <View style={{ height: 90 }}></View>
-        <View
-          style={{
-            width: "100%",
+  const Item = ({ name, last_name, dob, _id, index }) => {
+    const [collapse, setCollapse] = useState(false);
 
-            flexDirection: "row",
-            justifyContent: "flex-end",
-            alignItems: "center",
-            gap: 10,
-          }}
-        >
-          <Text
-            style={{
-              color: "#FDF7ED",
-              fontFamily: "PilcrowRounded", // This should match the name you've set up in your React Native project.
-              fontSize: 16,
-              fontStyle: "normal",
-              // fontWeight: "700", // You might need to adjust the fontFamily instead to specify the weight.
-              lineHeight: 19, // Approximation based on "normal" in CSS.
-              letterSpacing: 0.48,
+    return (
+      <>
+        <View key={_id} style={{ marginTop: 40 }}>
+          <TouchableOpacity
+            style={styles.item}
+            onPress={() => {
+              console.log("THIS IS THE ID: ", _id);
+              router.push(`/users/${_id}`);
             }}
           >
-            View Saved Gifts
-          </Text>
-          <FontAwesome name="chevron-down" size={22} color="white" />
-        </View>
-      </View>
-
-      <View style={styles.item}>
-        <View style={styles.itemTextContainer}>
-          <View style={{ flexDirection: "row", gap: 10 }}>
-            <FontAwesome
-              name="birthday-cake"
-              size={30}
-              color={itemColors[index]}
-            />
-            <View style={{ flexDirection: "column" }}>
-              <Text style={styles.name}>{name}</Text>
-              <Text style={[styles.birthday]}>{formatDate(dob)}</Text>
+            <View style={styles.itemTextContainer}>
+              <View style={{ flexDirection: "row", gap: 10 }}>
+                <FontAwesome
+                  name="birthday-cake"
+                  size={30}
+                  color={itemColors[index]}
+                />
+                <View style={{ flexDirection: "column" }}>
+                  <Text style={styles.name}>{name}</Text>
+                  <Text style={[styles.birthday]}>{formatDate(dob)}</Text>
+                </View>
+              </View>
             </View>
-          </View>
-        </View>
-        <View style={styles.card}>
-          <View style={styles.content}>
-            <Text style={[styles.days, { color: itemColors[index] }]}>
-              {daysUntilBirthday(dob)}
+            <View style={styles.card}>
+              <View style={styles.content}>
+                <Text style={[styles.days, { color: itemColors[index] }]}>
+                  {daysUntilBirthday(dob)}
+                </Text>
+                <Text style={styles.label}>Days Left</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setCollapse(!collapse);
+            }}
+            style={{
+              borderBottomRightRadius: collapse ? 0 : 10,
+              borderBottomLeftRadius: collapse ? 0 : 10,
+              flexDirection: "row",
+              padding: 10,
+              backgroundColor: itemColors[index],
+              justifyContent: "flex-end",
+              alignItems: "center",
+              gap: 10,
+            }}
+          >
+            <Text
+              style={{
+                color: "#FDF7ED",
+                fontFamily: "PilcrowRounded", // This should match the name you've set up in your React Native project.
+                fontSize: 16,
+                fontStyle: "normal",
+                // fontWeight: "700", // You might need to adjust the fontFamily instead to specify the weight.
+                lineHeight: 19, // Approximation based on "normal" in CSS.
+                letterSpacing: 0.48,
+              }}
+            >
+              {collapse ? "Collapse" : "View Saved Gifts"}
             </Text>
-            <Text style={styles.label}>Days Left</Text>
-          </View>
+            {!collapse ? (
+              <FontAwesome name="chevron-down" size={22} color="white" />
+            ) : (
+              <FontAwesome name="chevron-up" size={22} color="white" />
+            )}
+          </TouchableOpacity>
+          {collapse && (
+            <View
+              style={{
+                height: "auto",
+                width: "auto",
+                backgroundColor: colors.brightWhite,
+                borderBottomLeftRadius: 10,
+                borderBottomRightRadius: 10,
+              }}
+            >
+              <Text
+                style={{
+                  fontFamily: "PilcrowRounded",
+                  fontSize: 18,
+                  padding: 12,
+                }}
+              >
+                Saved Gifts
+              </Text>
+              <View
+                style={{
+                  flexDirection: "row",
+                  justifyContent: "flex-start",
+                  width: "auto",
+                  gap: 8,
+                  paddingHorizontal: 20,
+                }}
+              >
+                <View>
+                  <View
+                    style={{
+                      height: 80,
+                      width: 120,
+                      backgroundColor: "white",
+                      borderWidth: 1,
+                      borderColor: "lightgray",
+                      borderRadius: 8,
+                    }}
+                  >
+                    <FontAwesome
+                      name="heart"
+                      size={24}
+                      color="black"
+                      style={{ position: "absolute", bottom: 8, right: 8 }}
+                    />
+                  </View>
+                  <Text
+                    style={{
+                      fontFamily: "PilcrowRounded",
+                      fontSize: 18,
+                      padding: 12,
+                    }}
+                  >
+                    Raiders
+                  </Text>
+                </View>
+                <View
+                  style={{
+                    flexDirection: "column",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    width: 100,
+                    height: 100,
+                  }}
+                >
+                  <Image
+                    source={require("../assets/images/blackplus.png")}
+                    style={{ height: 40, width: 40 }}
+                  />
+                  <Text>Add New</Text>
+                </View>
+              </View>
+            </View>
+          )}
         </View>
-      </View>
-    </TouchableOpacity>
-  );
+      </>
+    );
+  };
 
   return (
     <View style={styles.container}>
@@ -503,7 +588,7 @@ const styles = StyleSheet.create({
   item: {
     flexDirection: "row",
     padding: 20,
-    marginVertical: 8,
+    marginTop: 8,
     alignItems: "center",
     borderColor: "#E7E7E7",
     backgroundColor: colors.brightWhite,
@@ -523,6 +608,8 @@ const styles = StyleSheet.create({
     fontWeight: "400",
     lineHeight: 24, // Setting it to the font size, as 'normal' typically refers to around 100-120% of the font size
     letterSpacing: -0.72,
+    maxWidth: 200,
+    maxHeight: 30,
   },
   birthday: {
     fontSize: 16,

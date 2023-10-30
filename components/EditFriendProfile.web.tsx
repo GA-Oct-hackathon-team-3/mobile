@@ -23,7 +23,7 @@ import * as friendsService from "../utilities/friends-service";
 
 import { FontAwesome } from "@expo/vector-icons";
 
-function capitalizeFirstLetter(str) {
+export function capitalizeFirstLetter(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
