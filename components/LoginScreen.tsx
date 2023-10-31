@@ -26,7 +26,7 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const { width, height } = useWindowDimensions();
   const router = useRouter();
-  const { setToken } = useAuth();
+  const { setToken, setUserData } = useAuth();
 
   async function signInWithEmail() {
     setLoading(true);
@@ -36,7 +36,9 @@ export default function LoginScreen() {
       password: password,
     });
     if (response) {
-      setToken(response);
+      console.log("LOGIN RESPONSE", response);
+      setToken(response.token);
+      setUserData(response);
     }
 
     setLoading(false);

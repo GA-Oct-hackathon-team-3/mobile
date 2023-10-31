@@ -8,7 +8,7 @@ const DUMMY_PROFILE = {
   image: "https://via.placeholder.com/150", // A dummy image. Replace with a real one if needed.
 };
 // Import necessary components and libraries
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, Image } from "react-native";
 import Gifts from "./Gifts";
 import ProfileContent from "./ProfileContent";
@@ -16,13 +16,30 @@ import { ScrollView } from "react-native-gesture-handler";
 import { FontAwesome } from "@expo/vector-icons";
 import { colors } from "../constants/Theme";
 import { useAuth } from "./AuthContext";
+import * as UserAPI from "../utilities/users-api";
 
 export default function CurrentUserProfileScreen() {
   const [selected, setSelected] = useState("profile");
   const { logout } = useAuth();
 
+  const [user, setUser] = useState(null);
+
   const handleSelect = (value: string) => {
     setSelected(value);
+  };
+
+  useEffect(() => {
+    fetchCurrentUser();
+  }, []);
+
+  const fetchCurrentUser = async () => {
+    try {
+      const data = await UserAPI.getCurrentUser();
+      console.log(data, "CURRENT USER");
+      setUser(data.user);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleLogout = async () => {
@@ -53,7 +70,7 @@ export default function CurrentUserProfileScreen() {
           source={require("../assets/images/alex.jpg")}
           style={styles.avatar}
         />
-        <Text style={styles.name}>Anthony Sudol</Text>
+        <Text style={styles.name}>{user && user.name}</Text>
         <Text style={styles.subText}>Friend</Text>
       </View>
       <View style={styles.info}>
@@ -106,7 +123,7 @@ export default function CurrentUserProfileScreen() {
 
       {selected == "profile" ? (
         <ScrollView>
-          <ProfileContent />
+          <ProfileContent user={user} />
         </ScrollView>
       ) : (
         <Gifts isExplore={true} />

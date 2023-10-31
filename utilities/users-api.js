@@ -17,3 +17,7 @@ export function googleLogin(credentials) {
 export function checkToken() {
   return sendRequest(`${BASE_URL}check-token`);
 }
+
+export function getCurrentUser() {
+  return sendRequest(`${BASE_URL}users/profile/all`);
+}

@@ -16,6 +16,8 @@ import * as friendsService from "../utilities/friends-service";
 import * as tagsService from "../utilities/tags-service";
 import { capitalizeFirstLetter } from "./EditFriendProfile.web";
 import ToastManager, { Toast } from "toastify-react-native";
+import { useAuth } from "./AuthContext";
+import * as UserApi from "../utilities/users-api";
 
 export default function EditTags() {
   const params = useLocalSearchParams();
@@ -53,10 +55,9 @@ export default function EditTags() {
   const scrollViewRef = useRef<ScrollView>();
 
   const fetchTags = async () => {
-    console.log(params, "PARAMS");
-    const friendData = await friendsService.retrieveFriend(params.id);
+    console.log("PARAMS ID", params, "USER ID", userData);
 
-    console.log(friendData, "FRIEND");
+    let friendData = await friendsService.retrieveFriend(params.id);
 
     setAddedTags(
       friendData.tags.map((tag) => capitalizeFirstLetter(tag.title))

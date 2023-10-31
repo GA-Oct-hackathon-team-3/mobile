@@ -6,7 +6,7 @@ import { colors } from "../constants/Theme";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useRouter, useLocalSearchParams } from "expo-router";
 
-const ProfileContent = () => {
+const ProfileContent = ({ user }) => {
   const router = useRouter();
   const params = useLocalSearchParams();
   return (
@@ -50,7 +50,11 @@ const ProfileContent = () => {
         <View style={styles.giftTop}>
           <Text style={styles.text}>Selected Tags</Text>
           <TouchableOpacity
-            onPress={() => router.push(`/users/${params.id}/edit-tags`)}
+            onPress={() =>
+              router.push(
+                `/users/${params.id ? params.id : user._id}/edit-tags`
+              )
+            }
           >
             <Image
               source={require("../assets/images/pencil.png")}

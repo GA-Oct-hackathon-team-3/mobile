@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import {
   View,
@@ -12,6 +12,10 @@ import { colors } from "../constants/Theme";
 import TitleBack from "./TitleBack";
 import { FontAwesome } from "@expo/vector-icons";
 import { Slider } from "@miblanchard/react-native-slider";
+import { useLocalSearchParams } from "expo-router";
+import { capitalizeFirstLetter } from "./EditFriendProfile.web";
+import * as friendsService from "../utilities/friends-service";
+
 const marks = [
   {
     value: 0,
@@ -39,6 +43,32 @@ const Filters = () => {
   const { width } = useWindowDimensions();
   const [show, setShow] = useState(null);
 
+  const { id } = useLocalSearchParams();
+
+  const [filters, setFilters] = useState({
+    budget: "",
+    tags: { selected: [], unselected: [] },
+    giftType: [],
+  });
+
+  const [selectedGiftTypes, setSelectedGiftTypes] = useState([]);
+  const [unselectedGiftTypes, setUnselectedGiftTypes] = useState([]);
+  const [giftTypes, setGiftTypes] = useState([
+    "Experience",
+    "Present",
+    "Donation",
+  ]);
+
+  const [selectedTags, setSelectedTags] = useState([]);
+  const [unselectedTags, setUnselectedTags] = useState([]);
+  const [tags, setTags] = useState([]);
+  const [budget, setBudget] = useState(0);
+  const [sliderMarks, setSliderMarks] = useState([50, 250, 500, 750, 1000]);
+
+  useEffect(() => {
+    fetchTags();
+  }, []);
+
   const handlePress = (string) => {
     if (show === string) {
       setShow(null);
@@ -51,6 +81,77 @@ const Filters = () => {
     console.log(value);
     return `${value}°C`;
   }
+
+  const fetchTags = async () => {
+    console.log(id, "ID");
+
+    let friendData = await friendsService.retrieveFriend(id);
+
+    console.log(friendData.giftPreferences, "FRIEND DATA");
+
+    setSelectedTags(
+      friendData.tags.map((tag) => capitalizeFirstLetter(tag.title))
+    );
+
+    setTags(friendData.tags.map((tag) => capitalizeFirstLetter(tag.title)));
+
+    setSelectedGiftTypes(
+      friendData.giftPreferences.map((gift) => capitalizeFirstLetter(gift))
+    );
+  };
+
+  const handleRemoveGiftType = (giftType) => {
+    let newGiftTypes = filters.giftType.filter((t) => t !== giftType);
+    setFilters({ ...filters, giftType: newGiftTypes });
+  };
+
+  const handleAddTag = (tag) => {
+    setUnselectedTags((prev) => prev.filter((t) => t !== tag));
+    setSelectedTags((prev) => [...prev, tag]);
+  };
+
+  const handleChangeTag = (tag) => {
+    if (selectedTags.includes(tag)) {
+      setSelectedTags((prev) => prev.filter((t) => t !== tag));
+      setUnselectedTags((prev) => [...prev, tag]);
+    } else {
+      setUnselectedTags((prev) => prev.filter((t) => t !== tag));
+      setSelectedTags((prev) => [...prev, tag]);
+    }
+  };
+
+  const handleChangeGiftType = (giftType) => {
+    if (selectedGiftTypes.includes(giftType)) {
+      setSelectedGiftTypes((prev) => prev.filter((t) => t !== giftType));
+    } else {
+      setSelectedGiftTypes((prev) => [...prev, giftType]);
+    }
+  };
+
+  const TopTrackMark = (index) => {
+    console.log("INDEX", index);
+    const value = sliderMarks[index];
+
+    console.log("Value", value);
+    return (
+      <View style={{ paddingTop: 20 }}>
+        <Text
+          style={{ fontFamily: "PilcrowBold", fontSize: 16, marginTop: 20 }}
+        >
+          {sliderMarks[index.index]}
+        </Text>
+      </View>
+    );
+  };
+
+  useEffect(() => {
+    console.log(budget, "BUDGET");
+  }, [budget]);
+
+  const handleClear = () => {
+    setFilters({ budget: "", tags: [], giftType: [] });
+    setShow(null);
+  };
   return (
     <View style={styles.container}>
       <TitleBack title="Filters" marginLeft={-80} paddingRight={100} />
@@ -67,7 +168,10 @@ const Filters = () => {
           </Text>
           <TouchableOpacity onPress={() => handlePress("budget")}>
             {show === "budget" ? (
-              <Image source={require("../assets/images/minus.png")} />
+              <Image
+                source={require("../assets/images/minus.png")}
+                style={{ height: 30, width: 30 }}
+              />
             ) : (
               <Image
                 source={require("../assets/images/blackplus.png")}
@@ -78,12 +182,34 @@ const Filters = () => {
         </View>
 
         {show === "budget" && (
-          <Slider
-            maximumValue={17}
-            minimumValue={0}
-            step={1}
-            trackMarks={[50, 250, 500, 750, 1000]}
-          />
+          <View style={styles.sliderContainer}>
+            <View
+              style={{
+                width: "auto",
+                justifyContent: "center",
+                alignItems: "center",
+                paddingVertical: 5,
+              }}
+            >
+              <Text style={{ fontFamily: "PilcrowBold", fontSize: 20 }}>
+                ${budget}
+              </Text>
+            </View>
+            <Slider
+              maximumValue={1000}
+              minimumValue={0}
+              step={50}
+              trackMarks={[50, 250, 500, 750, 1000]}
+              trackStyle={{ width: "100%" }}
+              value={budget}
+              onValueChange={(value) => setBudget(value)}
+              renderTrackMarkComponent={(index) => (
+                <TopTrackMark index={index} />
+              )}
+              thumbTintColor={colors.purple}
+              minimumTrackTintColor={colors.purple}
+            />
+          </View>
         )}
 
         <View
@@ -101,7 +227,10 @@ const Filters = () => {
           </Text>
           <TouchableOpacity onPress={() => handlePress("tags")}>
             {show === "tags" ? (
-              <FontAwesome name="minus" size={20} color="black" />
+              <Image
+                source={require("../assets/images/minus.png")}
+                style={{ height: 30, width: 30 }}
+              />
             ) : (
               <Image
                 source={require("../assets/images/blackplus.png")}
@@ -113,19 +242,22 @@ const Filters = () => {
 
         {show === "tags" && (
           <View style={styles.tagsSection}>
-            <View style={styles.tag}>
-              <Text style={styles.selectTagText}>Reading</Text>
-            </View>
-            <View style={styles.tag}>
-              <Text style={styles.selectTagText}>Outdoor Activities</Text>
-            </View>
-
-            <View style={styles.tag}>
-              <Text style={styles.selectTagText}>Arts and Crafts</Text>
-            </View>
-            <View style={styles.tag}>
-              <Text style={styles.selectTagText}>Games</Text>
-            </View>
+            {tags.map((tag, idx) => (
+              <TouchableOpacity
+                style={[
+                  styles.tag,
+                  {
+                    backgroundColor: selectedTags.includes(tag)
+                      ? colors.green
+                      : "lightgray",
+                  },
+                ]}
+                key={idx}
+                onPress={() => handleChangeTag(tag)}
+              >
+                <Text style={styles.selectTagText}>{tag}</Text>
+              </TouchableOpacity>
+            ))}
           </View>
         )}
 
@@ -143,25 +275,38 @@ const Filters = () => {
             Gift Type
           </Text>
           <TouchableOpacity onPress={() => handlePress("gifttype")}>
-            <Image
-              source={require("../assets/images/blackplus.png")}
-              style={{ height: 30, width: 30 }}
-            />
+            {show === "gifttype" ? (
+              <Image
+                source={require("../assets/images/minus.png")}
+                style={{ height: 30, width: 30 }}
+              />
+            ) : (
+              <Image
+                source={require("../assets/images/blackplus.png")}
+                style={{ height: 30, width: 30 }}
+              />
+            )}
           </TouchableOpacity>
         </View>
 
         {show === "gifttype" && (
           <View style={styles.tagsSection}>
-            <View style={styles.tag}>
-              <Text style={styles.selectTagText}>Experience</Text>
-            </View>
-            <View style={styles.tag}>
-              <Text style={styles.selectTagText}>Present</Text>
-            </View>
-
-            <View style={styles.tag}>
-              <Text style={styles.selectTagText}>Donation</Text>
-            </View>
+            {giftTypes.map((giftType, idx) => (
+              <TouchableOpacity
+                style={[
+                  styles.tag,
+                  {
+                    backgroundColor: selectedGiftTypes.includes(giftType)
+                      ? colors.green
+                      : "lightgray",
+                  },
+                ]}
+                key={idx}
+                onPress={() => handleChangeGiftType(giftType)}
+              >
+                <Text style={styles.selectTagText}>{giftType}</Text>
+              </TouchableOpacity>
+            ))}
           </View>
         )}
 
@@ -176,7 +321,7 @@ const Filters = () => {
       </View>
 
       <View style={{ flexDirection: "row" }}>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={handleClear}>
           <View
             style={{
               width: width / 2,
@@ -228,6 +373,13 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.cream,
   },
+  sliderContainer: {
+    marginLeft: 20,
+    marginRight: 20,
+    alignItems: "stretch",
+    justifyContent: "center",
+    paddingBottom: 30,
+  },
   filterContainer: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -240,6 +392,11 @@ const styles = StyleSheet.create({
     fontFamily: "PilcrowBold",
     color: colors.brightWhite,
   },
+  unselectedTagText: {
+    fontSize: 16,
+    fontFamily: "PilcrowBold",
+    color: colors.brightWhite,
+  },
   tag: {
     flexDirection: "row",
     height: 40,
@@ -248,6 +405,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: colors.green,
   },
+  unselectedTag: {
+    flexDirection: "row",
+    height: 40,
+    borderRadius: 10,
+    padding: 12,
+    alignItems: "center",
+    backgroundColor: "lightgray",
+  },
   tagsSection: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -255,6 +420,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
     alignItems: "center",
     gap: 12,
+    paddingBottom: 10,
   },
 });
 

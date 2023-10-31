@@ -1,7 +1,7 @@
 import React from "react";
-import Filters from "../components/Filters";
+import Filters from "../../../components/Filters";
 import { Stack } from "expo-router";
-import Header from "../components/Header";
+import Header from "../../../components/Header";
 
 const Page = () => {
   return (

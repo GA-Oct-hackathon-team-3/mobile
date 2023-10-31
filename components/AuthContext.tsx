@@ -3,7 +3,7 @@ import { Platform } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { useRouter, useSegments } from "expo-router";
 import { getOnboarded } from "../utilities/storage";
-import { getToken } from "../utilities/users-service";
+import { getToken, getUser } from "../utilities/users-service";
 
 const AuthContext = createContext(null);
 
@@ -37,6 +37,7 @@ export function useProtectedRoute(token) {
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [onboarded, setOnboarded] = useState(false);
+  const [userData, setUserData] = useState(null);
   // For simplicity, we're just tracking a user object. Set to null for no user.
 
   useEffect(() => {
@@ -49,12 +50,16 @@ export const AuthProvider = ({ children }) => {
       if (token) {
         setToken(token);
         getOnboarded();
+        let data = await getUser();
+        setUserData(data);
       }
     } else {
       let token = await getToken();
       if (token) {
         setToken(token);
         getOnboarded();
+        let data = await getUser();
+        setUserData(data);
       }
     }
     console.log(token, "this is the token");
@@ -76,7 +81,16 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ token, setToken, login, logout, onboarded, setOnboarded }}
+      value={{
+        token,
+        setToken,
+        login,
+        logout,
+        onboarded,
+        setOnboarded,
+        userData,
+        setUserData,
+      }}
     >
       {children}
     </AuthContext.Provider>

@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
 } from "react-native";
 import { colors } from "../constants/Theme";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 
 const giftData = {
   gifts: [
@@ -79,6 +79,7 @@ interface GiftItemProps {
 
 const Gifts = ({ isExplore }: GiftProps) => {
   const router = useRouter();
+  const { id } = useLocalSearchParams();
   const GiftItem = ({ item }: GiftItemProps) => (
     <View style={styles.itemContainer}>
       <View>
@@ -115,7 +116,7 @@ const Gifts = ({ isExplore }: GiftProps) => {
               <Text style={{ fontFamily: "PilcrowRounded" }}>Refresh</Text>
             </View>
           </TouchableOpacity>
-          <TouchableOpacity onPress={() => router.push("/filters")}>
+          <TouchableOpacity onPress={() => router.push(`/users/${id}/filters`)}>
             <View
               style={{ flexDirection: "column", alignItems: "center", gap: 2 }}
             >
