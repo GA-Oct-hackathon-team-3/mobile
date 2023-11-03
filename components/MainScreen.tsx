@@ -138,7 +138,7 @@ export default function MainScreen() {
 
     return (
       <>
-        <View key={_id} style={{ marginTop: 40 }}>
+        <View key={_id} style={{ marginTop: 20 }}>
           <TouchableOpacity
             style={styles.item}
             onPress={() => {

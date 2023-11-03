@@ -16,8 +16,9 @@ export default async function sendRequest(url, method = "GET", payload = null) {
   const res = await fetch(url, options);
 
   if (res.ok) {
-    if (res.headers.get("content-length") === "0" || res.status === 204) {
-      return null; // or however you want to handle an empty response
+    if (res.headers.get("content-length") === "0") {
+      return {};
+      // return null; // or however you want to handle an empty response
     }
     return res.json();
   }
