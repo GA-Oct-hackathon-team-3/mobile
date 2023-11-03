@@ -14,13 +14,10 @@ import TitleBack from "./TitleBack";
 import { colors } from "../constants/Theme";
 import * as tagsService from "../utilities/tags-service";
 import * as friendsService from "../utilities/friends-service";
-import { useNavigation } from "expo-router";
 
 export default function AddTags() {
   const params = useLocalSearchParams();
-  const navigation = useNavigation();
 
-  console.log(params, "ADD TAG PARAMS");
   const [searchTag, setSearchTag] = useState("");
   const [addedTags, setAddedTags] = useState([
     "Pokemon",
@@ -51,8 +48,6 @@ export default function AddTags() {
   const fetchTags = async () => {
     const friendData = await friendsService.retrieveFriend(params.id);
 
-    console.log(friendData, "FRIEND");
-
     setAddedTags(friendData.tags);
     setFriend(friendData);
   };
@@ -61,9 +56,7 @@ export default function AddTags() {
     fetchTags();
   }, []);
 
-  useEffect(() => {
-    console.log(addedTags);
-  }, [addedTags]);
+  useEffect(() => {}, [addedTags]);
 
   const handleTagPress = (tag) => {
     if (!addedTags.includes(tag)) {
@@ -94,7 +87,6 @@ export default function AddTags() {
         });
       });
     } catch (err) {
-      console.log(err);
     } finally {
       setLoading(false);
     }

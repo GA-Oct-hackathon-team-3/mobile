@@ -31,7 +31,7 @@ const BirthdaySkeleton = () => {
             width={24}
             height={24}
             colorMode={colorMode}
-            radius={"round"}
+            radius={"square"}
           />
         </View>
       </View>
@@ -58,7 +58,12 @@ const BirthdaySkeleton = () => {
         </View>
         <View style={styles.card}>
           <View style={styles.content}>
-            <Skeleton colorMode={colorMode} height={50} width={50} />
+            <Skeleton
+              colorMode={colorMode}
+              height={50}
+              width={50}
+              radius={"square"}
+            />
           </View>
         </View>
       </View>

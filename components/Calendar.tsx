@@ -93,7 +93,6 @@ export default class Calendar extends Component<State> {
 
           const numItems = Math.floor(Math.random() * 3 + 1);
           for (let j = 0; j < numItems; j++) {
-            console.log(items[strTime], strTime);
             items[strTime].push({
               name: `${
                 names[Math.floor(Math.random() * names.length)].firstName
@@ -115,8 +114,6 @@ export default class Calendar extends Component<State> {
       this.setState({
         items: newItems,
       });
-
-      console.log("ITEMS: ", newItems);
     }, 1000);
   };
 
@@ -130,8 +127,6 @@ export default class Calendar extends Component<State> {
   renderItem = (reservation: AgendaEntry, isFirst: boolean) => {
     const fontSize = isFirst ? 16 : 14;
     const color = isFirst ? "black" : "#43515c";
-
-    console.log("RESERVATION: ", reservation);
 
     return (
       <TouchableOpacity

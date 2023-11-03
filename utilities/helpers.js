@@ -19,9 +19,8 @@ export function daysUntilBirthday(dob) {
 }
 
 export function test(dob) {
-  console.log(dob);
   const array = dob.split("-");
-  console.log("ARRAY DOB", array);
+
   const dobObject = {
     year: array[0],
     month: numericMonthToString([array[1]]),

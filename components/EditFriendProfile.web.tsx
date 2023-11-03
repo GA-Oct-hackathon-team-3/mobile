@@ -63,7 +63,7 @@ export default function EditFriendProfile() {
             : "https://i.imgur.com/hCwHtRc.png"
         }?timestamp=${uniqueTimestamp}`;
         setFriend(friendData);
-        console.log(friendData);
+
         setFormInput(friendData);
         setSelectedGender(capitalizeFirstLetter(friendData.gender));
 
@@ -112,8 +112,6 @@ export default function EditFriendProfile() {
   };
 
   const handleSubmit = async () => {
-    console.log("SHOWING TOAST");
-
     notify();
 
     setLoading(true);

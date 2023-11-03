@@ -55,8 +55,6 @@ export default function EditTags() {
   const scrollViewRef = useRef<ScrollView>();
 
   const fetchTags = async () => {
-    console.log("PARAMS ID", params, "USER ID", userData);
-
     let friendData = await friendsService.retrieveFriend(params.id);
 
     setAddedTags(
@@ -99,7 +97,6 @@ export default function EditTags() {
       });
       showToasts();
     } catch (err) {
-      console.log(err);
     } finally {
       setLoading(false);
     }

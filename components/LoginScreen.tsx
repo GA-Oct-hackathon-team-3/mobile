@@ -36,7 +36,6 @@ export default function LoginScreen() {
       password: password,
     });
     if (response) {
-      console.log("LOGIN RESPONSE", response);
       setToken(response.token);
       setUserData(response);
     }
@@ -46,8 +45,6 @@ export default function LoginScreen() {
 
   async function signUpWithEmail() {
     setLoading(true);
-
-    console.log("SIGNED UP THE USER");
 
     setLoading(false);
   }

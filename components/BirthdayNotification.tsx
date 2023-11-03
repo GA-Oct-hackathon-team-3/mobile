@@ -14,7 +14,6 @@ export default function BirthdayNotification({ name, birthday, message }) {
           style={styles.button}
           onPress={() => {
             // Place your logic here to send a message to Cara
-            console.log("Message to Cara");
           }}
         >
           <Text style={styles.buttonText}>Send Message to {name}</Text>

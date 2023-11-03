@@ -42,7 +42,7 @@ export default function UserProfileScreen() {
             : "https://i.imgur.com/hCwHtRc.png"
         }?timestamp=${uniqueTimestamp}`;
         setFriend(friendData);
-        console.log(friendData);
+
         setDobObject(splitDOB(friendData.dob));
       }
     } catch (error) {
@@ -133,7 +133,7 @@ export default function UserProfileScreen() {
 
       {selected == "profile" ? (
         <ScrollView>
-          <ProfileContent />
+          <ProfileContent user={friend} />
         </ScrollView>
       ) : (
         <Gifts isExplore={true} />

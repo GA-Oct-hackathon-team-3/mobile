@@ -62,7 +62,6 @@ export const AuthProvider = ({ children }) => {
         setUserData(data);
       }
     }
-    console.log(token, "this is the token");
   };
 
   useProtectedRoute(token);

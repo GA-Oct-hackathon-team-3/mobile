@@ -10,7 +10,7 @@ export async function retrieveFriends() {
 
 export async function retrieveFriend(id) {
   const url = `${BASE_URL}/${id}`;
-  console.log(url, "URL");
+
   const friend = await sendRequest(url, "GET", null);
   return friend;
 }
@@ -41,6 +41,6 @@ export async function uploadPhoto(id, file) {
     },
     body: formData,
   });
-  console.log("this is the response: ", response);
+
   if (response.status === 200) return response;
 }

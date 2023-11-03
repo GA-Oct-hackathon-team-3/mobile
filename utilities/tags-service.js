@@ -2,7 +2,6 @@ import sendRequest from "./send-request";
 const BASE_URL = "http://localhost:3010/api/";
 
 export async function addTag(id, tag) {
-  console.log(id, tag, "ID AND TAG");
   const friend = await sendRequest(
     BASE_URL + `friends/${id}/tags`,
     "POST",

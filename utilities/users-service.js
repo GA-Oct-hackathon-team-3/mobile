@@ -19,7 +19,7 @@ export async function getToken() {
       : await SecureStore.getItemAsync("token");
   if (!token) return null;
   const payload = JSON.parse(atob(token.split(".")[1]));
-  console.log(payload, "PAYLOAD");
+
   if (payload.exp < Date.now() / 1000) {
     Platform.OS === "web"
       ? localStorage.removeItem("token")
@@ -44,7 +44,7 @@ export async function getUser() {
   let userData;
   if (token) {
     const payload = JSON.parse(atob(token.split(".")[1]));
-    console.log(payload, "PAYLOAD");
+
     userData = {
       exp: payload.exp,
       id: payload.payload,

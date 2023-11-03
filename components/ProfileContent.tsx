@@ -9,6 +9,7 @@ import { useRouter, useLocalSearchParams } from "expo-router";
 const ProfileContent = ({ user }) => {
   const router = useRouter();
   const params = useLocalSearchParams();
+
   return (
     <View style={styles.container}>
       <View style={styles.giftTypeContainer}>
@@ -63,19 +64,12 @@ const ProfileContent = ({ user }) => {
           </TouchableOpacity>
         </View>
         <View style={styles.tagsSection}>
-          <View style={styles.tag}>
-            <Text style={styles.selectTagText}>Reading</Text>
-          </View>
-          <View style={styles.tag}>
-            <Text style={styles.selectTagText}>Outdoor Activities</Text>
-          </View>
-
-          <View style={styles.tag}>
-            <Text style={styles.selectTagText}>Arts and Crafts</Text>
-          </View>
-          <View style={styles.tag}>
-            <Text style={styles.selectTagText}>Games</Text>
-          </View>
+          {/* {user &&
+            user.tags.map((tag) => (
+              <View style={styles.tag}>
+                <Text style={styles.selectTagText}>{tag.title}</Text>
+              </View>
+            ))} */}
         </View>
       </View>
 

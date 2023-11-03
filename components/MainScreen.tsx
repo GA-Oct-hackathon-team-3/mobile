@@ -75,7 +75,6 @@ export default function MainScreen() {
       }
     };
     fetchFriends();
-    console.log("THIS IS ONBOARDED: ", onboarded);
   }, []);
 
   useEffect(() => {
@@ -124,7 +123,6 @@ export default function MainScreen() {
   const handleSearch = (query) => {
     setSearchQuery(query);
     if (query) {
-      console.log(query, "THIS IS THE QUERY");
       setFilteredData(
         data.filter((item) =>
           item.name.toLowerCase().includes(query.toLowerCase())
@@ -144,7 +142,6 @@ export default function MainScreen() {
           <TouchableOpacity
             style={styles.item}
             onPress={() => {
-              console.log("THIS IS THE ID: ", _id);
               router.push(`/users/${_id}`);
             }}
           >

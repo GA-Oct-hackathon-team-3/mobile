@@ -78,16 +78,11 @@ const Filters = () => {
   };
 
   function valuetext(value) {
-    console.log(value);
     return `${value}°C`;
   }
 
   const fetchTags = async () => {
-    console.log(id, "ID");
-
     let friendData = await friendsService.retrieveFriend(id);
-
-    console.log(friendData.giftPreferences, "FRIEND DATA");
 
     setSelectedTags(
       friendData.tags.map((tag) => capitalizeFirstLetter(tag.title))
@@ -129,10 +124,8 @@ const Filters = () => {
   };
 
   const TopTrackMark = (index) => {
-    console.log("INDEX", index);
     const value = sliderMarks[index];
 
-    console.log("Value", value);
     return (
       <View style={{ paddingTop: 20 }}>
         <Text
@@ -144,9 +137,7 @@ const Filters = () => {
     );
   };
 
-  useEffect(() => {
-    console.log(budget, "BUDGET");
-  }, [budget]);
+  useEffect(() => {}, [budget]);
 
   const handleClear = () => {
     setFilters({ budget: "", tags: [], giftType: [] });

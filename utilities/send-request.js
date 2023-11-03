@@ -12,10 +12,8 @@ export default async function sendRequest(url, method = "GET", payload = null) {
     options.headers = options.headers || {};
     options.headers.Authorization = `Bearer ${token}`;
   }
-  console.log(options, "options", url, "url");
-  const res = await fetch(url, options);
 
-  console.log("RESPONSE", res);
+  const res = await fetch(url, options);
 
   if (res.ok) {
     if (res.headers.get("content-length") === "0" || res.status === 204) {

@@ -38,8 +38,6 @@ export default function SignUpScreen() {
       location,
     };
 
-    console.log(data); // Just for demonstration purposes
-
     // Make your API request here
   };
 
@@ -58,9 +56,7 @@ export default function SignUpScreen() {
     try {
       const userData = await usersService.register(data);
       router.replace("/");
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   };
 
   return (

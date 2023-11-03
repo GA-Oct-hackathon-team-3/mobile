@@ -94,7 +94,7 @@ export default function EditFriendProfile() {
             : "https://i.imgur.com/hCwHtRc.png"
         }?timestamp=${uniqueTimestamp}`;
         setFriend(friendData);
-        console.log(friendData);
+
         setFormInput(friendData);
         setSelectedGender(capitalizeFirstLetter(friendData.gender));
 

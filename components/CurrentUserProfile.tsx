@@ -35,11 +35,9 @@ export default function CurrentUserProfileScreen() {
   const fetchCurrentUser = async () => {
     try {
       const data = await UserAPI.getCurrentUser();
-      console.log(data, "CURRENT USER");
+
       setUser(data.user);
-    } catch (error) {
-      console.log(error);
-    }
+    } catch (error) {}
   };
 
   const handleLogout = async () => {

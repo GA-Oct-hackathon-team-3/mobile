@@ -109,7 +109,7 @@ export default function CreateFriendsProfile() {
     //       const response = await friendsService.uploadPhoto(friendData._id, uploadedPhoto);
     //       if (response!.ok && friendData) router.replace("/");
     //   } catch (error) {
-    //       console.log(error);
+    //
     //   }
     // }
     if (friendData) router.push(`/users/${friendData._id}/add-tags`);
