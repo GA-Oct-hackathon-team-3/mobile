@@ -15,6 +15,7 @@ import * as UserController from "../utilities/users-service";
 import { useAuth } from "../components/AuthContext";
 import { FontAwesome } from "@expo/vector-icons";
 import { colors, buttons } from "../constants/Theme";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const oceanBlue = "#007AFF";
 const white = "#fff";
@@ -54,7 +55,9 @@ export default function LoginScreen() {
   };
 
   return (
-    <View style={[styles.container, { width: width }]}>
+    <KeyboardAwareScrollView
+      contentContainerStyle={[styles.container, { width: width }]}
+    >
       <View
         style={{
           position: "absolute",
@@ -161,7 +164,7 @@ export default function LoginScreen() {
           </Text>
         </View>
       </TouchableOpacity>
-    </View>
+    </KeyboardAwareScrollView>
   );
 }
 

@@ -8,11 +8,13 @@ import {
   Image,
   TouchableOpacity,
   useWindowDimensions,
+  KeyboardAvoidingView,
 } from "react-native";
 import Picker from "@react-native-picker/picker";
 import { colors } from "../constants/Theme";
 import { useRouter } from "expo-router";
 import * as usersService from "../utilities/users-service";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 export default function SignUpScreen() {
   const [name, setName] = useState("");
@@ -60,7 +62,7 @@ export default function SignUpScreen() {
   };
 
   return (
-    <View style={styles.container}>
+    <KeyboardAwareScrollView contentContainerStyle={styles.container}>
       <View
         style={{
           position: "absolute",
@@ -187,7 +189,7 @@ export default function SignUpScreen() {
           </Text>
         </View>
       </TouchableOpacity>
-    </View>
+    </KeyboardAwareScrollView>
   );
 }
 
