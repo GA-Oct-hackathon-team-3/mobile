@@ -122,7 +122,7 @@ export default function MainScreen() {
 
   const handleSearch = (query) => {
     setSearchQuery(query);
-    if (query) {
+    if (query && data.length > 0) {
       setFilteredData(
         data.filter((item) =>
           item.name.toLowerCase().includes(query.toLowerCase())

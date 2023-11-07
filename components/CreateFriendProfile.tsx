@@ -18,6 +18,7 @@ import * as friendsService from "../utilities/friends-service";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 import { FontAwesome } from "@expo/vector-icons";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 function convertDateFormat(dateString) {
   let date = new Date(dateString);
@@ -112,11 +113,12 @@ export default function CreateFriendsProfile() {
     //
     //   }
     // }
-    if (friendData) router.push(`/users/${friendData._id}/add-tags`);
+    console.log(friendData);
+    if (friendData._id) router.push(`/users/${friendData._id}/add-tags`);
   };
 
   return (
-    <View style={styles.container}>
+    <KeyboardAwareScrollView style={styles.container}>
       <TitleBack title={"Create Friend Profile"} />
       <View
         style={{
@@ -308,7 +310,7 @@ export default function CreateFriendsProfile() {
           </View>
         </TouchableOpacity>
       </View>
-    </View>
+    </KeyboardAwareScrollView>
   );
 }
 
