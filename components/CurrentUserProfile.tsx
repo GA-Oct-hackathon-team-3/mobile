@@ -17,10 +17,12 @@ import { FontAwesome } from "@expo/vector-icons";
 import { colors } from "../constants/Theme";
 import { useAuth } from "./AuthContext";
 import * as UserAPI from "../utilities/users-api";
+import { useRouter } from "expo-router";
 
 export default function CurrentUserProfileScreen() {
   const [selected, setSelected] = useState("profile");
   const { logout } = useAuth();
+  const router = useRouter();
 
   const [user, setUser] = useState(null);
 
@@ -47,6 +49,9 @@ export default function CurrentUserProfileScreen() {
       console.error(error);
     }
   };
+  const goToSettings = () => {
+    router.push("/settings");
+  };
   return (
     <View style={styles.container}>
       <TouchableOpacity
@@ -58,9 +63,9 @@ export default function CurrentUserProfileScreen() {
           width: 40,
           zIndex: 1,
         }}
-        onPress={logout}
+        onPress={goToSettings}
       >
-        <FontAwesome name="power-off" size={24} color={colors.brightWhite} />
+        <FontAwesome name="gears" size={24} color={colors.brightWhite} />
       </TouchableOpacity>
       <View style={styles.backgroundCover}></View>
       <View style={styles.header}>

@@ -18,6 +18,7 @@ import { useRouter } from "expo-router";
 import * as usersService from "../utilities/users-service";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { useAuth } from "./AuthContext";
 
 function convertDateFormat(dateString) {
   let date = new Date(dateString);
@@ -48,6 +49,7 @@ export default function SignUpScreen() {
   const { height, width } = useWindowDimensions();
   const [passwordValidity, setPasswordValidity] = useState(false);
   const [requiredMessage, setRequiredMessage] = useState("");
+  const { setToken, setUserData } = useAuth();
 
   const handleConfirm = (date) => {
     console.warn("A date has been picked: ", date);
@@ -93,6 +95,11 @@ export default function SignUpScreen() {
     if (valid) setRequiredMessage("");
     try {
       const userData = await usersService.register(data);
+      if (userData) {
+        setToken(userData.token);
+        setUserData(userData);
+      }
+
       router.replace("/");
     } catch (error) {
       Alert.alert(

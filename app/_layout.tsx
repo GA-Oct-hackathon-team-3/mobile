@@ -14,6 +14,7 @@ import Colors from "../constants/Colors";
 import { colors } from "../constants/Theme";
 import { AuthProvider } from "../components/AuthContext";
 import "react-native-gesture-handler";
+import Header from "../components/Header";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -89,7 +90,10 @@ function RootLayoutNav() {
           /> */}
           <Stack.Screen
             name="settings"
-            options={{ headerShown: true, title: "Settings" }}
+            options={{
+              title: "Settings",
+              header: () => <Header />,
+            }}
           />
           {/* <Stack.Screen
             name="add-tags"
