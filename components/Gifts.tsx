@@ -3,7 +3,7 @@ import React from "react";
 import { View, Image, Text, StyleSheet, FlatList } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
-const Gifts = ({ isExplore, favoriteGifts }) => {
+const Gifts = ({ isExplore, favoriteGifts, isEnabled }) => {
   const GiftItem = ({ item }) => (
     <View style={styles.itemContainer}>
       <View>
@@ -29,6 +29,16 @@ const Gifts = ({ isExplore, favoriteGifts }) => {
     <View style={styles.exploreHeader}>
       <View style={styles.textRec}>
         <Text>Personalized Recommendations</Text>
+        {isEnabled ? 'recommendations go here'
+        // <FlatList
+        //   data={}
+        //   renderItem={({ item }) => <GiftItem item={item} />}
+        //   keyExtractor={(item) => item.id}
+        //   numColumns={2}
+        // /> 
+        : (
+            <Text>Add tags to get personalized gift recommendations</Text>
+        )}
       </View>
       <FontAwesome name="refresh" size={20} color="black" />
       <FontAwesome name="filter" size={20} color="black" />

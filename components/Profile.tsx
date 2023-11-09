@@ -40,6 +40,7 @@ export default function UserProfileScreen() {
     month: '',
     day: '',
   });
+  const [enableRecs, setEnableRecs] = useState <boolean> (false);
   const { id } = useLocalSearchParams();
 
   const fetchUser = async () => {
@@ -50,7 +51,7 @@ export default function UserProfileScreen() {
       if (friend) {
         setUser(friend);
         setDobObject(splitDOB(friend.dob));
-        console.log("FRIEND", friend);
+        if (friend.tags.length > 0) setEnableRecs(true);
       }
     } catch (error) {
       console.error("Error fetching user: ", error);
@@ -70,7 +71,7 @@ export default function UserProfileScreen() {
       <View style={styles.backgroundCover}></View>
       <View style={styles.header}>
         <Image
-          source={require("../assets/images/alex.jpg")}
+          source={user && user.photo ? { uri: user.photo } : { uri: "https://i.imgur.com/hCwHtRc.png" }}
           style={styles.avatar}
         />
         <Text>{user && user.name}</Text>
@@ -131,7 +132,7 @@ export default function UserProfileScreen() {
             <ProfileContent giftPreferences={user?.giftPreferences} tags={user?.tags} favoriteGifts={user?.favoriteGifts} />
         </ScrollView>
         ) : (
-          <Gifts isExplore={true} favoriteGifts={null} />
+          <Gifts isExplore={true} favoriteGifts={null} isEnabled={enableRecs} />
         )}
     </View>
   );

@@ -42,8 +42,10 @@ const ProfileContent = ({ giftPreferences, tags, favoriteGifts }) => {
             </View>
         ))
     ) : (
-        <View style={styles.tag}>
-            <Text>Your friend doesn't have any tags. Click edit to add them.</Text>
+        <View>
+            <Text>Your friend doesn't have any tags.
+                <br />
+            Click edit to add them.</Text>
         </View>
     )}
 </View>
