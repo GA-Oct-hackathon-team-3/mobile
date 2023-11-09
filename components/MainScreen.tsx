@@ -51,7 +51,7 @@ const itemColors = [
 export default function MainScreen() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredData, setFilteredData] = useState(null);
+  const [filteredData, setFilteredData] = useState([]);
   const [upcomingBirthdays, setUpcomingBirthdays] = useState([]);
   const [laterBirthdays, setLaterBirthdays] = useState([]);
   const [birthdays, setBirthdays] = useState([]);
@@ -375,13 +375,45 @@ export default function MainScreen() {
           <BirthdaySkeleton />
           <BirthdaySkeleton />
         </>
-      ) : (
+      ) : filteredData && filteredData.length > 0 ? (
         <FlatList
           style={{ zIndex: 99 }}
           data={filteredData}
           renderItem={({ item, index }) => <Item {...item} index={index} />}
           keyExtractor={(item) => item._id}
         />
+      ) : (
+        <View
+          style={{
+            backgroundColor: colors.brightWhite,
+            marginTop: 20,
+
+            flexDirection: "row",
+            justifyContent: "flex-start",
+            alignItems: "center",
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.25,
+            shadowRadius: 3.84,
+            elevation: 5,
+            borderRadius: 10,
+            gap: 8,
+          }}
+        >
+          <Image
+            source={require("../assets/images/sadface.png")}
+            style={{ height: 100, width: 100 }}
+          />
+          <Text
+            style={{
+              fontFamily: "PilcrowRounded",
+              maxWidth: 200,
+              fontSize: 16,
+            }}
+          >
+            No birthdays to display-add a friend below to start gifting!
+          </Text>
+        </View>
       )}
       {/* <Modal
         animationType="fade"

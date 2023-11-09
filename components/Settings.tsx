@@ -12,6 +12,8 @@ import {
   StyleSheet,
 } from "react-native";
 import TitleBack from "./TitleBack";
+import * as WebBrowser from "expo-web-browser";
+import { useAuth } from "./AuthContext";
 
 const SettingsScreen = () => {
   const [name, setName] = useState("");
@@ -19,9 +21,28 @@ const SettingsScreen = () => {
   const [coinAmount, setCoinAmount] = useState("");
   const navigation = useNavigation();
   const router = useRouter();
+  const { logout } = useAuth();
 
   const dismiss = () => {
     router.back();
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const handlePressPrivacy = async () => {
+    let result = await WebBrowser.openBrowserAsync(
+      `https://www.victorylabs.io/privacy-policy-presently`
+    );
+  };
+
+  const handlePressIcons = async () => {
+    let result = await WebBrowser.openBrowserAsync(`https://icons8.com/`);
   };
 
   return (
@@ -75,7 +96,7 @@ const SettingsScreen = () => {
             <Text style={{ fontFamily: "PilcrowMedium", fontSize: 18 }}>
               Privacy Policy
             </Text>
-            <TouchableOpacity>
+            <TouchableOpacity onPress={handlePressPrivacy}>
               <FontAwesome name="chevron-right" size={16} color={"black"} />
             </TouchableOpacity>
           </View>
@@ -88,7 +109,7 @@ const SettingsScreen = () => {
             }}
           ></View>
 
-          <TouchableOpacity style={styles.logoutButton}>
+          <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
             <Text style={styles.logoutText}>Logout</Text>
           </TouchableOpacity>
         </View>
@@ -96,7 +117,7 @@ const SettingsScreen = () => {
         <View style={{ alignItems: "center", justifyContent: "center" }}>
           <Text>
             Select imagery powered by{" "}
-            <TouchableOpacity>
+            <TouchableOpacity onPress={handlePressIcons}>
               <Text style={{ textDecorationLine: "underline" }}>Icons8</Text>
             </TouchableOpacity>
           </Text>
