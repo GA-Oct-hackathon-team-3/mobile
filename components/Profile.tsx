@@ -16,6 +16,7 @@ import { ScrollView } from "react-native-gesture-handler";
 import { FontAwesome } from "@expo/vector-icons";
 import * as friendService from "../utilities/friends-service";
 import { useLocalSearchParams } from "expo-router";
+import { calculateAge, daysUntilBirthday, splitDOB } from "../utilities/helpers";
 
 interface Friend {
     name: string;
@@ -34,6 +35,11 @@ interface Friend {
 export default function UserProfileScreen() {
   const [selected, setSelected] = useState("profile");
   const [user, setUser] = useState <Friend | null> (null);
+  const [dobObject, setDobObject] = useState ({
+    year: '',
+    month: '',
+    day: '',
+  });
   const { id } = useLocalSearchParams();
 
   const fetchUser = async () => {
@@ -42,7 +48,8 @@ export default function UserProfileScreen() {
       const friend = await friendService.retrieveFriend(id);
 
       if (friend) {
-        setUser(friend as Friend);
+        setUser(friend);
+        setDobObject(splitDOB(friend.dob));
         console.log("FRIEND", friend);
       }
     } catch (error) {
@@ -71,14 +78,14 @@ export default function UserProfileScreen() {
       </View>
       <View style={styles.info}>
         <View style={styles.infoDescription}>
-          <Text style={{ color: "#804C46", fontWeight: "bold" }}>10</Text>
-          <Text>January</Text>
+          <Text style={{ color: "#804C46", fontWeight: "bold" }}>{dobObject && dobObject.day}</Text>
+          <Text>{dobObject && dobObject.month}</Text>
         </View>
         <View
           style={{ height: 30, width: 1, backgroundColor: "lightgray" }}
         ></View>
         <View style={styles.infoDescription}>
-          <Text style={{ color: "#804C46", fontWeight: "bold" }}>180 </Text>
+          <Text style={{ color: "#804C46", fontWeight: "bold" }}>{user && daysUntilBirthday(user.dob)}</Text>
           <Text>Days left</Text>
         </View>
         <View
@@ -86,7 +93,7 @@ export default function UserProfileScreen() {
         ></View>
 
         <View style={styles.infoDescription}>
-          <Text style={{ color: "#804C46", fontWeight: "bold" }}>27</Text>
+          <Text style={{ color: "#804C46", fontWeight: "bold" }}>{user && calculateAge(user.dob)}</Text>
           <Text>Age</Text>
         </View>
         <FontAwesome

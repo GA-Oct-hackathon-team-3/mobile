@@ -13,34 +13,10 @@ import {
 import { FontAwesome } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
 import * as friendsService from "../utilities/friends-service";
+import { formatDate } from '../utilities/helpers';
 import { useAuth } from "./AuthContext";
 import { colors } from "../constants/Theme";
 import AddButton from "./AddButton";
-
-function daysUntilBirthday(dob) {
-  const birthday = new Date(dob);
-  const currentDate = new Date();
-
-  const nextBirthday = new Date(
-    currentDate.getFullYear(),
-    birthday.getMonth(),
-    birthday.getDate()
-  );
-
-  // If the next birthday is before the current date, set it to next year
-  if (nextBirthday < currentDate) {
-    nextBirthday.setFullYear(currentDate.getFullYear() + 1);
-  }
-
-  // Calculate the time difference in milliseconds
-  const timeDifference = nextBirthday - currentDate;
-
-  // Convert milliseconds to days
-  const days = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
-  return days;
-}
-// Usage example:
-const userBirthday = new Date(1990, 4, 15); // e.g., May 15th
 
 export default function MainScreen() {
   const router = useRouter();
@@ -53,8 +29,6 @@ export default function MainScreen() {
   const [showTutorial, setShowTutorial] = useState(false);
   const { width, height } = useWindowDimensions();
   const [showNext, setShowNext] = useState(false);
-
-  const createSortedBirthdays = () => {};
 
   useEffect(() => {
     const fetchFriends = async () => {
@@ -70,29 +44,6 @@ export default function MainScreen() {
     console.log("THIS IS ONBOARDED: ", onboarded);
   }, []);
 
-  function formatDate(dateString) {
-    const months = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ];
-    const date = new Date(dateString);
-    const day = date.getUTCDate();
-    const month = months[date.getUTCMonth()];
-    const year = date.getUTCFullYear();
-
-    return `${day} ${month} ${year}`;
-  }
-
   const handleSearch = (query) => {
     setSearchQuery(query);
     if (query) {
@@ -107,7 +58,7 @@ export default function MainScreen() {
     }
   };
 
-  const Item = ({ name, last_name, dob, _id }) => (
+  const Item = ({ name, dob, _id, daysUntilBirthday }) => (
     <TouchableOpacity
       onPress={() => {
         console.log("THIS IS THE ID: ", _id);
@@ -156,7 +107,7 @@ export default function MainScreen() {
         </View>
         <View style={styles.card}>
           <View style={styles.content}>
-            <Text style={styles.days}>{daysUntilBirthday(dob)}</Text>
+            <Text style={styles.days}>{daysUntilBirthday}</Text>
             <Text style={styles.label}>Days Left</Text>
           </View>
         </View>
