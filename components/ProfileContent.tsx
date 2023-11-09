@@ -14,13 +14,17 @@ const ProfileContent = ({ giftPreferences, tags, favoriteGifts }) => {
         </View>
         {/* Gift Type Bottom */}
         <View style={styles.giftSquareContainer}>
-          <View style={styles.giftTypeSquare}>
+          <View style={[styles.giftTypeSquare, { backgroundColor: giftPreferences?.includes('Experience') ? "lightgrey" : "white", }]}>
             <FontAwesome name="music" size={34} color="black" />
             <Text>Experience</Text>
           </View>
-          <View style={styles.giftTypeSquare}>
+          <View style={[styles.giftTypeSquare, { backgroundColor: giftPreferences?.includes('Present') ? "lightgrey" : "white", }]}>
             <FontAwesome name="gift" size={34} color="black" />
             <Text>Presents</Text>
+          </View>
+          <View style={[styles.giftTypeSquare, { backgroundColor: giftPreferences?.includes('Donation') ? "lightgrey" : "white", }]}>
+            <FontAwesome name="handshake-o" size={34} color="black" />
+            <Text>Donations</Text>
           </View>
         </View>
       </View>
@@ -31,20 +35,18 @@ const ProfileContent = ({ giftPreferences, tags, favoriteGifts }) => {
           <FontAwesome name="pencil" size={20} color="black" />
         </View>
         <View style={styles.tagsSection}>
-          <View style={styles.tag}>
-            <Text>Reading</Text>
-          </View>
-          <View style={styles.tag}>
-            <Text>Outdoor Activities</Text>
-          </View>
-
-          <View style={styles.tag}>
-            <Text>Arts and Crafts</Text>
-          </View>
-          <View style={styles.tag}>
-            <Text>Games</Text>
-          </View>
+    {tags && tags.length > 0 ? (
+        tags.map((tag, idx) => (
+            <View style={styles.tag} key={idx}>
+                <Text key={idx}>{tag.title}</Text>
+            </View>
+        ))
+    ) : (
+        <View style={styles.tag}>
+            <Text>Your friend doesn't have any tags. Click edit to add them.</Text>
         </View>
+    )}
+</View>
       </View>
 
       <View style={styles.giftTypeContainer}>
@@ -73,12 +75,13 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   giftTypeSquare: {
-    backgroundColor: "lightgray",
     height: 80,
     width: 80,
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "lightgrey"
   },
   giftSquareContainer: {
     flexDirection: "row",

@@ -3,72 +3,19 @@ import React from "react";
 import { View, Image, Text, StyleSheet, FlatList } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 
-const giftData = {
-  gifts: [
-    {
-      id: "1",
-      gift_name: "Handmade Leather Wallet",
-      gift_price: "50.00",
-      gift_image: "wallet",
-    },
-    {
-      id: "2",
-      gift_name: "Artisan Chocolate Box",
-      gift_price: "30.00",
-      gift_image: "chocolate",
-    },
-    {
-      id: "3",
-      gift_name: "Vintage Pendant Necklace",
-      gift_price: "40.00",
-      gift_image: "necklace",
-    },
-    {
-      id: "4",
-      gift_name: "Customized Mug",
-      gift_price: "15.00",
-      gift_image: "mug",
-    },
-    {
-      id: "5",
-      gift_name: "Decorative Candle Set",
-      gift_price: "25.00",
-      gift_image: "url/to/candle_set_image.jpg",
-    },
-    // ... (continue in the same pattern)
-    {
-      id: "29",
-      gift_name: "Gourmet Coffee Beans",
-      gift_price: "20.00",
-      gift_image: "url/to/coffee_beans_image.jpg",
-    },
-    {
-      id: "30",
-      gift_name: "Luxury Bathrobe",
-      gift_price: "80.00",
-      gift_image: "url/to/bathrobe_image.jpg",
-    },
-    {
-      id: "31",
-      gift_name: "Luxury Bathrobe",
-      gift_price: "80.00",
-      gift_image: "url/to/bathrobe_image.jpg",
-    },
-  ],
-};
-
 const Gifts = ({ isExplore, favoriteGifts }) => {
   const GiftItem = ({ item }) => (
     <View style={styles.itemContainer}>
       <View>
         <Image
-          source={require(`../assets/images/wallet.jpg`)}
+          source={item.image}
+          alt={item.imageSearchQuery}
           style={styles.giftImage}
         />
         <TouchableOpacity
           style={{ position: "absolute", right: 40, bottom: 12 }}
         >
-          <FontAwesome name="heart-o" size={20} color="black" />
+          <FontAwesome name="heart" size={24} color="red" />
         </TouchableOpacity>
       </View>
       <Text style={styles.giftName}>{item.title}</Text>
