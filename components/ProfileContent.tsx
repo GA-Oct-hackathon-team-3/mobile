@@ -3,7 +3,7 @@ import React from "react";
 import { View, StyleSheet, Text } from "react-native";
 import Gifts from "./Gifts";
 
-const ProfileContent = () => {
+const ProfileContent = ({ giftPreferences, tags, favoriteGifts }) => {
   return (
     <View style={styles.container}>
       <View style={styles.giftTypeContainer}>
@@ -48,7 +48,7 @@ const ProfileContent = () => {
       </View>
 
       <View style={styles.giftTypeContainer}>
-        <Gifts isExplore={false} />
+        <Gifts isExplore={false} favoriteGifts={favoriteGifts} />
       </View>
     </View>
   );

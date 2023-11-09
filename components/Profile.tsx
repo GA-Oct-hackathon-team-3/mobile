@@ -17,9 +17,23 @@ import { FontAwesome } from "@expo/vector-icons";
 import * as friendService from "../utilities/friends-service";
 import { useLocalSearchParams } from "expo-router";
 
+interface Friend {
+    name: string;
+    gender: string;
+    location: string;
+    dob: string;
+    photo: string;
+    bio: string;
+    interests: string[];
+    tags: string[];
+    user: string;
+    giftPreferences: string[];
+    favoriteGifts: string[];
+}
+
 export default function UserProfileScreen() {
   const [selected, setSelected] = useState("profile");
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState <Friend | null> (null);
   const { id } = useLocalSearchParams();
 
   const fetchUser = async () => {
@@ -28,13 +42,14 @@ export default function UserProfileScreen() {
       const friend = await friendService.retrieveFriend(id);
 
       if (friend) {
-        setUser(friend);
+        setUser(friend as Friend);
         console.log("FRIEND", friend);
       }
     } catch (error) {
       console.error("Error fetching user: ", error);
     }
   };
+
 
   useEffect(() => {
     fetchUser();
@@ -106,13 +121,11 @@ export default function UserProfileScreen() {
 
       {selected == "profile" ? (
         <ScrollView>
-          <ProfileContent />
+            <ProfileContent giftPreferences={user?.giftPreferences} tags={user?.tags} favoriteGifts={user?.favoriteGifts} />
         </ScrollView>
-      ) : (
-        <Gifts isExplore={true} />
-      )}
-
-      {/* You can add the "Favorited Gifts" section similarly */}
+        ) : (
+          <Gifts isExplore={true} favoriteGifts={null} />
+        )}
     </View>
   );
 }

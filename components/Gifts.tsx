@@ -57,7 +57,7 @@ const giftData = {
   ],
 };
 
-const Gifts = ({ isExplore }) => {
+const Gifts = ({ isExplore, favoriteGifts }) => {
   const GiftItem = ({ item }) => (
     <View style={styles.itemContainer}>
       <View>
@@ -71,34 +71,42 @@ const Gifts = ({ isExplore }) => {
           <FontAwesome name="heart-o" size={20} color="black" />
         </TouchableOpacity>
       </View>
-      <Text style={styles.giftName}>{item.gift_name}</Text>
-      <Text style={styles.giftPrice}>${item.gift_price}</Text>
+      <Text style={styles.giftName}>{item.title}</Text>
+      <Text style={styles.giftPrice}>${item.estimatedCost}</Text>
     </View>
   );
 
   return (
-    <View style={styles.container}>
-      {isExplore ? (
-        <View style={styles.exploreHeader}>
-          <View style={styles.textRec}>
-            <Text>Personalized Recommendations</Text>
-          </View>
-          <FontAwesome name="refresh" size={20} color="black" />
-          <FontAwesome name="filter" size={20} color="black" />
-        </View>
+<View style={styles.container}>
+  {isExplore ? (
+    <View style={styles.exploreHeader}>
+      <View style={styles.textRec}>
+        <Text>Personalized Recommendations</Text>
+      </View>
+      <FontAwesome name="refresh" size={20} color="black" />
+      <FontAwesome name="filter" size={20} color="black" />
+    </View>
+  ) : (
+    <View style={styles.giftTop}>
+      <Text>Favorited Gifts</Text>
+      <FontAwesome name="pencil" size={20} color="black" />
+      {favoriteGifts && favoriteGifts.length > 0 ? (
+        <FlatList
+          data={favoriteGifts}
+          renderItem={({ item }) => <GiftItem item={item} />}
+          keyExtractor={(item) => item.id}
+          numColumns={2}
+        />
       ) : (
         <View style={styles.giftTop}>
-          <Text>Favorited Gifts</Text>
+          <Text>No favorites</Text>
           <FontAwesome name="pencil" size={20} color="black" />
         </View>
       )}
-      <FlatList
-        data={giftData.gifts}
-        renderItem={({ item }) => <GiftItem item={item} />}
-        keyExtractor={(item) => item.id}
-        numColumns={2}
-      />
     </View>
+  )}
+</View>
+
   );
 };
 
