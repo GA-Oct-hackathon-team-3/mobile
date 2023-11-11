@@ -1,31 +1,26 @@
+import { FontAwesome } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  StyleSheet,
-  View,
-  Text,
   FlatList,
-  TextInput,
   Image,
-  Modal,
-  useWindowDimensions,
+  StyleSheet,
+  Text,
+  TextInput,
   TouchableOpacity,
-  Pressable,
+  View,
+  useWindowDimensions,
 } from "react-native";
-import { FontAwesome } from "@expo/vector-icons";
-import { Link, useRouter } from "expo-router";
-import * as friendsService from "../utilities/friends-service";
-import { formatDate } from '../utilities/helpers';
-import { useAuth } from "./AuthContext";
 import { colors } from "../constants/Theme";
-import { daysUntilBirthday } from "../utilities/helpers";
-import AddButton from "./AddButton";
+import * as friendsService from "../utilities/friends-service";
+import { formatDate } from "../utilities/helpers";
+import { useAuth } from "./AuthContext";
 // import { Skeleton } from "moti/skeleton";
-import ToastManager, { Toast } from "toastify-react-native";
 import { Skeleton } from "moti/skeleton";
+import ToastManager, { Toast } from "toastify-react-native";
 import BirthdaySkeleton from "./skeletons/BirthdaySkeleton";
 import ReminderSkeleton from "./skeletons/ReminderSkeleton";
 import SearchBarSkeleton from "./skeletons/SearchBarSkeleton";
-
 
 const itemColors = [
   "#FE6797",
@@ -99,7 +94,6 @@ export default function MainScreen() {
     Toast.success("Friend Created");
   };
 
-
   const handleSearch = (query) => {
     setSearchQuery(query);
     if (query && data.length > 0) {
@@ -113,7 +107,8 @@ export default function MainScreen() {
     }
   };
 
-  const Item = ({ name, dob, _id, daysUntilBirthday }) => {
+  const Item = ({ name, dob, _id, daysUntilBirthday, index }) => {
+    const [collapse, setCollapse] = useState(false);
 
     return (
       <>
@@ -140,7 +135,7 @@ export default function MainScreen() {
             <View style={styles.card}>
               <View style={styles.content}>
                 <Text style={[styles.days, { color: itemColors[index] }]}>
-                  {daysUntilBirthday(dob)}
+                  {daysUntilBirthday}
                 </Text>
                 <Text style={styles.label}>Days Left</Text>
               </View>
@@ -253,14 +248,7 @@ export default function MainScreen() {
                 </View>
               </View>
             </View>
-
-          </View>
-        </View>
-        <View style={styles.card}>
-          <View style={styles.content}>
-            <Text style={styles.days}>{daysUntilBirthday}</Text>
-            <Text style={styles.label}>Days Left</Text>
-          </View>
+          )}
         </View>
       </>
     );

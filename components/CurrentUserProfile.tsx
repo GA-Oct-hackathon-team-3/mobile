@@ -38,6 +38,8 @@ export default function CurrentUserProfileScreen() {
     try {
       const data = await UserAPI.getCurrentUser();
 
+      console.log(data.user, "CURRENT USER");
+
       setUser(data.user);
     } catch (error) {}
   };

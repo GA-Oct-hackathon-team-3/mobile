@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Text, TouchableOpacity, Image } from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
+import { Image } from "expo-image";
+
 import Gifts from "./Gifts";
 import ProfileContent from "./ProfileContent";
 import { ScrollView } from "react-native-gesture-handler";
@@ -12,36 +14,32 @@ import {
   splitDOB,
 } from "../utilities/helpers";
 import { useLocalSearchParams } from "expo-router";
-import { calculateAge, daysUntilBirthday, splitDOB } from "../utilities/helpers";
 import { colors } from "../constants/Theme";
 
-
 interface Friend {
-    name: string;
-    gender: string;
-    location: string;
-    dob: string;
-    photo: string;
-    bio: string;
-    interests: string[];
-    tags: string[];
-    user: string;
-    giftPreferences: string[];
-    favoriteGifts: string[];
-
-
+  name: string;
+  gender: string;
+  location: string;
+  dob: string;
+  photo: string;
+  bio: string;
+  interests: string[];
+  tags: string[];
+  user: string;
+  giftPreferences: string[];
+  favoriteGifts: string[];
+}
 
 export default function UserProfileScreen() {
   const router = useRouter();
   const [selected, setSelected] = useState("profile");
-
-  const [user, setUser] = useState <Friend | null> (null);
-  const [dobObject, setDobObject] = useState ({
-    year: '',
-    month: '',
-    day: '',
+  const [user, setUser] = useState<Friend | null>(null);
+  const [dobObject, setDobObject] = useState({
+    year: "",
+    month: "",
+    day: "",
   });
-  const [enableRecs, setEnableRecs] = useState <boolean> (false);
+  const [enableRecs, setEnableRecs] = useState<boolean>(false);
 
   const { id } = useLocalSearchParams();
 
@@ -49,26 +47,26 @@ export default function UserProfileScreen() {
     try {
       const friendData = await friendService.retrieveFriend(id);
       if (friendData) {
+        console.log("THIS IS THE FRIEND DATA", friendData);
         const uniqueTimestamp = Date.now();
         friendData.photo = `${
           friendData.photo
             ? friendData.photo
             : "https://i.imgur.com/hCwHtRc.png"
         }?timestamp=${uniqueTimestamp}`;
-        setFriend(friendData);
+        setUser(friendData);
+      }
 
-
-      if (friend) {
-        setUser(friend);
-        setDobObject(splitDOB(friend.dob));
-        if (friend.tags.length > 0) setEnableRecs(true);
-
+      if (user) {
+        console.log("THIS IS THE FRIEND DATA", user);
+        setUser(user);
+        setDobObject(splitDOB(user.dob));
+        if (user.tags.length > 0) setEnableRecs(true);
       }
     } catch (error) {
-      console.error("Error fetching friend: ", error);
+      console.error("Error fetching user: ", error);
     }
   };
-
 
   useEffect(() => {
     fetchFriend();
@@ -91,36 +89,41 @@ export default function UserProfileScreen() {
           />
         </TouchableOpacity>
         <Image
-          source={user && user.photo ? { uri: user.photo } : { uri: "https://i.imgur.com/hCwHtRc.png" }}
+          source={
+            user && user.photo
+              ? { uri: user.photo }
+              : { uri: "https://i.imgur.com/hCwHtRc.png" }
+          }
           style={styles.avatar}
         />
-        <Text style={styles.name}>{friend && friend.name}</Text>
+        <Text style={styles.name}>{user && user.name}</Text>
         <Text style={styles.subText}>Friend</Text>
       </View>
       <View style={styles.info}>
         <View style={styles.infoDescription}>
-          <Text style={{ color: "#804C46", fontWeight: "bold" }}>{dobObject && dobObject.day}</Text>
+          <Text style={{ color: "#804C46", fontWeight: "bold" }}>
+            {dobObject && dobObject.day}
+          </Text>
           <Text>{dobObject && dobObject.month}</Text>
-
         </View>
         <View
           style={{ height: 30, width: 1, backgroundColor: "lightgray" }}
         ></View>
         <View style={styles.infoDescription}>
-
-          <Text style={{ color: "#804C46", fontWeight: "bold" }}>{user && daysUntilBirthday(user.dob)}</Text>
+          <Text style={{ color: "#804C46", fontWeight: "bold" }}>
+            {user && daysUntilBirthday(user.dob)}
+          </Text>
           <Text>Days left</Text>
-
         </View>
         <View
           style={{ height: 30, width: 1, backgroundColor: "lightgray" }}
         ></View>
 
         <View style={styles.infoDescription}>
-
-          <Text style={{ color: "#804C46", fontWeight: "bold" }}>{user && calculateAge(user.dob)}</Text>
+          <Text style={{ color: "#804C46", fontWeight: "bold" }}>
+            {user && calculateAge(user.dob)}
+          </Text>
           <Text>Age</Text>
-
         </View>
         <TouchableOpacity onPress={() => router.push(`/users/${id}/update`)}>
           <Image
@@ -154,13 +157,15 @@ export default function UserProfileScreen() {
 
       {selected == "profile" ? (
         <ScrollView>
-
-            <ProfileContent giftPreferences={user?.giftPreferences} tags={user?.tags} favoriteGifts={user?.favoriteGifts} />
-
+          <ProfileContent
+            giftPreferences={user?.giftPreferences}
+            tags={user?.tags}
+            favoriteGifts={user?.favoriteGifts}
+          />
         </ScrollView>
-        ) : (
-          <Gifts isExplore={true} favoriteGifts={null} isEnabled={enableRecs} />
-        )}
+      ) : (
+        <Gifts isExplore={true} favoriteGifts={null} isEnabled={enableRecs} />
+      )}
     </View>
   );
 }

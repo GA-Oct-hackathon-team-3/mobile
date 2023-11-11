@@ -88,7 +88,16 @@ export default function CreateFriendsProfile() {
     });
 
     if (!result.canceled) {
+      console.log(JSON.stringify(result), "IMAGE RESULT");
+      let { uri } = result;
+
+      let file = {
+        name: uri.split("/").pop(),
+        uri,
+        type: "image/jpeg",
+      };
       setImage(result.assets[0].uri);
+      setUploadedPhoto(file);
     }
   };
 
@@ -105,15 +114,17 @@ export default function CreateFriendsProfile() {
       giftPreferences: selectedPreferences.map((p) => p.toLowerCase()),
     };
     const friendData = await friendsService.createFriend(data);
-    // if (image) {
-    //   try {
-    //       const response = await friendsService.uploadPhoto(friendData._id, uploadedPhoto);
-    //       if (response!.ok && friendData) router.replace("/");
-    //   } catch (error) {
-    //
-    //   }
-    // }
-    console.log(friendData);
+    if (image) {
+      try {
+        const response = await friendsService.uploadPhoto(
+          friendData._id,
+          uploadedPhoto
+        );
+        console.log(response, "PHOTO UPLOAD RESPONSE");
+
+        if (response!.ok && friendData) router.replace("/");
+      } catch (error) {}
+    }
     if (friendData._id) router.push(`/users/${friendData._id}/add-tags`);
   };
 

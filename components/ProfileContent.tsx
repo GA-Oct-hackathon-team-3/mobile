@@ -6,11 +6,9 @@ import { colors } from "../constants/Theme";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useRouter, useLocalSearchParams } from "expo-router";
 
-const ProfileContent = ({ user }) => {
+const ProfileContent = ({ giftPreferences, tags, favoriteGifts, user }) => {
   const router = useRouter();
   const params = useLocalSearchParams();
-
-const ProfileContent = ({ giftPreferences, tags, favoriteGifts }) => {
 
   return (
     <View style={styles.container}>
@@ -25,15 +23,42 @@ const ProfileContent = ({ giftPreferences, tags, favoriteGifts }) => {
         </View>
         {/* Gift Type Bottom */}
         <View style={styles.giftSquareContainer}>
-          <View style={[styles.giftTypeSquare, { backgroundColor: giftPreferences?.includes('Experience') ? "lightgrey" : "white", }]}>
+          <View
+            style={[
+              styles.giftTypeSquare,
+              {
+                backgroundColor: giftPreferences?.includes("Experience")
+                  ? "lightgrey"
+                  : "white",
+              },
+            ]}
+          >
             <FontAwesome name="music" size={34} color="black" />
             <Text>Experience</Text>
           </View>
-          <View style={[styles.giftTypeSquare, { backgroundColor: giftPreferences?.includes('Present') ? "lightgrey" : "white", }]}>
+          <View
+            style={[
+              styles.giftTypeSquare,
+              {
+                backgroundColor: giftPreferences?.includes("Present")
+                  ? "lightgrey"
+                  : "white",
+              },
+            ]}
+          >
             <FontAwesome name="gift" size={34} color="black" />
             <Text>Presents</Text>
           </View>
-          <View style={[styles.giftTypeSquare, { backgroundColor: giftPreferences?.includes('Donation') ? "lightgrey" : "white", }]}>
+          <View
+            style={[
+              styles.giftTypeSquare,
+              {
+                backgroundColor: giftPreferences?.includes("Donation")
+                  ? "lightgrey"
+                  : "white",
+              },
+            ]}
+          >
             <FontAwesome name="handshake-o" size={34} color="black" />
             <Text>Donations</Text>
           </View>
@@ -57,20 +82,20 @@ const ProfileContent = ({ giftPreferences, tags, favoriteGifts }) => {
           </TouchableOpacity>
         </View>
         <View style={styles.tagsSection}>
-    {tags && tags.length > 0 ? (
-        tags.map((tag, idx) => (
-            <View style={styles.tag} key={idx}>
+          {tags && tags.length > 0 ? (
+            tags.map((tag, idx) => (
+              <View style={styles.tag} key={idx}>
                 <Text key={idx}>{tag.title}</Text>
+              </View>
+            ))
+          ) : (
+            <View>
+              <Text>
+                Your friend doesn't have any tags. Click edit to add them.
+              </Text>
             </View>
-        ))
-    ) : (
-        <View>
-            <Text>Your friend doesn't have any tags.
-                <br />
-            Click edit to add them.</Text>
+          )}
         </View>
-    )}
-</View>
       </View>
 
       <View style={styles.giftTypeContainer}>
@@ -106,7 +131,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 1,
-    borderColor: "lightgrey"
+    borderColor: "lightgrey",
   },
   giftSquareContainer: {
     flexDirection: "row",

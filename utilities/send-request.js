@@ -13,6 +13,8 @@ export default async function sendRequest(url, method = "GET", payload = null) {
     options.headers.Authorization = `Bearer ${token}`;
   }
 
+  console.log(options, "OPTIONS, SEND REQUEST");
+
   const res = await fetch(url, options);
 
   if (res.ok) {
