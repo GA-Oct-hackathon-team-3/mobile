@@ -10,6 +10,8 @@ const ProfileContent = ({ user }) => {
   const router = useRouter();
   const params = useLocalSearchParams();
 
+const ProfileContent = ({ giftPreferences, tags, favoriteGifts }) => {
+
   return (
     <View style={styles.container}>
       <View style={styles.giftTypeContainer}>
@@ -23,26 +25,17 @@ const ProfileContent = ({ user }) => {
         </View>
         {/* Gift Type Bottom */}
         <View style={styles.giftSquareContainer}>
-          <View style={styles.giftTypeSquare}>
-            <Image
-              source={require("../assets/images/experiences.png")}
-              style={{ width: 40, height: 40 }}
-            />
-            <Text style={styles.lightText}>Experience</Text>
+          <View style={[styles.giftTypeSquare, { backgroundColor: giftPreferences?.includes('Experience') ? "lightgrey" : "white", }]}>
+            <FontAwesome name="music" size={34} color="black" />
+            <Text>Experience</Text>
           </View>
-          <View style={styles.giftTypeSquare}>
-            <Image
-              source={require("../assets/images/pinkpresent.png")}
-              style={{ width: 40, height: 40 }}
-            />
-            <Text style={styles.lightText}>Presents</Text>
+          <View style={[styles.giftTypeSquare, { backgroundColor: giftPreferences?.includes('Present') ? "lightgrey" : "white", }]}>
+            <FontAwesome name="gift" size={34} color="black" />
+            <Text>Presents</Text>
           </View>
-          <View style={styles.giftTypeSquare}>
-            <Image
-              source={require("../assets/images/donations.png")}
-              style={{ width: 40, height: 40 }}
-            />
-            <Text style={styles.lightText}>Presents</Text>
+          <View style={[styles.giftTypeSquare, { backgroundColor: giftPreferences?.includes('Donation') ? "lightgrey" : "white", }]}>
+            <FontAwesome name="handshake-o" size={34} color="black" />
+            <Text>Donations</Text>
           </View>
         </View>
       </View>
@@ -64,17 +57,24 @@ const ProfileContent = ({ user }) => {
           </TouchableOpacity>
         </View>
         <View style={styles.tagsSection}>
-          {/* {user &&
-            user.tags.map((tag) => (
-              <View style={styles.tag}>
-                <Text style={styles.selectTagText}>{tag.title}</Text>
-              </View>
-            ))} */}
+    {tags && tags.length > 0 ? (
+        tags.map((tag, idx) => (
+            <View style={styles.tag} key={idx}>
+                <Text key={idx}>{tag.title}</Text>
+            </View>
+        ))
+    ) : (
+        <View>
+            <Text>Your friend doesn't have any tags.
+                <br />
+            Click edit to add them.</Text>
         </View>
+    )}
+</View>
       </View>
 
       <View style={styles.giftTypeContainer}>
-        <Gifts isExplore={false} />
+        <Gifts isExplore={false} favoriteGifts={favoriteGifts} />
       </View>
     </View>
   );
@@ -100,14 +100,13 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   giftTypeSquare: {
-    backgroundColor: colors.cream,
-    borderColor: "lightgray",
-    borderWidth: 1,
     height: 80,
     width: 80,
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
+    borderWidth: 1,
+    borderColor: "lightgrey"
   },
   giftSquareContainer: {
     flexDirection: "row",

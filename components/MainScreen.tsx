@@ -14,6 +14,7 @@ import {
 import { FontAwesome } from "@expo/vector-icons";
 import { Link, useRouter } from "expo-router";
 import * as friendsService from "../utilities/friends-service";
+import { formatDate } from '../utilities/helpers';
 import { useAuth } from "./AuthContext";
 import { colors } from "../constants/Theme";
 import { daysUntilBirthday } from "../utilities/helpers";
@@ -24,6 +25,7 @@ import { Skeleton } from "moti/skeleton";
 import BirthdaySkeleton from "./skeletons/BirthdaySkeleton";
 import ReminderSkeleton from "./skeletons/ReminderSkeleton";
 import SearchBarSkeleton from "./skeletons/SearchBarSkeleton";
+
 
 const itemColors = [
   "#FE6797",
@@ -97,28 +99,6 @@ export default function MainScreen() {
     Toast.success("Friend Created");
   };
 
-  function formatDate(dateString) {
-    const months = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ];
-    const date = new Date(dateString);
-    const day = date.getUTCDate();
-    const month = months[date.getUTCMonth()];
-    const year = date.getUTCFullYear();
-
-    return `${day} ${month} ${year}`;
-  }
 
   const handleSearch = (query) => {
     setSearchQuery(query);
@@ -133,8 +113,7 @@ export default function MainScreen() {
     }
   };
 
-  const Item = ({ name, last_name, dob, _id, index }) => {
-    const [collapse, setCollapse] = useState(false);
+  const Item = ({ name, dob, _id, daysUntilBirthday }) => {
 
     return (
       <>
@@ -274,7 +253,14 @@ export default function MainScreen() {
                 </View>
               </View>
             </View>
-          )}
+
+          </View>
+        </View>
+        <View style={styles.card}>
+          <View style={styles.content}>
+            <Text style={styles.days}>{daysUntilBirthday}</Text>
+            <Text style={styles.label}>Days Left</Text>
+          </View>
         </View>
       </>
     );

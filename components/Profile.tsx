@@ -1,13 +1,3 @@
-const DUMMY_PROFILE = {
-  first_name: "Alex",
-  last_name: "Turner",
-  birthday: "1992-01-10",
-  about:
-    "A passionate developer who loves sushi, cheers for the 49ers, and spends weekends coding.",
-  tags: ["Sushi Lover", "49ers Fan", "Programmer"],
-  image: "https://via.placeholder.com/150", // A dummy image. Replace with a real one if needed.
-};
-// Import necessary components and libraries
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, Image } from "react-native";
 import Gifts from "./Gifts";
@@ -22,13 +12,37 @@ import {
   splitDOB,
 } from "../utilities/helpers";
 import { useLocalSearchParams } from "expo-router";
+import { calculateAge, daysUntilBirthday, splitDOB } from "../utilities/helpers";
 import { colors } from "../constants/Theme";
+
+
+interface Friend {
+    name: string;
+    gender: string;
+    location: string;
+    dob: string;
+    photo: string;
+    bio: string;
+    interests: string[];
+    tags: string[];
+    user: string;
+    giftPreferences: string[];
+    favoriteGifts: string[];
+
+
 
 export default function UserProfileScreen() {
   const router = useRouter();
   const [selected, setSelected] = useState("profile");
-  const [friend, setFriend] = useState(null);
-  const [dobObject, setDobObject] = useState(null);
+
+  const [user, setUser] = useState <Friend | null> (null);
+  const [dobObject, setDobObject] = useState ({
+    year: '',
+    month: '',
+    day: '',
+  });
+  const [enableRecs, setEnableRecs] = useState <boolean> (false);
+
   const { id } = useLocalSearchParams();
 
   const fetchFriend = async () => {
@@ -43,12 +57,18 @@ export default function UserProfileScreen() {
         }?timestamp=${uniqueTimestamp}`;
         setFriend(friendData);
 
-        setDobObject(splitDOB(friendData.dob));
+
+      if (friend) {
+        setUser(friend);
+        setDobObject(splitDOB(friend.dob));
+        if (friend.tags.length > 0) setEnableRecs(true);
+
       }
     } catch (error) {
       console.error("Error fetching friend: ", error);
     }
   };
+
 
   useEffect(() => {
     fetchFriend();
@@ -71,7 +91,7 @@ export default function UserProfileScreen() {
           />
         </TouchableOpacity>
         <Image
-          source={require("../assets/images/alex.jpg")}
+          source={user && user.photo ? { uri: user.photo } : { uri: "https://i.imgur.com/hCwHtRc.png" }}
           style={styles.avatar}
         />
         <Text style={styles.name}>{friend && friend.name}</Text>
@@ -79,27 +99,28 @@ export default function UserProfileScreen() {
       </View>
       <View style={styles.info}>
         <View style={styles.infoDescription}>
-          <Text style={styles.numberText}> {dobObject && dobObject.day}</Text>
-          <Text style={styles.subText}>{dobObject && dobObject.month}</Text>
+          <Text style={{ color: "#804C46", fontWeight: "bold" }}>{dobObject && dobObject.day}</Text>
+          <Text>{dobObject && dobObject.month}</Text>
+
         </View>
         <View
           style={{ height: 30, width: 1, backgroundColor: "lightgray" }}
         ></View>
         <View style={styles.infoDescription}>
-          <Text style={styles.numberText}>
-            {friend && daysUntilBirthday(friend.dob)}
-          </Text>
-          <Text style={styles.subText}>Days left</Text>
+
+          <Text style={{ color: "#804C46", fontWeight: "bold" }}>{user && daysUntilBirthday(user.dob)}</Text>
+          <Text>Days left</Text>
+
         </View>
         <View
           style={{ height: 30, width: 1, backgroundColor: "lightgray" }}
         ></View>
 
         <View style={styles.infoDescription}>
-          <Text style={styles.numberText}>
-            {friend && calculateAge(friend.dob)}
-          </Text>
-          <Text style={styles.subText}>Age</Text>
+
+          <Text style={{ color: "#804C46", fontWeight: "bold" }}>{user && calculateAge(user.dob)}</Text>
+          <Text>Age</Text>
+
         </View>
         <TouchableOpacity onPress={() => router.push(`/users/${id}/update`)}>
           <Image
@@ -133,13 +154,13 @@ export default function UserProfileScreen() {
 
       {selected == "profile" ? (
         <ScrollView>
-          <ProfileContent user={friend} />
-        </ScrollView>
-      ) : (
-        <Gifts isExplore={true} />
-      )}
 
-      {/* You can add the "Favorited Gifts" section similarly */}
+            <ProfileContent giftPreferences={user?.giftPreferences} tags={user?.tags} favoriteGifts={user?.favoriteGifts} />
+
+        </ScrollView>
+        ) : (
+          <Gifts isExplore={true} favoriteGifts={null} isEnabled={enableRecs} />
+        )}
     </View>
   );
 }

@@ -11,60 +11,6 @@ import {
 import { colors } from "../constants/Theme";
 import { useLocalSearchParams, useRouter } from "expo-router";
 
-const giftData = {
-  gifts: [
-    {
-      id: "1",
-      gift_name: "Handmade Leather Wallet",
-      gift_price: "50.00",
-      gift_image: "wallet",
-    },
-    {
-      id: "2",
-      gift_name: "Artisan Chocolate Box",
-      gift_price: "30.00",
-      gift_image: "chocolate",
-    },
-    {
-      id: "3",
-      gift_name: "Vintage Pendant Necklace",
-      gift_price: "40.00",
-      gift_image: "necklace",
-    },
-    {
-      id: "4",
-      gift_name: "Customized Mug",
-      gift_price: "15.00",
-      gift_image: "mug",
-    },
-    {
-      id: "5",
-      gift_name: "Decorative Candle Set",
-      gift_price: "25.00",
-      gift_image: "url/to/candle_set_image.jpg",
-    },
-    // ... (continue in the same pattern)
-    {
-      id: "29",
-      gift_name: "Gourmet Coffee Beans",
-      gift_price: "20.00",
-      gift_image: "url/to/coffee_beans_image.jpg",
-    },
-    {
-      id: "30",
-      gift_name: "Luxury Bathrobe",
-      gift_price: "80.00",
-      gift_image: "url/to/bathrobe_image.jpg",
-    },
-    {
-      id: "31",
-      gift_name: "Luxury Bathrobe",
-      gift_price: "80.00",
-      gift_image: "url/to/bathrobe_image.jpg",
-    },
-  ],
-};
-
 interface GiftProps {
   isExplore: boolean;
 }
@@ -77,77 +23,71 @@ interface GiftItemProps {
   };
 }
 
-const Gifts = ({ isExplore }: GiftProps) => {
-  const router = useRouter();
-  const { id } = useLocalSearchParams();
-  const GiftItem = ({ item }: GiftItemProps) => (
+
+const Gifts = ({ isExplore, favoriteGifts, isEnabled }) => {
+  const GiftItem = ({ item }) => (
+
+
+
     <View style={styles.itemContainer}>
       <View>
         <Image
-          source={require(`../assets/images/wallet.jpg`)}
+          source={item.image}
+          alt={item.imageSearchQuery}
           style={styles.giftImage}
         />
         <TouchableOpacity
           style={{ position: "absolute", right: 40, bottom: 12 }}
         >
-          <FontAwesome name="heart-o" size={20} color="black" />
+          <FontAwesome name="heart" size={24} color="red" />
         </TouchableOpacity>
       </View>
-      <Text style={styles.giftName}>{item.gift_name}</Text>
-      <Text style={styles.giftPrice}>${item.gift_price}</Text>
+      <Text style={styles.giftName}>{item.title}</Text>
+      <Text style={styles.giftPrice}>${item.estimatedCost}</Text>
     </View>
   );
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.brightWhite }]}>
-      {isExplore ? (
-        <View style={styles.exploreHeader}>
-          <View style={styles.textRec}>
-            <Text style={styles.headerText}>Personalized Recommendations</Text>
-          </View>
-          <TouchableOpacity>
-            <View
-              style={{ flexDirection: "column", alignItems: "center", gap: 2 }}
-            >
-              <Image
-                source={require("../assets/images/refresh.png")}
-                style={{ height: 20, width: 20 }}
-              />
-              <Text style={{ fontFamily: "PilcrowRounded" }}>Refresh</Text>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => router.push(`/users/${id}/filters`)}>
-            <View
-              style={{ flexDirection: "column", alignItems: "center", gap: 2 }}
-            >
-              <Image
-                source={require("../assets/images/filter1.png")}
-                style={{ height: 20, width: 20 }}
-              />
-              <Text style={{ fontFamily: "PilcrowRounded" }}>Filter</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
+<View style={styles.container}>
+  {isExplore ? (
+    <View style={styles.exploreHeader}>
+      <View style={styles.textRec}>
+        <Text>Personalized Recommendations</Text>
+        {isEnabled ? 'recommendations go here'
+        // <FlatList
+        //   data={}
+        //   renderItem={({ item }) => <GiftItem item={item} />}
+        //   keyExtractor={(item) => item.id}
+        //   numColumns={2}
+        // /> 
+        : (
+            <Text>Add tags to get personalized gift recommendations</Text>
+        )}
+      </View>
+      <FontAwesome name="refresh" size={20} color="black" />
+      <FontAwesome name="filter" size={20} color="black" />
+    </View>
+  ) : (
+    <View style={styles.giftTop}>
+      <Text>Favorited Gifts</Text>
+      <FontAwesome name="pencil" size={20} color="black" />
+      {favoriteGifts && favoriteGifts.length > 0 ? (
+        <FlatList
+          data={favoriteGifts}
+          renderItem={({ item }) => <GiftItem item={item} />}
+          keyExtractor={(item) => item.id}
+          numColumns={2}
+        />
       ) : (
         <View style={styles.giftTop}>
-          <Text style={styles.text}>Favorited Gifts</Text>
-          {isExplore ? (
-            <Image
-              source={require("../assets/images/pencil.png")}
-              style={{ width: 20, height: 20 }}
-            />
-          ) : (
-            <View></View>
-          )}
+          <Text>No favorites</Text>
+          <FontAwesome name="pencil" size={20} color="black" />
         </View>
       )}
-      <FlatList
-        data={giftData.gifts}
-        renderItem={({ item }) => <GiftItem item={item} />}
-        keyExtractor={(item) => item.id}
-        numColumns={2}
-      />
     </View>
+  )}
+</View>
+
   );
 };
 
