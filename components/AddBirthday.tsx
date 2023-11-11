@@ -24,7 +24,6 @@ export default function AddBirthdayScreen() {
   };
 
   const onSubmit = () => {
-    console.log("Submitted:", firstName, lastName, birthday);
     // Handle your submission logic here. For example, save to a backend or local storage.
   };
 

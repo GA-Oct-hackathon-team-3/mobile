@@ -96,7 +96,7 @@ export default function TabLayout() {
         }}
       />
 
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="reminders"
         options={{
           headerShown: true,
@@ -110,9 +110,9 @@ export default function TabLayout() {
             </View>
           ),
         }}
-      />
+      /> */}
 
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="calendar"
         options={{
           headerShown: true,
@@ -126,9 +126,9 @@ export default function TabLayout() {
             </View>
           ),
         }}
-      />
+      /> */}
 
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="gifts"
         options={{
           headerShown: true,
@@ -142,7 +142,7 @@ export default function TabLayout() {
             </View>
           ),
         }}
-      />
+      /> */}
 
       <Tabs.Screen
         name="profile"

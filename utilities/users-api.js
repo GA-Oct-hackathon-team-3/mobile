@@ -1,8 +1,7 @@
 import sendRequest from "./send-request";
-const BASE_URL = "http://localhost:3010/api/";
+const BASE_URL = "https://presently-backend-64495929a7ac.herokuapp.com/api/";
 
 export function register(userData) {
-  console.log("userData at userApi", userData);
   return sendRequest(`${BASE_URL}users`, "POST", userData);
 }
 
@@ -16,4 +15,8 @@ export function googleLogin(credentials) {
 
 export function checkToken() {
   return sendRequest(`${BASE_URL}check-token`);
+}
+
+export function getCurrentUser() {
+  return sendRequest(`${BASE_URL}users/profile/all`);
 }

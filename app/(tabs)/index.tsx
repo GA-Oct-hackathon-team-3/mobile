@@ -1,7 +1,7 @@
 import { StyleSheet, TouchableOpacity } from "react-native";
 
 import EditScreenInfo from "../../components/EditScreenInfo";
-import { Text, View } from "react-native";
+import { Text, View, Image } from "react-native";
 import MainScreen from "../../components/MainScreen";
 import { FontAwesome } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
@@ -11,7 +11,7 @@ export default function TabOneScreen() {
   return (
     <>
       <MainScreen />
-      <TouchableOpacity
+      {/* <TouchableOpacity
         onPress={() => router.push("/add-friend")}
         style={styles.floatingButtonContainer}
       >
@@ -23,10 +23,13 @@ export default function TabOneScreen() {
             gap: 12,
           }}
         >
-          <FontAwesome name="plus" size={20} color="white" />
+          <Image
+            source={require("../../assets/images/plus.png")}
+            style={{ height: 24, width: 24 }}
+          />
           <Text style={styles.addText}>Add Friend</Text>
         </View>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </>
   );
 }
@@ -48,10 +51,11 @@ const styles = StyleSheet.create({
   },
   addText: {
     color: "#FFF",
-    fontSize: 16,
+    fontSize: 18,
     fontStyle: "normal",
     lineHeight: 19,
     letterSpacing: 0.48,
+    fontFamily: "PilcrowMedium",
   },
   floatingButtonContainer: {
     position: "absolute",

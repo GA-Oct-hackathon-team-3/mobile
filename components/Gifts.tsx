@@ -1,10 +1,34 @@
 import { FontAwesome } from "@expo/vector-icons";
 import React from "react";
-import { View, Image, Text, StyleSheet, FlatList } from "react-native";
-import { TouchableOpacity } from "react-native-gesture-handler";
+import {
+  View,
+  Image,
+  Text,
+  StyleSheet,
+  FlatList,
+  TouchableOpacity,
+} from "react-native";
+import { colors } from "../constants/Theme";
+import { useLocalSearchParams, useRouter } from "expo-router";
+
+interface GiftProps {
+  isExplore: boolean;
+}
+
+interface GiftItemProps {
+  item: {
+    gift_name: string;
+    gift_price: string | number;
+    id: string;
+  };
+}
+
 
 const Gifts = ({ isExplore, favoriteGifts, isEnabled }) => {
   const GiftItem = ({ item }) => (
+
+
+
     <View style={styles.itemContainer}>
       <View>
         <Image
@@ -70,10 +94,10 @@ const Gifts = ({ isExplore, favoriteGifts, isEnabled }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    borderColor: "gray",
-    borderWidth: 1,
+
     borderRadius: 10,
     paddingTop: 10,
+    // backgroundColor: colors.cream,
   },
   title: {
     fontSize: 24,
@@ -97,13 +121,14 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   giftName: {
-    fontSize: 12,
+    fontSize: 16,
     textAlign: "left",
     marginBottom: 4,
+    fontFamily: "PilcrowRounded",
   },
   giftPrice: {
     fontSize: 16,
-    fontWeight: "bold",
+    fontFamily: "PilcrowBold",
     textAlign: "left",
   },
   exploreHeader: {
@@ -121,6 +146,14 @@ const styles = StyleSheet.create({
     paddingLeft: 20,
     paddingRight: 20,
     paddingTop: 20,
+  },
+  text: {
+    fontFamily: "PilcrowMedium",
+    fontSize: 16,
+  },
+  headerText: {
+    fontFamily: "PilcrowMedium",
+    fontSize: 16,
   },
 });
 

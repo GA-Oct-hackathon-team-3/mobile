@@ -15,6 +15,7 @@ import * as UserController from "../utilities/users-service";
 import { useAuth } from "../components/AuthContext";
 import { FontAwesome } from "@expo/vector-icons";
 import { colors, buttons } from "../constants/Theme";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 const oceanBlue = "#007AFF";
 const white = "#fff";
@@ -26,7 +27,7 @@ export default function LoginScreen() {
   const [loading, setLoading] = useState(false);
   const { width, height } = useWindowDimensions();
   const router = useRouter();
-  const { setToken } = useAuth();
+  const { setToken, setUserData } = useAuth();
 
   async function signInWithEmail() {
     setLoading(true);
@@ -36,7 +37,8 @@ export default function LoginScreen() {
       password: password,
     });
     if (response) {
-      setToken(response);
+      setToken(response.token);
+      setUserData(response);
     }
 
     setLoading(false);
@@ -44,8 +46,6 @@ export default function LoginScreen() {
 
   async function signUpWithEmail() {
     setLoading(true);
-
-    console.log("SIGNED UP THE USER");
 
     setLoading(false);
   }
@@ -55,27 +55,33 @@ export default function LoginScreen() {
   };
 
   return (
-    <View style={[styles.container, { width: width }]}>
+    <KeyboardAwareScrollView
+      contentContainerStyle={[styles.container, { width: width }]}
+    >
       <View
         style={{
           position: "absolute",
-          width: "100%",
-          height: 70,
+          width: width,
+          height: 100,
           alignItems: "center",
           justifyContent: "center",
-          top: 20,
+          top: 40,
         }}
       >
         <Image
           source={require("../assets/images/Prently1.png")}
-          style={{ width: 240, height: 80, resizeMode: "contain" }}
+          style={{
+            width: 240,
+            height: 80,
+            resizeMode: "contain",
+          }}
         />
       </View>
       <View
         style={{
           flexDirection: "row",
           justifyContent: "space-between",
-          paddingTop: 80,
+          paddingTop: 100,
         }}
       >
         <TouchableOpacity
@@ -98,7 +104,7 @@ export default function LoginScreen() {
         />
       </View>
       <View style={{ gap: 12 }}>
-        <Text>Email</Text>
+        <Text style={styles.text}>Email</Text>
         <TextInput
           style={styles.textInput}
           label="Email"
@@ -111,7 +117,7 @@ export default function LoginScreen() {
       </View>
 
       <View style={{ gap: 12 }}>
-        <Text>Password</Text>
+        <Text style={styles.text}>Password</Text>
         <TextInput
           style={styles.textInput}
           label="Password"
@@ -124,7 +130,13 @@ export default function LoginScreen() {
         />
       </View>
 
-      <Text style={{ textDecorationLine: "underline", fontWeight: "bold" }}>
+      <Text
+        style={{
+          textDecorationLine: "underline",
+          fontWeight: "bold",
+          fontFamily: "PilcrowRounded",
+        }}
+      >
         Forgot Password?
       </Text>
 
@@ -133,9 +145,26 @@ export default function LoginScreen() {
         onPress={signInWithEmail}
         style={styles.signInButton}
       >
-        <Text style={{ color: "white", fontSize: 24 }}>Login</Text>
+        <View
+          style={{
+            height: 100,
+            width: 240,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <Text
+            style={{
+              color: "white",
+              fontSize: 24,
+              fontFamily: "PilcrowMedium",
+            }}
+          >
+            Login
+          </Text>
+        </View>
       </TouchableOpacity>
-    </View>
+    </KeyboardAwareScrollView>
   );
 }
 
@@ -198,9 +227,12 @@ const styles = StyleSheet.create({
   },
   loginText: {
     color: "#3D3C3C",
-    fontFamily: "Pilcrow Rounded",
+    fontFamily: "PilcrowBold",
     fontSize: 24,
-    fontWeight: "bold",
     lineHeight: 24 * 1.2,
+  },
+  text: {
+    fontFamily: "PilcrowRounded",
+    fontSize: 16,
   },
 });

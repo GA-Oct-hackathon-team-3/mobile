@@ -1,5 +1,8 @@
 import sendRequest from "./send-request";
-const BASE_URL = "http://localhost:3010/api/friends";
+import { getToken } from "./users-service";
+
+const BASE_URL =
+  "https://presently-backend-64495929a7ac.herokuapp.com/api/friends";
 
 export async function retrieveFriends() {
   const friends = await sendRequest(BASE_URL, "GET", null);
@@ -8,7 +11,37 @@ export async function retrieveFriends() {
 
 export async function retrieveFriend(id) {
   const url = `${BASE_URL}/${id}`;
-  console.log(url, "URL");
+
   const friend = await sendRequest(url, "GET", null);
   return friend;
+}
+
+export async function createFriend(friendData) {
+  const newFriend = await sendRequest(`${BASE_URL}/create`, "POST", friendData);
+  return newFriend;
+}
+
+export async function updateFriend(id, friendInput) {
+  const response = await sendRequest(
+    `${BASE_URL}/${id}/update`,
+    "PUT",
+    friendInput
+  );
+  return response;
+}
+
+export async function uploadPhoto(id, file) {
+  const formData = new FormData();
+  formData.append("photo", file);
+  const token = getToken();
+
+  const response = await fetch(`${BASE_URL}/${id}/upload`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  });
+
+  if (response.status === 200) return response;
 }

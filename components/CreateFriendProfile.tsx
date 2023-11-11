@@ -14,15 +14,59 @@ import { useRouter } from "expo-router";
 import { colors } from "../constants/Theme";
 import TitleBack from "./TitleBack";
 
+import * as friendsService from "../utilities/friends-service";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+
+import { FontAwesome } from "@expo/vector-icons";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+
+function convertDateFormat(dateString) {
+  let date = new Date(dateString);
+  let year = date.getUTCFullYear();
+
+  // Months in JavaScript are 0-indexed, so January is 0 and December is 11
+  // Adding 1 to get the month in the format 01-12
+  let month = ("0" + (date.getUTCMonth() + 1)).slice(-2);
+  let day = ("0" + date.getUTCDate()).slice(-2);
+
+  return `${year}-${month}-${day}`;
+}
+
 export default function CreateFriendsProfile() {
-  const [gender, setGender] = useState("");
-  const [giftCost, setGiftCost] = useState("");
-  const { width, height } = useWindowDimensions;
+  const [formInput, setFormInput] = useState({
+    name: "",
+    dob: "",
+    gender: "",
+    location: "",
+    giftPreferences: [],
+    giftCost: "",
+  });
+  const { width, height } = useWindowDimensions();
   const [selectedGender, setSelectedGender] = useState("");
   const [selectedPreferences, setSelectedPreferences] = useState([]);
+  const [uploadedPhoto, setUploadedPhoto] = useState(null);
   const router = useRouter();
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [birthday, setBirthday] = useState(new Date().toDateString());
 
   const [image, setImage] = useState(null);
+
+  const currentDate = new Date();
+
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+  const handleConfirm = (date) => {
+    console.warn("A date has been picked: ", date);
+    setBirthday(date.toDateString());
+    setFormInput({ ...formInput, dob: convertDateFormat(date) });
+    hideDatePicker();
+  };
 
   const togglePreference = (preference) => {
     if (selectedPreferences.includes(preference)) {
@@ -43,15 +87,38 @@ export default function CreateFriendsProfile() {
       quality: 1,
     });
 
-    console.log(result);
-
     if (!result.canceled) {
       setImage(result.assets[0].uri);
     }
   };
 
+  const handleChange = (fieldName: string, value: string) => {
+    setFormInput((prev) => ({
+      ...prev,
+      [fieldName]: value,
+    }));
+  };
+
+  const handleSubmit = async () => {
+    const data = {
+      ...formInput,
+      giftPreferences: selectedPreferences.map((p) => p.toLowerCase()),
+    };
+    const friendData = await friendsService.createFriend(data);
+    // if (image) {
+    //   try {
+    //       const response = await friendsService.uploadPhoto(friendData._id, uploadedPhoto);
+    //       if (response!.ok && friendData) router.replace("/");
+    //   } catch (error) {
+    //
+    //   }
+    // }
+    console.log(friendData);
+    if (friendData._id) router.push(`/users/${friendData._id}/add-tags`);
+  };
+
   return (
-    <View style={styles.container}>
+    <KeyboardAwareScrollView style={styles.container}>
       <TitleBack title={"Create Friend Profile"} />
       <View
         style={{
@@ -72,15 +139,63 @@ export default function CreateFriendsProfile() {
                   style={{ width: 100, height: 100, borderRadius: 50 }}
                 />
               ) : (
-                <Text>Add profile photo</Text>
+                <FontAwesome name="plus" size={40} color="white" />
               )}
             </TouchableOpacity>
           </View>
           <View style={styles.inputContainer}>
             <Text>Name</Text>
-            <TextInput placeholder="Name" style={styles.input} />
-            <Text>Birthday</Text>
-            <TextInput placeholder="DOB" style={styles.input} />
+            <TextInput
+              placeholder="Name"
+              style={styles.input}
+              value={formInput.name}
+              onChangeText={(text) => handleChange("name", text)}
+            />
+            <Text>Date of Birth</Text>
+            <DateTimePickerModal
+              isVisible={isDatePickerVisible}
+              mode="date"
+              onConfirm={handleConfirm}
+              onCancel={hideDatePicker}
+            />
+
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                backgroundColor: colors.brightWhite,
+                padding: 10,
+                borderRadius: 5,
+                borderWidth: 1,
+                borderColor: "#E0E0E0",
+              }}
+            >
+              <Text>{birthday}</Text>
+              <TouchableOpacity
+                onPress={showDatePicker}
+                style={{
+                  backgroundColor: colors.orange,
+                  padding: 5,
+                  borderRadius: 5,
+                }}
+              >
+                <Text
+                  style={{
+                    fontFamily: "PilcrowMedium",
+                    color: colors.brightWhite,
+                  }}
+                >
+                  Set Birthday
+                </Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* <TextInput
+              placeholder="yyyy-mm-dd"
+              style={styles.input}
+              value={formInput.dob}
+              onChangeText={(text) => handleChange("dob", text)}
+            /> */}
             <Text>Gender</Text>
             <View style={styles.genderContainer}>
               <TouchableOpacity
@@ -88,7 +203,10 @@ export default function CreateFriendsProfile() {
                   styles.genderButton,
                   selectedGender === "Male" ? styles.selected : {},
                 ]}
-                onPress={() => setSelectedGender("Male")}
+                onPress={() => {
+                  setSelectedGender("Male");
+                  handleChange("gender", "male");
+                }}
               >
                 <Text>Male</Text>
               </TouchableOpacity>
@@ -98,7 +216,10 @@ export default function CreateFriendsProfile() {
                   styles.genderButton,
                   selectedGender === "Female" ? styles.selected : {},
                 ]}
-                onPress={() => setSelectedGender("Female")}
+                onPress={() => {
+                  setSelectedGender("Female");
+                  handleChange("gender", "female");
+                }}
               >
                 <Text>Female</Text>
               </TouchableOpacity>
@@ -108,14 +229,22 @@ export default function CreateFriendsProfile() {
                   styles.genderButton,
                   selectedGender === "Other" ? styles.selected : {},
                 ]}
-                onPress={() => setSelectedGender("Other")}
+                onPress={() => {
+                  setSelectedGender("Other");
+                  handleChange("gender", "other");
+                }}
               >
                 <Text>Other</Text>
               </TouchableOpacity>
             </View>
 
             <Text>Location</Text>
-            <TextInput placeholder="Location" style={styles.input} />
+            <TextInput
+              placeholder="Location"
+              style={styles.input}
+              value={formInput.location}
+              onChangeText={(text) => handleChange("location", text)}
+            />
 
             <Text>Gift type Preferences (choose all that apply)</Text>
             <View style={styles.checkboxContainer}>
@@ -162,8 +291,8 @@ export default function CreateFriendsProfile() {
               <TextInput
                 placeholder="Gift Cost"
                 style={styles.input}
-                value={giftCost}
-                onChangeText={setGiftCost}
+                value={formInput.giftCost}
+                onChangeText={(text) => handleChange("giftCost", text)}
               />
             </View>
           </View>
@@ -175,11 +304,13 @@ export default function CreateFriendsProfile() {
           }}
         >
           <View style={styles.button}>
-            <Text style={styles.buttonText}>Continue to add tags</Text>
+            <Text style={styles.buttonText} onPress={handleSubmit}>
+              Continue to add tags
+            </Text>
           </View>
         </TouchableOpacity>
       </View>
-    </View>
+    </KeyboardAwareScrollView>
   );
 }
 
@@ -205,7 +336,7 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: "#E0E0E0",
+    backgroundColor: "#53CF85",
     justifyContent: "center",
     alignItems: "center",
   },

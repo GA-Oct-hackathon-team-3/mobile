@@ -3,6 +3,7 @@ import { Platform } from "react-native";
 import * as SecureStore from "expo-secure-store";
 import { useRouter, useSegments } from "expo-router";
 import { getOnboarded } from "../utilities/storage";
+import { getToken, getUser } from "../utilities/users-service";
 
 const AuthContext = createContext(null);
 
@@ -18,7 +19,7 @@ export function useProtectedRoute(token) {
         if (!token) {
           router.replace("/landing");
         } else if (token) {
-          router.replace("/landing");
+          router.replace("/");
         }
       }, 1);
     } else {
@@ -36,39 +37,59 @@ export function useProtectedRoute(token) {
 export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [onboarded, setOnboarded] = useState(false);
+  const [userData, setUserData] = useState(null);
   // For simplicity, we're just tracking a user object. Set to null for no user.
 
   useEffect(() => {
-    // getUserToken();
+    getUserToken();
   }, []);
 
   const getUserToken = async () => {
     if (Platform.OS === "web") {
-      let token = localStorage.getItem("token");
+      let token = await getToken();
       if (token) {
         setToken(token);
         getOnboarded();
+        let data = await getUser();
+        setUserData(data);
       }
     } else {
-      let token = await SecureStore.getItemAsync("token");
+      let token = await getToken();
       if (token) {
         setToken(token);
         getOnboarded();
+        let data = await getUser();
+        setUserData(data);
       }
     }
-    console.log(token, "this is the token");
   };
 
-  // useProtectedRoute(token);
+  useProtectedRoute(token);
 
   // Dummy login/logout functions. In real-world, you'll integrate actual auth logic here.
   const login = (dummyUser) => {};
 
-  const logout = () => {};
+  const logout = async () => {
+    setToken(null);
+    if (Platform.OS === "web") {
+      localStorage.removeItem("token");
+    } else {
+      await SecureStore.deleteItemAsync("token");
+    }
+  };
 
   return (
     <AuthContext.Provider
-      value={{ token, setToken, login, logout, onboarded, setOnboarded }}
+      value={{
+        token,
+        setToken,
+        login,
+        logout,
+        onboarded,
+        setOnboarded,
+        userData,
+        setUserData,
+      }}
     >
       {children}
     </AuthContext.Provider>

@@ -95,3 +95,17 @@ export function formatDate(dateString) {
   
     return years;
   }
+
+
+export function profileFormValidation(profileInput) {
+  if (!profileInput.name || !profileInput.dob || !profileInput.gender)
+    return false;
+  else return true;
+}
+
+export function profileDobValidation(dateOfBirth) {
+  const dob = new Date(dateOfBirth);
+  const currentDate = new Date();
+  if (dob > currentDate) return false;
+  else return true;
+}

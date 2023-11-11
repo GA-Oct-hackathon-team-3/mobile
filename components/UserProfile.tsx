@@ -36,12 +36,10 @@ function UserProfile() {
 
   const fetchUser = async () => {
     try {
-      console.log("This is the id", id);
       const friend = await friendService.retrieveFriend(id);
 
       if (friend) {
         setUser(friend);
-        console.log("FRIEND", friend);
       }
     } catch (error) {
       console.error("Error fetching user: ", error);
@@ -76,7 +74,7 @@ function UserProfile() {
         const chatGPTResponse = {
           message: content,
         };
-        console.log(content, "HERE IS THE CONTENT");
+
         setResultArray(stringToArray(content));
       }
     } catch (error) {

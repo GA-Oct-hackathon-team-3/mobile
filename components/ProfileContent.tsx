@@ -1,16 +1,27 @@
 import { FontAwesome } from "@expo/vector-icons";
 import React from "react";
-import { View, StyleSheet, Text } from "react-native";
+import { View, StyleSheet, Text, Image, Touchable } from "react-native";
 import Gifts from "./Gifts";
+import { colors } from "../constants/Theme";
+import { TouchableOpacity } from "react-native-gesture-handler";
+import { useRouter, useLocalSearchParams } from "expo-router";
+
+const ProfileContent = ({ user }) => {
+  const router = useRouter();
+  const params = useLocalSearchParams();
 
 const ProfileContent = ({ giftPreferences, tags, favoriteGifts }) => {
+
   return (
     <View style={styles.container}>
       <View style={styles.giftTypeContainer}>
         {/* Gift Type Top */}
         <View style={styles.giftTop}>
-          <Text>Gift Type</Text>
-          <FontAwesome name="pencil" size={20} color="black" />
+          <Text style={styles.text}>Gift Type</Text>
+          <Image
+            source={require("../assets/images/pencil.png")}
+            style={{ height: 20, width: 20 }}
+          />
         </View>
         {/* Gift Type Bottom */}
         <View style={styles.giftSquareContainer}>
@@ -31,8 +42,19 @@ const ProfileContent = ({ giftPreferences, tags, favoriteGifts }) => {
 
       <View style={styles.giftTypeContainer}>
         <View style={styles.giftTop}>
-          <Text>Selected Tags</Text>
-          <FontAwesome name="pencil" size={20} color="black" />
+          <Text style={styles.text}>Selected Tags</Text>
+          <TouchableOpacity
+            onPress={() =>
+              router.push(
+                `/users/${params.id ? params.id : user._id}/edit-tags`
+              )
+            }
+          >
+            <Image
+              source={require("../assets/images/pencil.png")}
+              style={{ height: 20, width: 20 }}
+            />
+          </TouchableOpacity>
         </View>
         <View style={styles.tagsSection}>
     {tags && tags.length > 0 ? (
@@ -64,10 +86,11 @@ const styles = StyleSheet.create({
     gap: 28,
   },
   giftTypeContainer: {
-    borderColor: "gray",
+    borderColor: "lightgray",
     borderWidth: 1,
     borderRadius: 10,
     minHeight: 150,
+    backgroundColor: colors.brightWhite,
   },
   giftTop: {
     flexDirection: "row",
@@ -102,13 +125,24 @@ const styles = StyleSheet.create({
   },
   tag: {
     flexDirection: "row",
-    borderColor: "gray",
     height: 40,
     borderRadius: 10,
-    borderWidth: 1,
-    paddingLeft: 8,
-    paddingRight: 8,
+    padding: 12,
     alignItems: "center",
+    backgroundColor: colors.green,
+  },
+  text: {
+    fontFamily: "PilcrowMedium",
+    fontSize: 16,
+  },
+  lightText: {
+    fontFamily: "PilcrowRounded",
+    fontSize: 16,
+  },
+  selectTagText: {
+    fontSize: 16,
+    fontFamily: "PilcrowBold",
+    color: colors.brightWhite,
   },
 });
 

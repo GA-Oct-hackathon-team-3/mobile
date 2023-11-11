@@ -1,6 +1,7 @@
 import { FontAwesome } from "@expo/vector-icons";
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { colors } from "../constants/Theme";
 
 export default function BirthdayNotification({ name, birthday, message }) {
   return (
@@ -13,7 +14,6 @@ export default function BirthdayNotification({ name, birthday, message }) {
           style={styles.button}
           onPress={() => {
             // Place your logic here to send a message to Cara
-            console.log("Message to Cara");
           }}
         >
           <Text style={styles.buttonText}>Send Message to {name}</Text>
@@ -46,9 +46,10 @@ const styles = StyleSheet.create({
   text: {
     fontSize: 16,
     marginBottom: 10,
+    fontFamily: "PilcrowRounded",
   },
   button: {
-    backgroundColor: "#000",
+    backgroundColor: colors.purple,
     paddingVertical: 10,
     paddingHorizontal: 15,
     borderRadius: 5,
@@ -56,5 +57,6 @@ const styles = StyleSheet.create({
   buttonText: {
     color: "#fff",
     fontSize: 16,
+    fontFamily: "PilcrowRounded",
   },
 });

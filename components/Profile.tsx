@@ -1,22 +1,20 @@
-const DUMMY_PROFILE = {
-  first_name: "Alex",
-  last_name: "Turner",
-  birthday: "1992-01-10",
-  about:
-    "A passionate developer who loves sushi, cheers for the 49ers, and spends weekends coding.",
-  tags: ["Sushi Lover", "49ers Fan", "Programmer"],
-  image: "https://via.placeholder.com/150", // A dummy image. Replace with a real one if needed.
-};
-// Import necessary components and libraries
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, Image } from "react-native";
 import Gifts from "./Gifts";
 import ProfileContent from "./ProfileContent";
 import { ScrollView } from "react-native-gesture-handler";
 import { FontAwesome } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import * as friendService from "../utilities/friends-service";
+import {
+  calculateAge,
+  daysUntilBirthday,
+  splitDOB,
+} from "../utilities/helpers";
 import { useLocalSearchParams } from "expo-router";
 import { calculateAge, daysUntilBirthday, splitDOB } from "../utilities/helpers";
+import { colors } from "../constants/Theme";
+
 
 interface Friend {
     name: string;
@@ -30,10 +28,13 @@ interface Friend {
     user: string;
     giftPreferences: string[];
     favoriteGifts: string[];
-}
+
+
 
 export default function UserProfileScreen() {
+  const router = useRouter();
   const [selected, setSelected] = useState("profile");
+
   const [user, setUser] = useState <Friend | null> (null);
   const [dobObject, setDobObject] = useState ({
     year: '',
@@ -41,26 +42,36 @@ export default function UserProfileScreen() {
     day: '',
   });
   const [enableRecs, setEnableRecs] = useState <boolean> (false);
+
   const { id } = useLocalSearchParams();
 
-  const fetchUser = async () => {
+  const fetchFriend = async () => {
     try {
-      console.log("This is the id", id);
-      const friend = await friendService.retrieveFriend(id);
+      const friendData = await friendService.retrieveFriend(id);
+      if (friendData) {
+        const uniqueTimestamp = Date.now();
+        friendData.photo = `${
+          friendData.photo
+            ? friendData.photo
+            : "https://i.imgur.com/hCwHtRc.png"
+        }?timestamp=${uniqueTimestamp}`;
+        setFriend(friendData);
+
 
       if (friend) {
         setUser(friend);
         setDobObject(splitDOB(friend.dob));
         if (friend.tags.length > 0) setEnableRecs(true);
+
       }
     } catch (error) {
-      console.error("Error fetching user: ", error);
+      console.error("Error fetching friend: ", error);
     }
   };
 
 
   useEffect(() => {
-    fetchUser();
+    fetchFriend();
   }, []);
 
   const handleSelect = (value: string) => {
@@ -70,39 +81,53 @@ export default function UserProfileScreen() {
     <View style={styles.container}>
       <View style={styles.backgroundCover}></View>
       <View style={styles.header}>
+        <TouchableOpacity
+          style={{ position: "absolute", left: 0, top: 40 }}
+          onPress={() => router.back()}
+        >
+          <Image
+            source={require("../assets/images/arrow-left.png")}
+            style={{ height: 24, width: 24 }}
+          />
+        </TouchableOpacity>
         <Image
           source={user && user.photo ? { uri: user.photo } : { uri: "https://i.imgur.com/hCwHtRc.png" }}
           style={styles.avatar}
         />
-        <Text>{user && user.name}</Text>
-        <Text>Friend</Text>
+        <Text style={styles.name}>{friend && friend.name}</Text>
+        <Text style={styles.subText}>Friend</Text>
       </View>
       <View style={styles.info}>
         <View style={styles.infoDescription}>
           <Text style={{ color: "#804C46", fontWeight: "bold" }}>{dobObject && dobObject.day}</Text>
           <Text>{dobObject && dobObject.month}</Text>
+
         </View>
         <View
           style={{ height: 30, width: 1, backgroundColor: "lightgray" }}
         ></View>
         <View style={styles.infoDescription}>
+
           <Text style={{ color: "#804C46", fontWeight: "bold" }}>{user && daysUntilBirthday(user.dob)}</Text>
           <Text>Days left</Text>
+
         </View>
         <View
           style={{ height: 30, width: 1, backgroundColor: "lightgray" }}
         ></View>
 
         <View style={styles.infoDescription}>
+
           <Text style={{ color: "#804C46", fontWeight: "bold" }}>{user && calculateAge(user.dob)}</Text>
           <Text>Age</Text>
+
         </View>
-        <FontAwesome
-          name="pencil"
-          size={20}
-          color="black"
-          style={{ position: "relative", right: -40, top: 0 }}
-        />
+        <TouchableOpacity onPress={() => router.push(`/users/${id}/update`)}>
+          <Image
+            source={require("../assets/images/pencil.png")}
+            style={{ height: 20, width: 20, right: -40 }}
+          />
+        </TouchableOpacity>
       </View>
       <View style={styles.actionButtons}>
         <TouchableOpacity
@@ -129,7 +154,9 @@ export default function UserProfileScreen() {
 
       {selected == "profile" ? (
         <ScrollView>
+
             <ProfileContent giftPreferences={user?.giftPreferences} tags={user?.tags} favoriteGifts={user?.favoriteGifts} />
+
         </ScrollView>
         ) : (
           <Gifts isExplore={true} favoriteGifts={null} isEnabled={enableRecs} />
@@ -142,7 +169,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 15,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: colors.cream,
     paddingTop: 120,
   },
   header: {
@@ -190,10 +217,14 @@ const styles = StyleSheet.create({
   selected: {
     color: "black",
     textDecorationLine: "underline",
+    fontFamily: "PilcrowMedium",
+    fontSize: 20,
   },
 
   unselected: {
     color: "gray",
+    fontFamily: "PilcrowRounded",
+    fontSize: 18,
   },
   backgroundCover: {
     position: "absolute",
@@ -201,6 +232,21 @@ const styles = StyleSheet.create({
     height: 140,
     right: 0,
     top: 0,
-    backgroundColor: "#F5F5F5",
+    backgroundColor: colors.orange,
+    borderBottomLeftRadius: 8,
+    borderBottomRightRadius: 8,
+  },
+  name: {
+    fontFamily: "PilcrowMedium",
+    fontSize: 24,
+  },
+  subText: {
+    fontFamily: "PilcrowRounded",
+    fontSize: 16,
+  },
+  numberText: {
+    fontFamily: "PilcrowRounded",
+    fontSize: 18,
+    color: colors.orange,
   },
 });

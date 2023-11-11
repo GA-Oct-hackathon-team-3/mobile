@@ -13,6 +13,8 @@ import { Pressable, View, useColorScheme, Image, Text } from "react-native";
 import Colors from "../constants/Colors";
 import { colors } from "../constants/Theme";
 import { AuthProvider } from "../components/AuthContext";
+import "react-native-gesture-handler";
+import Header from "../components/Header";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -31,9 +33,14 @@ export default function RootLayout() {
   const [loaded, error] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
     PilcrowRounded: require("../assets/fonts/PilcrowRounded-Regular.ttf"),
+    PilcrowBold: require("../assets/fonts/PilcrowRounded-Bold.otf"),
+    PilcrowMedium: require("../assets/fonts/PilcrowRounded-Medium.otf"),
 
     ...FontAwesome.font,
   });
+  // if (Platform.OS === 'web') {
+  //   global._frameTimestamp = null
+  // }
 
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
@@ -83,15 +90,18 @@ function RootLayoutNav() {
           /> */}
           <Stack.Screen
             name="settings"
-            options={{ headerShown: true, title: "Settings" }}
+            options={{
+              title: "Settings",
+              header: () => <Header />,
+            }}
           />
-          <Stack.Screen
+          {/* <Stack.Screen
             name="add-tags"
             options={{
               headerShown: true,
               title: "Add Tags",
             }}
-          />
+          /> */}
         </Stack>
       </AuthProvider>
     </ThemeProvider>

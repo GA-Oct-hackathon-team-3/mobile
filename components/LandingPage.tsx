@@ -26,10 +26,11 @@ const LandingPage = () => {
         <Text
           style={{
             color: "white",
-            fontSize: 24,
+            fontSize: 28,
             width: 300,
             textAlign: "center",
             paddingTop: 40,
+            fontFamily: "PilcrowMedium",
           }}
         >
           Remember the perfect gift, every time
@@ -42,15 +43,7 @@ const LandingPage = () => {
         />
 
         <View style={styles.bottomContainer}>
-          <Text
-            style={{
-              color: "#3D3C3C",
-              fontSize: 18,
-              paddingTop: 20,
-              width: 240,
-              textAlign: "left",
-            }}
-          >
+          <Text style={styles.aboutText}>
             {
               "\u2022 Get reminders to help you keep track of upcoming birthdays. \n\n \u2022 Browse recommendations based on your loved one’s interests and hobbies."
             }
@@ -59,7 +52,14 @@ const LandingPage = () => {
             onPress={() => router.push("/signup")}
             style={styles.getStartedButton}
           >
-            <View>
+            <View
+              style={{
+                height: 80,
+                width: 200,
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
               <Text style={styles.text}>Get Started</Text>
             </View>
           </TouchableOpacity>
@@ -69,7 +69,7 @@ const LandingPage = () => {
               <Text
                 style={[styles.bottomText, { textDecorationLine: "underline" }]}
               >
-                Log In{" "}
+                Log In
               </Text>
             </View>
           </TouchableOpacity>
@@ -87,6 +87,14 @@ const styles = StyleSheet.create({
 
     backgroundColor: "#FDF7ED",
   },
+  aboutText: {
+    fontSize: 22,
+    fontFamily: "PilcrowRounded",
+    paddingTop: 20,
+    width: 240,
+    textAlign: "left",
+    color: "#3D3C3C",
+  },
 
   bottomContainer: {
     flexDirection: "column",
@@ -99,10 +107,12 @@ const styles = StyleSheet.create({
   },
   text: {
     color: "white",
-    fontSize: 22,
+    fontSize: 24,
+    fontFamily: "PilcrowMedium",
   },
   bottomText: {
     fontSize: 16,
+    fontFamily: "PilcrowMedium",
   },
   getStartedButton: {
     backgroundColor: "#53CF85",
