@@ -168,7 +168,7 @@ export default function UserProfileScreen() {
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.button}
-          onPress={() => handleSelect("gifts")}
+          onPress={() => handleSelect("explore")}
         >
           <Text
             style={activeTab == "profile" ? styles.unselected : styles.selected}
@@ -185,11 +185,23 @@ export default function UserProfileScreen() {
             giftPreferences={user.giftPreferences}
             tags={user.tags}
             toggleFavorite={toggleFavorite}
+            friendLocation={user.location}
           />
         </ScrollView>
       )}
       {user && activeTab === "explore" && (
-        <Explore favorites={favorites} enableRecs={enableRecs} toggleFavorite={toggleFavorite} />
+        <ScrollView>
+            <Explore 
+            enableRecs={enableRecs} 
+            toggleFavorite={toggleFavorite}
+            friend={user}
+            giftPreferences={user.giftPreferences}
+            tags={user.tags}
+            id={id}
+            friendLocation={user.location}
+            
+            />
+        </ScrollView>
       )}
     </View>
   );

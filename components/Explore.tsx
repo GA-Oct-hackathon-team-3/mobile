@@ -1,5 +1,5 @@
 import { FontAwesome } from "@expo/vector-icons";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   Image,
@@ -10,8 +10,10 @@ import {
 } from "react-native";
 import { colors } from "../constants/Theme";
 import { useLocalSearchParams, useRouter } from "expo-router";
+import * as friendsService from '../utilities/friends-service';
 
 import GiftItem from './Gift';
+import { useRecommendation } from './RecommendationContext';
 
 interface Explore {
   isExplore: boolean;
@@ -26,29 +28,97 @@ interface GiftItemProps {
 }
 
 
-const Explore = ({ enableRecs, favorites, toggleFavorite }) => {
+const Explore = ({ enableRecs, toggleFavorite, giftPreferences, tags, id, friend, friendLocation }) => {
+    const router = useRouter();
 
-  return (
-<View style={styles.container}>
-    <View style={styles.exploreHeader}>
-      <View style={styles.textRec}>
-        <Text>Personalized Recommendations</Text>
-        {enableRecs ? 'recommendations go here'
-        // <FlatList
-        //   data={}
-        //   renderItem={({ item }) => <GiftItem item={item} />}
-        //   keyExtractor={(item) => item.id}
-        //   numColumns={2}
-        // /> 
-        : (
-            <Text>Add tags to get personalized gift recommendations</Text>
-        )}
-      </View>
-      <FontAwesome name="refresh" size={20} color="black" />
-      <FontAwesome name="filter" size={20} color="black" />
-    </View>
-    </View>
-)
+    const { cache, updateCache } = useRecommendation();
+
+    const [recs, setRecs] = useState([]);
+    const [isRecommending, setIsRecommending] = useState(false);
+    const [showError, setShowError] = useState(false);
+    const [refresh, setRefresh] = useState(false);
+    const [filteredGiftTypes, setFilteredGiftTypes] = useState(giftPreferences);
+    const [filteredTags, setFilteredTags] = useState(tags);
+    const [budget, setBudget] = useState(null);
+
+    useEffect(() => {
+        const getRecommendations = async () => {
+          const requestBody = {
+            giftTypes: filteredGiftTypes,
+            tags: filteredTags,
+          };
+          if (budget) requestBody.budget = budget;
+          setIsRecommending(true);
+          try {
+            const recom = await friendsService.getRecommendations(id, requestBody);
+            console.log(recom)
+            setRefresh(false);
+            setRecs(recom.recommendations);
+            updateCache(id, recom.recommendations);
+            setIsRecommending(false);
+            setShowError(false);
+          } catch (error) {
+            setShowError(true);
+            setIsRecommending(false);
+            setRefresh(false);
+          }
+        };
+    
+        if (enableRecs && (!recs.length || refresh)) {
+          if (!refresh) {
+            if (cache[id] && cache[id].length) setRecs(cache[id]);
+            else getRecommendations();
+          } else {
+            getRecommendations();
+          }
+        }
+      }, 
+        [enableRecs, filteredGiftTypes, filteredTags, recs.length, id, refresh, budget, giftPreferences, tags, cache, updateCache]
+      );
+
+      return (
+        <View style={styles.container}>
+          <View style={styles.exploreHeader}>
+            <View style={styles.textRec}>
+              <Text>Personalized Recommendations</Text>
+            </View>
+            <FontAwesome name="refresh" size={20} color="black" />
+            <FontAwesome name="filter" size={20} color="black" />
+          </View>
+          <View>
+            {!showError ? (
+              <>
+                {refresh || (!recs.length && tags.length) ? (
+                  <View>
+                    <FontAwesome name="refresh" size={30} color={colors.purple} />
+                  </View>
+                ) : (
+                  <FlatList
+                    data={recs}
+                    renderItem={({ item }) => (
+                      <GiftItem gift={item} toggleFavorite={toggleFavorite} isFavorite={false} location={friendLocation} />
+                    )}
+                    keyExtractor={(item, idx) => idx.toString()}
+                    numColumns={2}
+                  />
+                )}
+              </>
+            ) : (
+              <View>
+                <Text>
+                  It appears our servers are too busy, try again in a few seconds
+                </Text>
+              </View>
+            )}
+            {!enableRecs && (
+              <View>
+                <Text>Add tags to get personalized gift recommendations</Text>
+              </View>
+            )}
+          </View>
+        </View>
+      );
+      
 }
 
 const styles = StyleSheet.create({

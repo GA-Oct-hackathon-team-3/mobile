@@ -48,7 +48,11 @@ export async function uploadPhoto(id, file) {
   if (response.status === 200) return response;
 }
 
-
+export async function getRecommendations(id, data){
+    const response = await sendRequest(`${BASE_URL}/${id}/generate-gift`, "POST", data);
+    return response;
+  }
+  
 export async function addToFavorites(friendId, recData){
     const response = await sendRequest(`${BASE_URL}/${friendId}/favorites`, "POST", recData);
     return response;
