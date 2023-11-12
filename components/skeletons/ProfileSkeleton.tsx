@@ -1,18 +1,35 @@
 import React from "react";
-import { View, StyleSheet } from "react-native";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { colors } from "../../constants/Theme";
 import { Skeleton } from "moti/skeleton";
 import ProfileContentSkeleton from "./ProfileContentSkeleton";
+import { useRouter } from "expo-router";
+import { Image } from "expo-image";
 
-type Props = {};
+type Props = {
+  isCurrUser: boolean;
+};
 
-function ProfileSkeleton({}: Props) {
+function ProfileSkeleton({ isCurrUser = false }: Props) {
   const colorMode = "light";
+  const router = useRouter();
 
   return (
     <>
       <View style={styles.backgroundCover}></View>
       <View style={styles.header}>
+        {!isCurrUser && (
+          <TouchableOpacity
+            style={{ position: "absolute", left: 0, top: 40, zIndex: 1 }}
+            onPress={() => router.back()}
+          >
+            <Image
+              source={require("../../assets/images/arrow-left.png")}
+              style={{ height: 24, width: 24 }}
+            />
+          </TouchableOpacity>
+        )}
+
         <View style={styles.avatar}>
           <Skeleton radius="round" colorMode="light" width={60} height={60} />
         </View>

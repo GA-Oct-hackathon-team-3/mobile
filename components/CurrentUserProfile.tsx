@@ -59,7 +59,7 @@ export default function CurrentUserProfileScreen() {
   return (
     <View style={styles.container}>
       {!user ? (
-        <ProfileSkeleton />
+        <ProfileSkeleton isCurrUser={true} />
       ) : (
         <>
           <TouchableOpacity
