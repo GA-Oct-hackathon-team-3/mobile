@@ -9,16 +9,26 @@ const ReminderSkeleton = () => {
     <View style={styles.remindersContainer}>
       <View style={styles.peopleContainer}>
         <View style={{ marginTop: 12 }}>
-          <Skeleton width={50} height={100} colorMode={colorMode} />
+          <Skeleton
+            radius={"square"}
+            width={50}
+            height={100}
+            colorMode={colorMode}
+          />
         </View>
         <View style={{ width: 4 }}></View>
-        <Skeleton width={50} height={100} colorMode={colorMode} />
+        <Skeleton
+          radius={"square"}
+          width={50}
+          height={100}
+          colorMode={colorMode}
+        />
       </View>
 
       <View style={styles.remindTextContainer}>
         <View style={{ gap: 8 }}>
-          <Skeleton width={160} colorMode={colorMode} />
-          <Skeleton width={200} colorMode={colorMode} />
+          <Skeleton radius={"square"} width={160} colorMode={colorMode} />
+          <Skeleton radius={"square"} width={200} colorMode={colorMode} />
         </View>
       </View>
     </View>

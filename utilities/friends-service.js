@@ -35,7 +35,7 @@ export async function uploadPhoto(id, file) {
 
   const formData = new FormData();
   formData.append("photo", file);
-  const token = getToken();
+  const token = await getToken();
 
   const response = await fetch(`${BASE_URL}/${id}/upload`, {
     method: "POST",

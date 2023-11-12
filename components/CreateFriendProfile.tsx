@@ -123,9 +123,11 @@ export default function CreateFriendsProfile() {
         console.log(response, "PHOTO UPLOAD RESPONSE");
 
         if (response!.ok && friendData) router.replace("/");
+        return;
       } catch (error) {}
     }
     if (friendData._id) router.push(`/users/${friendData._id}/add-tags`);
+    return;
   };
 
   return (

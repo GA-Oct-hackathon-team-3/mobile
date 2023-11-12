@@ -538,26 +538,27 @@ export default function MainScreen() {
         </TouchableOpacity>
       </Modal> */}
       {isLoading ? (
-        <View style={styles.modalBackground}>
-          <View style={styles.skelButtonContainer}>
-            <View
-              style={{
-                flexDirection: "column",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: 12,
-              }}
-            >
-              <Skeleton
-                width={80}
-                height={60}
-                colorMode="light"
-                radius={"square"}
-              />
-            </View>
-          </View>
-        </View>
+        <></>
       ) : (
+        // <View style={styles.modalBackground}>
+        //   <View style={styles.skelButtonContainer}>
+        //     <View
+        //       style={{
+        //         flexDirection: "column",
+        //         alignItems: "center",
+        //         justifyContent: "center",
+        //         gap: 12,
+        //       }}
+        //     >
+        //       <Skeleton
+        //         width={80}
+        //         height={60}
+        //         colorMode="light"
+        //         radius={"square"}
+        //       />
+        //     </View>
+        //   </View>
+        // </View>
         <TouchableOpacity
           onPress={() => router.push("/add-friend")}
           style={styles.floatingButtonContainer}

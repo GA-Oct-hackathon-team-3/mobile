@@ -18,11 +18,13 @@ import { colors } from "../constants/Theme";
 import { useAuth } from "./AuthContext";
 import * as UserAPI from "../utilities/users-api";
 import { useRouter } from "expo-router";
+import ProfileSkeleton from "./skeletons/ProfileSkeleton";
 
 export default function CurrentUserProfileScreen() {
   const [selected, setSelected] = useState("profile");
   const { logout } = useAuth();
   const router = useRouter();
+  const [loading, setLoading] = useState(true);
 
   const [user, setUser] = useState(null);
 
@@ -56,85 +58,96 @@ export default function CurrentUserProfileScreen() {
   };
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        style={{
-          position: "absolute",
-          top: 60,
-          right: 0,
-          height: 40,
-          width: 40,
-          zIndex: 1,
-        }}
-        onPress={goToSettings}
-      >
-        <FontAwesome name="gears" size={24} color={colors.brightWhite} />
-      </TouchableOpacity>
-      <View style={styles.backgroundCover}></View>
-      <View style={styles.header}>
-        <Image
-          source={require("../assets/images/alex.jpg")}
-          style={styles.avatar}
-        />
-        <Text style={styles.name}>{user && user.name}</Text>
-        <Text style={styles.subText}>Friend</Text>
-      </View>
-      <View style={styles.info}>
-        <View style={styles.infoDescription}>
-          <Text style={styles.numberText}>10</Text>
-          <Text style={styles.subText}>January</Text>
-        </View>
-        <View
-          style={{ height: 30, width: 1, backgroundColor: "lightgray" }}
-        ></View>
-        <View style={styles.infoDescription}>
-          <Text style={styles.numberText}>180</Text>
-          <Text style={styles.subText}>Days left</Text>
-        </View>
-        <View
-          style={{ height: 30, width: 1, backgroundColor: "lightgray" }}
-        ></View>
-
-        <View style={styles.infoDescription}>
-          <Text style={styles.numberText}>27</Text>
-          <Text style={styles.subText}>Age</Text>
-        </View>
-        <Image
-          source={require("../assets/images/pencil.png")}
-          style={{ height: 20, width: 20, right: -40 }}
-        />
-      </View>
-      <View style={styles.actionButtons}>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => handleSelect("profile")}
-        >
-          <Text
-            style={selected == "profile" ? styles.selected : styles.unselected}
-          >
-            Profile
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => handleSelect("gifts")}
-        >
-          <Text
-            style={selected == "profile" ? styles.unselected : styles.selected}
-          >
-            Explore Gifts
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {selected == "profile" ? (
-        <ScrollView>
-          <ProfileContent user={user} />
-        </ScrollView>
+      {!user ? (
+        <ProfileSkeleton />
       ) : (
-        <Gifts isExplore={true} />
-      )}
+        <>
+          <TouchableOpacity
+            style={{
+              position: "absolute",
+              top: 60,
+              right: 0,
+              height: 40,
+              width: 40,
+              zIndex: 1,
+            }}
+            onPress={goToSettings}
+          >
+            <FontAwesome name="gears" size={24} color={colors.brightWhite} />
+          </TouchableOpacity>
+          <View style={styles.backgroundCover}></View>
+          <View style={styles.header}>
+            {user && (
+              <Image
+                source={{ uri: user.photo }}
+                style={styles.avatar}
+                onLoadEnd={() => setLoading(false)}
+              />
+            )}
+            <Text style={styles.name}>{user && user.name}</Text>
+            <Text style={styles.subText}>Friend</Text>
+          </View>
+          <View style={styles.info}>
+            <View style={styles.infoDescription}>
+              <Text style={styles.numberText}>10</Text>
+              <Text style={styles.subText}>January</Text>
+            </View>
+            <View
+              style={{ height: 30, width: 1, backgroundColor: "lightgray" }}
+            ></View>
+            <View style={styles.infoDescription}>
+              <Text style={styles.numberText}>180</Text>
+              <Text style={styles.subText}>Days left</Text>
+            </View>
+            <View
+              style={{ height: 30, width: 1, backgroundColor: "lightgray" }}
+            ></View>
 
-      {/* You can add the "Favorited Gifts" section similarly */}
+            <View style={styles.infoDescription}>
+              <Text style={styles.numberText}>27</Text>
+              <Text style={styles.subText}>Age</Text>
+            </View>
+            <Image
+              source={require("../assets/images/pencil.png")}
+              style={{ height: 20, width: 20, right: -40 }}
+            />
+          </View>
+          <View style={styles.actionButtons}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => handleSelect("profile")}
+            >
+              <Text
+                style={
+                  selected == "profile" ? styles.selected : styles.unselected
+                }
+              >
+                Profile
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => handleSelect("gifts")}
+            >
+              <Text
+                style={
+                  selected == "profile" ? styles.unselected : styles.selected
+                }
+              >
+                Explore Gifts
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {selected == "profile" ? (
+            <ScrollView>
+              <ProfileContent user={user} />
+            </ScrollView>
+          ) : (
+            <Gifts isExplore={true} />
+          )}
+        </>
+      )}
     </View>
   );
 }

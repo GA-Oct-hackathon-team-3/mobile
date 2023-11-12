@@ -7,7 +7,7 @@ const SearchBarSkeleton = () => {
   return (
     <View style={styles.searchBar}>
       <Skeleton colorMode="light" height={22} width={22} radius={"square"} />
-      <Skeleton width={"90%"} colorMode="light" height={20} radius={"square"} />
+      <Skeleton width={"92%"} colorMode="light" height={20} radius={"square"} />
     </View>
   );
 };
@@ -18,7 +18,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     alignItems: "center",
     justifyContent: "space-between",
-    gap: 4,
+    gap: 8,
     flexDirection: "row",
 
     borderRadius: 5,

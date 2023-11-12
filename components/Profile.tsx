@@ -15,6 +15,8 @@ import {
 } from "../utilities/helpers";
 import { useLocalSearchParams } from "expo-router";
 import { colors } from "../constants/Theme";
+import ProfileSkeleton from "./skeletons/ProfileSkeleton";
+import * as ImageManipulator from "expo-image-manipulator";
 
 interface Friend {
   name: string;
@@ -34,12 +36,14 @@ export default function UserProfileScreen() {
   const router = useRouter();
   const [selected, setSelected] = useState("profile");
   const [user, setUser] = useState<Friend | null>(null);
+  const [image, setImage] = useState(null);
   const [dobObject, setDobObject] = useState({
     year: "",
     month: "",
     day: "",
   });
   const [enableRecs, setEnableRecs] = useState<boolean>(false);
+  const [loading, setLoading] = useState(true);
 
   const { id } = useLocalSearchParams();
 
@@ -68,6 +72,26 @@ export default function UserProfileScreen() {
     }
   };
 
+  const setupImage = async () => {
+    const imageResult = await ImageManipulator.manipulateAsync(
+      user.photo,
+      [
+        { resize: { width: 200, height: 200 } },
+
+        { flip: ImageManipulator.FlipType.Vertical },
+      ],
+      { compress: 0.5, format: ImageManipulator.SaveFormat.PNG }
+    );
+    setImage(imageResult.uri);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    if (user) {
+      setupImage();
+    }
+  }, [user]);
+
   useEffect(() => {
     fetchFriend();
   }, []);
@@ -75,96 +99,113 @@ export default function UserProfileScreen() {
   const handleSelect = (value: string) => {
     setSelected(value);
   };
+
+  const onLoad = () => {
+    setLoading(false);
+  };
   return (
     <View style={styles.container}>
-      <View style={styles.backgroundCover}></View>
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={{ position: "absolute", left: 0, top: 40 }}
-          onPress={() => router.back()}
-        >
-          <Image
-            source={require("../assets/images/arrow-left.png")}
-            style={{ height: 24, width: 24 }}
-          />
-        </TouchableOpacity>
-        <Image
-          source={
-            user && user.photo
-              ? { uri: user.photo }
-              : { uri: "https://i.imgur.com/hCwHtRc.png" }
-          }
-          style={styles.avatar}
-        />
-        <Text style={styles.name}>{user && user.name}</Text>
-        <Text style={styles.subText}>Friend</Text>
-      </View>
-      <View style={styles.info}>
-        <View style={styles.infoDescription}>
-          <Text style={{ color: "#804C46", fontWeight: "bold" }}>
-            {dobObject && dobObject.day}
-          </Text>
-          <Text>{dobObject && dobObject.month}</Text>
-        </View>
-        <View
-          style={{ height: 30, width: 1, backgroundColor: "lightgray" }}
-        ></View>
-        <View style={styles.infoDescription}>
-          <Text style={{ color: "#804C46", fontWeight: "bold" }}>
-            {user && daysUntilBirthday(user.dob)}
-          </Text>
-          <Text>Days left</Text>
-        </View>
-        <View
-          style={{ height: 30, width: 1, backgroundColor: "lightgray" }}
-        ></View>
-
-        <View style={styles.infoDescription}>
-          <Text style={{ color: "#804C46", fontWeight: "bold" }}>
-            {user && calculateAge(user.dob)}
-          </Text>
-          <Text>Age</Text>
-        </View>
-        <TouchableOpacity onPress={() => router.push(`/users/${id}/update`)}>
-          <Image
-            source={require("../assets/images/pencil.png")}
-            style={{ height: 20, width: 20, right: -40 }}
-          />
-        </TouchableOpacity>
-      </View>
-      <View style={styles.actionButtons}>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => handleSelect("profile")}
-        >
-          <Text
-            style={selected == "profile" ? styles.selected : styles.unselected}
-          >
-            Profile
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => handleSelect("gifts")}
-        >
-          <Text
-            style={selected == "profile" ? styles.unselected : styles.selected}
-          >
-            Explore Gifts
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {selected == "profile" ? (
-        <ScrollView>
-          <ProfileContent
-            giftPreferences={user?.giftPreferences}
-            tags={user?.tags}
-            favoriteGifts={user?.favoriteGifts}
-          />
-        </ScrollView>
+      {loading && !image ? (
+        <ProfileSkeleton />
       ) : (
-        <Gifts isExplore={true} favoriteGifts={null} isEnabled={enableRecs} />
+        <>
+          <View style={styles.backgroundCover}></View>
+          <View style={styles.header}>
+            <TouchableOpacity
+              style={{ position: "absolute", left: 0, top: 40 }}
+              onPress={() => router.back()}
+            >
+              <Image
+                source={require("../assets/images/arrow-left.png")}
+                style={{ height: 24, width: 24 }}
+              />
+            </TouchableOpacity>
+            <Image
+              source={{ uri: image }}
+              onLoad={onLoad}
+              style={styles.avatar}
+            />
+            <Text style={styles.name}>{user && user.name}</Text>
+            <Text style={styles.subText}>Friend</Text>
+          </View>
+          <View style={styles.info}>
+            <View style={styles.infoDescription}>
+              <Text style={{ color: "#804C46", fontWeight: "bold" }}>
+                {dobObject && dobObject.day}
+              </Text>
+              <Text>{dobObject && dobObject.month}</Text>
+            </View>
+            <View
+              style={{ height: 30, width: 1, backgroundColor: "lightgray" }}
+            ></View>
+            <View style={styles.infoDescription}>
+              <Text style={{ color: "#804C46", fontWeight: "bold" }}>
+                {user && daysUntilBirthday(user.dob)}
+              </Text>
+              <Text>Days left</Text>
+            </View>
+            <View
+              style={{ height: 30, width: 1, backgroundColor: "lightgray" }}
+            ></View>
+
+            <View style={styles.infoDescription}>
+              <Text style={{ color: "#804C46", fontWeight: "bold" }}>
+                {user && calculateAge(user.dob)}
+              </Text>
+              <Text>Age</Text>
+            </View>
+            <TouchableOpacity
+              onPress={() => router.push(`/users/${id}/update`)}
+            >
+              <Image
+                source={require("../assets/images/pencil.png")}
+                style={{ height: 20, width: 20, right: -40 }}
+              />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.actionButtons}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => handleSelect("profile")}
+            >
+              <Text
+                style={
+                  selected == "profile" ? styles.selected : styles.unselected
+                }
+              >
+                Profile
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => handleSelect("gifts")}
+            >
+              <Text
+                style={
+                  selected == "profile" ? styles.unselected : styles.selected
+                }
+              >
+                Explore Gifts
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {selected == "profile" ? (
+            <ScrollView>
+              <ProfileContent
+                giftPreferences={user?.giftPreferences}
+                tags={user?.tags}
+                favoriteGifts={user?.favoriteGifts}
+              />
+            </ScrollView>
+          ) : (
+            <Gifts
+              isExplore={true}
+              favoriteGifts={null}
+              isEnabled={enableRecs}
+            />
+          )}
+        </>
       )}
     </View>
   );
