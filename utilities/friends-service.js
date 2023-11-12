@@ -31,11 +31,10 @@ export async function updateFriend(id, friendInput) {
 }
 
 export async function uploadPhoto(id, file) {
-  console.log(id, typeof file, "ID AND FILE");
 
   const formData = new FormData();
   formData.append("photo", file);
-  const token = getToken();
+  const token = await getToken();
 
   const response = await fetch(`${BASE_URL}/${id}/upload`, {
     method: "POST",
@@ -46,7 +45,17 @@ export async function uploadPhoto(id, file) {
     body: formData,
   });
 
-  console.log(response, "RESPONSE, UPLOAD PHOTO");
-
   if (response.status === 200) return response;
 }
+
+
+export async function addToFavorites(friendId, recData){
+    const response = await sendRequest(`${BASE_URL}/${friendId}/favorites`, "POST", recData);
+    return response;
+  }
+  
+  export async function removeFromFavorites(friendId, recId){
+    const response = await sendRequest(`${BASE_URL}/${friendId}/favorites/${recId}`, "DELETE");
+    return response;
+  }
+

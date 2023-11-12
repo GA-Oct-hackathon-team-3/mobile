@@ -1,12 +1,12 @@
 import { FontAwesome } from "@expo/vector-icons";
 import React from "react";
-import { View, StyleSheet, Text, Image, Touchable } from "react-native";
-import Gifts from "./Gifts";
+import { View, StyleSheet, Text, Image, Touchable, FlatList } from "react-native";
+import GiftItem from './Gift';
 import { colors } from "../constants/Theme";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useRouter, useLocalSearchParams } from "expo-router";
 
-const ProfileContent = ({ giftPreferences, tags, favoriteGifts, user }) => {
+const ProfileContent = ({ giftPreferences, tags, favorites, user, toggleFavorite }) => {
   const router = useRouter();
   const params = useLocalSearchParams();
 
@@ -101,8 +101,24 @@ const ProfileContent = ({ giftPreferences, tags, favoriteGifts, user }) => {
       </View>
 
       <View style={styles.giftTypeContainer}>
-        <Gifts isExplore={false} favoriteGifts={favoriteGifts} />
-      </View>
+      <View style={styles.giftTop}>
+      <Text>Favorited Gifts</Text>
+      <FontAwesome name="pencil" size={20} color="black" />
+      {favorites && favorites.length > 0 ? (
+        <FlatList
+          data={favorites}
+          renderItem={({ item }) => <GiftItem gift={item} toggleFavorite={toggleFavorite} />}
+          keyExtractor={(item) => item.id}
+          numColumns={2}
+        />
+      ) : (
+        <View style={styles.giftTop}>
+          <Text>No favorites</Text>
+          <FontAwesome name="pencil" size={20} color="black" />
+        </View>
+      )}
+    </View>
+</View>
     </View>
   );
 };
