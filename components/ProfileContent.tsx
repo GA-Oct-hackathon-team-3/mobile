@@ -6,7 +6,7 @@ import { colors } from "../constants/Theme";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useRouter, useLocalSearchParams } from "expo-router";
 
-const ProfileContent = ({ giftPreferences, tags, favorites, user, toggleFavorite }) => {
+const ProfileContent = ({ giftPreferences, tags, favorites, user, toggleFavorite, friendLocation }) => {
   const router = useRouter();
   const params = useLocalSearchParams();
 
@@ -107,7 +107,7 @@ const ProfileContent = ({ giftPreferences, tags, favorites, user, toggleFavorite
       {favorites && favorites.length > 0 ? (
         <FlatList
           data={favorites}
-          renderItem={({ item }) => <GiftItem gift={item} toggleFavorite={toggleFavorite} />}
+          renderItem={({ item }) => <GiftItem gift={item} toggleFavorite={toggleFavorite} isFavorite={true} location={friendLocation} />}
           keyExtractor={(item) => item.id}
           numColumns={2}
         />

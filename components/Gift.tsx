@@ -1,5 +1,5 @@
 import { FontAwesome } from "@expo/vector-icons";
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Image,
@@ -9,8 +9,10 @@ import {
   TouchableOpacity,
 } from "react-native";
 
-const GiftItem = ({ gift, toggleFavorite }) => (
+const GiftItem = ({ gift, toggleFavorite, isFavorite, location }) => {
+    const [fillHeart, setFillHeart] = useState(isFavorite); // to toggle between empty or filled heart
 
+    return (
     <View style={styles.itemContainer}>
       <View>
         <Image
@@ -18,16 +20,21 @@ const GiftItem = ({ gift, toggleFavorite }) => (
           alt={gift.imageSearchQuery}
           style={styles.giftImage}
         />
-        <TouchableOpacity onPress={(e) => toggleFavorite(gift, e)}
+        <TouchableOpacity onPress={(e) => {
+            toggleFavorite(gift, e);
+            setFillHeart(!fillHeart);
+        }}
           style={{ position: "absolute", right: 40, bottom: 12 }}
         >
-          <FontAwesome name="heart" size={24} color="red" />
+            {fillHeart ?  <FontAwesome name="heart" size={24} color="red" /> : <FontAwesome name="heart-o" size={24} color="red"/>}
+         
         </TouchableOpacity>
       </View>
       <Text style={styles.giftName}>{gift.title}</Text>
       <Text style={styles.giftPrice}>${gift.estimatedCost}</Text>
     </View>
   );
+}
 
 
   const styles = StyleSheet.create({
