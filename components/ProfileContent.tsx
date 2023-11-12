@@ -16,10 +16,12 @@ const ProfileContent = ({ giftPreferences, tags, favoriteGifts, user }) => {
         {/* Gift Type Top */}
         <View style={styles.giftTop}>
           <Text style={styles.text}>Gift Type</Text>
+          <TouchableOpacity onPress={() => router.push(`/users/${params.id}/update`)}>
           <Image
             source={require("../assets/images/pencil.png")}
             style={{ height: 20, width: 20 }}
           />
+          </TouchableOpacity>
         </View>
         {/* Gift Type Bottom */}
         <View style={styles.giftSquareContainer}>

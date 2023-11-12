@@ -55,14 +55,10 @@ export default function UserProfileScreen() {
             : "https://i.imgur.com/hCwHtRc.png"
         }?timestamp=${uniqueTimestamp}`;
         setUser(friendData);
+        setDobObject(splitDOB(friendData.dob));
+        if (friendData.tags.length > 0) setEnableRecs(true);
       }
 
-      if (user) {
-        console.log("THIS IS THE FRIEND DATA", user);
-        setUser(user);
-        setDobObject(splitDOB(user.dob));
-        if (user.tags.length > 0) setEnableRecs(true);
-      }
     } catch (error) {
       console.error("Error fetching user: ", error);
     }
