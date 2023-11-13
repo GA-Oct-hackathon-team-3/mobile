@@ -1,21 +1,18 @@
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
-  Alert,
+  Image,
   StyleSheet,
+  Text,
   TextInput,
   View,
-  Button,
-  Text,
-  Image,
   useWindowDimensions,
 } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
-import { Stack, useRouter } from "expo-router";
-import * as UserController from "../utilities/users-service";
-import { useAuth } from "../components/AuthContext";
-import { FontAwesome } from "@expo/vector-icons";
-import { colors, buttons } from "../constants/Theme";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { useAuth } from "../components/AuthContext";
+import { colors } from "../constants/Theme";
+import * as UserController from "../utilities/users-service";
 
 const oceanBlue = "#007AFF";
 const white = "#fff";
@@ -36,6 +33,7 @@ export default function LoginScreen() {
       email: email,
       password: password,
     });
+    console.log("RESPONSE LOGIN: ", response);
     if (response) {
       setToken(response.token);
       setUserData(response);

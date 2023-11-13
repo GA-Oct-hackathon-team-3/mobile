@@ -153,46 +153,45 @@ export default function EditTags() {
         />
 
         <Text>Added Tags</Text>
-        <ScrollView
-          contentContainerStyle={{ maxHeight: 180 }}
-          ref={scrollViewRef}
-          onContentSizeChange={(width, height) => {
-            scrollViewSizeChanged(height);
-          }}
-        >
-          <View style={styles.addedTagsContainer}>
-            {addedTags.map((tag) => (
-              <View key={tag} style={styles.tagSelectButton}>
-                <Text key={tag} style={styles.tagSelectText}>
+        <View style={{ maxHeight: 140 }}>
+          <ScrollView
+            ref={scrollViewRef}
+            onContentSizeChange={(width, height) => {
+              scrollViewSizeChanged(height);
+            }}
+          >
+            <View style={styles.addedTagsContainer}>
+              {addedTags.map((tag) => (
+                <Text key={tag} style={styles.tagSelectButton}>
                   {tag}
                 </Text>
+              ))}
+            </View>
+          </ScrollView>
+        </View>
+
+        <View style={{ maxHeight: 240 }}>
+          <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+            {Object.entries(tagCategories).map(([category, tags]) => (
+              <View key={category}>
+                <Text>{category}</Text>
+                <View style={styles.tagList}>
+                  {tags.map((tag) => (
+                    <TouchableOpacity
+                      key={tag}
+                      onPress={() => handleTagPress(tag)}
+                      style={styles.tagButton}
+                    >
+                      <Text style={{ fontFamily: "PilcrowRounded" }}>
+                        {tag} +
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
               </View>
             ))}
-          </View>
-        </ScrollView>
-
-        <ScrollView
-          contentContainerStyle={{ maxHeight: 240, paddingBottom: 100 }}
-        >
-          {Object.entries(tagCategories).map(([category, tags]) => (
-            <View key={category}>
-              <Text>{category}</Text>
-              <View style={styles.tagList}>
-                {tags.map((tag) => (
-                  <TouchableOpacity
-                    key={tag}
-                    onPress={() => handleTagPress(tag)}
-                    style={styles.tagButton}
-                  >
-                    <Text style={{ fontFamily: "PilcrowRounded" }}>
-                      {tag} +
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
-            </View>
-          ))}
-        </ScrollView>
+          </ScrollView>
+        </View>
       </View>
       <View>
         <TouchableOpacity

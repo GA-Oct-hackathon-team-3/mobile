@@ -32,6 +32,7 @@ export async function getToken() {
 
 export async function login(credentials) {
   const res = await usersAPI.login(credentials);
+  console.log(res, "REPONSE USER CONTROLLER LOGIN");
 
   Platform.OS === "web"
     ? localStorage.setItem("token", res.accessToken)

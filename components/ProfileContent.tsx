@@ -1,12 +1,27 @@
 import { FontAwesome } from "@expo/vector-icons";
 import React from "react";
-import { View, StyleSheet, Text, Image, Touchable, FlatList } from "react-native";
-import GiftItem from './Gift';
+import {
+  View,
+  StyleSheet,
+  Text,
+  Image,
+  Touchable,
+  FlatList,
+  ScrollView,
+} from "react-native";
+import GiftItem from "./Gift";
 import { colors } from "../constants/Theme";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useRouter, useLocalSearchParams } from "expo-router";
 
-const ProfileContent = ({ giftPreferences, tags, favorites, user, toggleFavorite, friendLocation }) => {
+const ProfileContent = ({
+  giftPreferences,
+  tags,
+  favorites,
+  user,
+  toggleFavorite,
+  friendLocation,
+}) => {
   const router = useRouter();
   const params = useLocalSearchParams();
 
@@ -16,11 +31,13 @@ const ProfileContent = ({ giftPreferences, tags, favorites, user, toggleFavorite
         {/* Gift Type Top */}
         <View style={styles.giftTop}>
           <Text style={styles.text}>Gift Type</Text>
-          <TouchableOpacity onPress={() => router.push(`/users/${params.id}/update`)}>
-          <Image
-            source={require("../assets/images/pencil.png")}
-            style={{ height: 20, width: 20 }}
-          />
+          <TouchableOpacity
+            onPress={() => router.push(`/users/${params.id}/update`)}
+          >
+            <Image
+              source={require("../assets/images/pencil.png")}
+              style={{ height: 20, width: 20 }}
+            />
           </TouchableOpacity>
         </View>
         {/* Gift Type Bottom */}
@@ -83,11 +100,20 @@ const ProfileContent = ({ giftPreferences, tags, favorites, user, toggleFavorite
             />
           </TouchableOpacity>
         </View>
-        <View style={styles.tagsSection}>
+        <ScrollView contentContainerStyle={styles.tagsSection}>
           {tags && tags.length > 0 ? (
             tags.map((tag, idx) => (
               <View style={styles.tag} key={idx}>
-                <Text key={idx}>{tag.title}</Text>
+                <Text
+                  key={idx}
+                  style={{
+                    fontFamily: "PilcrowMedium",
+                    fontSize: 16,
+                    color: colors.brightWhite,
+                  }}
+                >
+                  {tag.title}
+                </Text>
               </View>
             ))
           ) : (
@@ -97,28 +123,35 @@ const ProfileContent = ({ giftPreferences, tags, favorites, user, toggleFavorite
               </Text>
             </View>
           )}
-        </View>
+        </ScrollView>
       </View>
 
       <View style={styles.giftTypeContainer}>
-      <View style={styles.giftTop}>
-      <Text>Favorited Gifts</Text>
-      <FontAwesome name="pencil" size={20} color="black" />
-      {favorites && favorites.length > 0 ? (
-        <FlatList
-          data={favorites}
-          renderItem={({ item }) => <GiftItem gift={item} toggleFavorite={toggleFavorite} isFavorite={true} location={friendLocation} />}
-          keyExtractor={(item) => item.id}
-          numColumns={2}
-        />
-      ) : (
         <View style={styles.giftTop}>
-          <Text>No favorites</Text>
+          <Text>Favorited Gifts</Text>
           <FontAwesome name="pencil" size={20} color="black" />
+          {favorites && favorites.length > 0 ? (
+            <FlatList
+              data={favorites}
+              renderItem={({ item }) => (
+                <GiftItem
+                  gift={item}
+                  toggleFavorite={toggleFavorite}
+                  isFavorite={true}
+                  location={friendLocation}
+                />
+              )}
+              keyExtractor={(item) => item.id}
+              numColumns={2}
+            />
+          ) : (
+            <View style={styles.giftTop}>
+              <Text>No favorites</Text>
+              <FontAwesome name="pencil" size={20} color="black" />
+            </View>
+          )}
         </View>
-      )}
-    </View>
-</View>
+      </View>
     </View>
   );
 };

@@ -1,22 +1,20 @@
-import React, { useRef, useState, useEffect } from "react";
+import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
+import React, { useEffect, useRef, useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
-  ScrollView,
-  Button,
-  Image,
   ActivityIndicator,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
   useWindowDimensions,
 } from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import TitleBack from "./TitleBack";
 import { colors } from "../constants/Theme";
-import * as tagsService from "../utilities/tags-service";
 import * as friendsService from "../utilities/friends-service";
-import { useNavigation } from "expo-router";
+import * as tagsService from "../utilities/tags-service";
+import TitleBack from "./TitleBack";
 
 export default function AddTags() {
   const params = useLocalSearchParams();

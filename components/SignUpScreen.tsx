@@ -82,7 +82,7 @@ export default function SignUpScreen() {
     const data = {
       name: name,
       tel: phoneNumber,
-      email: email,
+      email: email.toLowerCase(),
       password: password,
       confirmPassword: password,
       dob: dob,
