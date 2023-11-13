@@ -1,23 +1,20 @@
+import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  StyleSheet,
-  View,
-  TextInput,
-  Button,
-  Text,
-  Image,
-  TouchableOpacity,
-  useWindowDimensions,
-  KeyboardAvoidingView,
   ActivityIndicator,
   Alert,
+  Image,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  useWindowDimensions,
 } from "react-native";
-import Picker from "@react-native-picker/picker";
-import { colors } from "../constants/Theme";
-import { useRouter } from "expo-router";
-import * as usersService from "../utilities/users-service";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { colors } from "../constants/Theme";
+import * as usersService from "../utilities/users-service";
 import { useAuth } from "./AuthContext";
 
 function convertDateFormat(dateString) {

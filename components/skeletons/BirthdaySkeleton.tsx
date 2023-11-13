@@ -36,35 +36,42 @@ const BirthdaySkeleton = () => {
         </View>
       </View>
       <View style={styles.item}>
-        <View style={styles.itemTextContainer}>
-          <View style={{ flexDirection: "row", gap: 10 }}>
-            <Skeleton colorMode={colorMode} height={60} width={60} />
-            <View style={{ flexDirection: "column" }}>
-              <Skeleton
-                colorMode={colorMode}
-                width={200}
-                radius={"square"}
-                height={20}
-              />
-              <View style={{ height: 4 }}></View>
-              <Skeleton
-                colorMode={colorMode}
-                width={120}
-                radius={"square"}
-                height={20}
-              />
-            </View>
-          </View>
-        </View>
-        <View style={styles.card}>
-          <View style={styles.content}>
+        <View style={{ flexDirection: "row", gap: 10 }}>
+          <Skeleton
+            colorMode={colorMode}
+            height={60}
+            width={60}
+            radius={"square"}
+          />
+          <View style={{ flexDirection: "column", gap: 4 }}>
             <Skeleton
               colorMode={colorMode}
-              height={50}
-              width={50}
+              width={200}
               radius={"square"}
+              height={20}
+            />
+            <Skeleton
+              colorMode={colorMode}
+              width={120}
+              radius={"square"}
+              height={20}
             />
           </View>
+        </View>
+
+        <View style={styles.content}>
+          <Skeleton
+            colorMode={colorMode}
+            height={50}
+            width={40}
+            radius={"square"}
+          />
+          <Skeleton
+            colorMode={colorMode}
+            height={20}
+            width={50}
+            radius={"square"}
+          />
         </View>
       </View>
     </View>
@@ -91,7 +98,12 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     zIndex: 1,
   },
-  itemTextContainer: {},
+  itemTextContainer: {
+    flexDirection: "row",
+    marginTop: -4,
+
+    justifyContent: "flex-start",
+  },
   name: {
     color: "#000",
     fontFamily: "PilcrowRounded",
@@ -113,6 +125,7 @@ const styles = StyleSheet.create({
   content: {
     flexDirection: "column",
     alignItems: "center",
+    gap: 4,
   },
   label: {
     color: "#000",

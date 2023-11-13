@@ -1,12 +1,3 @@
-const DUMMY_PROFILE = {
-  first_name: "Alex",
-  last_name: "Turner",
-  birthday: "1992-01-10",
-  about:
-    "A passionate developer who loves sushi, cheers for the 49ers, and spends weekends coding.",
-  tags: ["Sushi Lover", "49ers Fan", "Programmer"],
-  image: "https://via.placeholder.com/150", // A dummy image. Replace with a real one if needed.
-};
 // Import necessary components and libraries
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, Image } from "react-native";
@@ -18,11 +9,14 @@ import { colors } from "../constants/Theme";
 import { useAuth } from "./AuthContext";
 import * as UserAPI from "../utilities/users-api";
 import { useRouter } from "expo-router";
+import ProfileSkeleton from "./skeletons/ProfileSkeleton";
+import * as ImageManipulator from "expo-image-manipulator";
 
 export default function CurrentUserProfileScreen() {
   const [selected, setSelected] = useState("profile");
-  const { logout } = useAuth();
   const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [image, setImage] = useState(null);
 
   const [user, setUser] = useState(null);
 
@@ -44,97 +38,131 @@ export default function CurrentUserProfileScreen() {
     } catch (error) {}
   };
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-    } catch (error) {
-      console.error(error);
+  const setupImage = async () => {
+    if (user && user.photo) {
+      const imageResult = await ImageManipulator.manipulateAsync(
+        user.photo,
+        [
+          { resize: { width: 200, height: 200 } },
+
+          { flip: ImageManipulator.FlipType.Vertical },
+        ],
+        { compress: 0.5, format: ImageManipulator.SaveFormat.PNG }
+      );
+      setImage(imageResult.uri);
+      setLoading(false);
     }
   };
+
   const goToSettings = () => {
     router.push("/settings");
   };
+
+  useEffect(() => {
+    if (user) {
+      setupImage();
+    }
+  }, [user]);
+
+  const onLoad = () => {
+    setLoading(false);
+  };
   return (
     <View style={styles.container}>
-      <TouchableOpacity
-        style={{
-          position: "absolute",
-          top: 60,
-          right: 0,
-          height: 40,
-          width: 40,
-          zIndex: 1,
-        }}
-        onPress={goToSettings}
-      >
-        <FontAwesome name="gears" size={24} color={colors.brightWhite} />
-      </TouchableOpacity>
-      <View style={styles.backgroundCover}></View>
-      <View style={styles.header}>
-        <Image
-          source={require("../assets/images/alex.jpg")}
-          style={styles.avatar}
-        />
-        <Text style={styles.name}>{user && user.name}</Text>
-        <Text style={styles.subText}>Friend</Text>
-      </View>
-      <View style={styles.info}>
-        <View style={styles.infoDescription}>
-          <Text style={styles.numberText}>10</Text>
-          <Text style={styles.subText}>January</Text>
-        </View>
-        <View
-          style={{ height: 30, width: 1, backgroundColor: "lightgray" }}
-        ></View>
-        <View style={styles.infoDescription}>
-          <Text style={styles.numberText}>180</Text>
-          <Text style={styles.subText}>Days left</Text>
-        </View>
-        <View
-          style={{ height: 30, width: 1, backgroundColor: "lightgray" }}
-        ></View>
-
-        <View style={styles.infoDescription}>
-          <Text style={styles.numberText}>27</Text>
-          <Text style={styles.subText}>Age</Text>
-        </View>
-        <Image
-          source={require("../assets/images/pencil.png")}
-          style={{ height: 20, width: 20, right: -40 }}
-        />
-      </View>
-      <View style={styles.actionButtons}>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => handleSelect("profile")}
-        >
-          <Text
-            style={selected == "profile" ? styles.selected : styles.unselected}
-          >
-            Profile
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => handleSelect("gifts")}
-        >
-          <Text
-            style={selected == "profile" ? styles.unselected : styles.selected}
-          >
-            Explore Gifts
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      {selected == "profile" ? (
-        <ScrollView>
-          <ProfileContent user={user} />
-        </ScrollView>
+      {!user ? (
+        <ProfileSkeleton isCurrUser={true} />
       ) : (
-        <Gifts isExplore={true} />
-      )}
+        <>
+          <TouchableOpacity
+            style={{
+              position: "absolute",
+              top: 60,
+              right: 0,
+              height: 40,
+              width: 40,
+              zIndex: 1,
+            }}
+            onPress={goToSettings}
+          >
+            <FontAwesome name="gears" size={24} color={colors.brightWhite} />
+          </TouchableOpacity>
+          <View style={styles.backgroundCover}></View>
+          <View style={styles.header}>
+            {user && (
+              <Image
+                source={{
+                  uri: image
+                    ? image
+                    : "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
+                }}
+                style={styles.avatar}
+                onLoadEnd={onLoad}
+              />
+            )}
+            <Text style={styles.name}>{user && user.name}</Text>
+            <Text style={styles.subText}>Friend</Text>
+          </View>
+          <View style={styles.info}>
+            <View style={styles.infoDescription}>
+              <Text style={styles.numberText}>10</Text>
+              <Text style={styles.subText}>January</Text>
+            </View>
+            <View
+              style={{ height: 30, width: 1, backgroundColor: "lightgray" }}
+            ></View>
+            <View style={styles.infoDescription}>
+              <Text style={styles.numberText}>180</Text>
+              <Text style={styles.subText}>Days left</Text>
+            </View>
+            <View
+              style={{ height: 30, width: 1, backgroundColor: "lightgray" }}
+            ></View>
 
-      {/* You can add the "Favorited Gifts" section similarly */}
+            <View style={styles.infoDescription}>
+              <Text style={styles.numberText}>27</Text>
+              <Text style={styles.subText}>Age</Text>
+            </View>
+            <Image
+              source={require("../assets/images/pencil.png")}
+              style={{ height: 20, width: 20, right: -40 }}
+            />
+          </View>
+          <View style={styles.actionButtons}>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => handleSelect("profile")}
+            >
+              <Text
+                style={
+                  selected == "profile" ? styles.selected : styles.unselected
+                }
+              >
+                Profile
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => handleSelect("gifts")}
+            >
+              <Text
+                style={
+                  selected == "profile" ? styles.unselected : styles.selected
+                }
+              >
+                Explore Gifts
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {selected == "profile" ? (
+            <ScrollView>
+              <ProfileContent user={user} />
+            </ScrollView>
+          ) : (
+            <Gifts isExplore={true} />
+          )}
+        </>
+      )}
     </View>
   );
 }

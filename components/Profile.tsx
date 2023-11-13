@@ -15,6 +15,8 @@ import {
 } from "../utilities/helpers";
 import { useLocalSearchParams } from "expo-router";
 import { colors } from "../constants/Theme";
+import ProfileSkeleton from "./skeletons/ProfileSkeleton";
+import * as ImageManipulator from "expo-image-manipulator";
 
 interface Friend {
   name: string;
@@ -34,6 +36,7 @@ export default function UserProfileScreen() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("profile");
   const [user, setUser] = useState<Friend | null>(null);
+  const [image, setImage] = useState(null);
   const [dobObject, setDobObject] = useState({
     year: "",
     month: "",
@@ -42,6 +45,8 @@ export default function UserProfileScreen() {
   const [favorites, setFavorites] = useState([]);
   const [enableRecs, setEnableRecs] = useState<boolean>(false);
   const [favError, setFavError] = useState('');
+  const [loading, setLoading] = useState(true);
+
 
   const { id } = useLocalSearchParams();
 
@@ -65,6 +70,26 @@ export default function UserProfileScreen() {
       console.error("Error fetching user: ", error);
     }
   };
+
+  const setupImage = async () => {
+    const imageResult = await ImageManipulator.manipulateAsync(
+      user.photo,
+      [
+        { resize: { width: 200, height: 200 } },
+
+        { flip: ImageManipulator.FlipType.Vertical },
+      ],
+      { compress: 0.5, format: ImageManipulator.SaveFormat.PNG }
+    );
+    setImage(imageResult.uri);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    if (user) {
+      setupImage();
+    }
+  }, [user]);
 
   useEffect(() => {
     fetchFriend();
@@ -98,49 +123,59 @@ export default function UserProfileScreen() {
     setActiveTab(value);
   };
 
+
+  const onLoad = () => {
+    setLoading(false);
+  };
+
   return (
     <View style={styles.container}>
-      <View style={styles.backgroundCover}></View>
-      <View style={styles.header}>
-        <TouchableOpacity
-          style={{ position: "absolute", left: 0, top: 40 }}
-          onPress={() => router.back()}
-        >
-          <Image
-            source={require("../assets/images/arrow-left.png")}
-            style={{ height: 24, width: 24 }}
-          />
-        </TouchableOpacity>
-        <Image
-          source={
-            user && user.photo
-              ? { uri: user.photo }
-              : { uri: "https://i.imgur.com/hCwHtRc.png" }
-          }
-          style={styles.avatar}
-        />
-        <Text style={styles.name}>{user && user.name}</Text>
-        <Text style={styles.subText}>Friend</Text>
-      </View>
-      <View style={styles.info}>
-        <View style={styles.infoDescription}>
-          <Text style={{ color: "#804C46", fontWeight: "bold" }}>
-            {dobObject && dobObject.day}
-          </Text>
-          <Text>{dobObject && dobObject.month}</Text>
-        </View>
-        <View
-          style={{ height: 30, width: 1, backgroundColor: "lightgray" }}
-        ></View>
-        <View style={styles.infoDescription}>
-          <Text style={{ color: "#804C46", fontWeight: "bold" }}>
-            {user && daysUntilBirthday(user.dob)}
-          </Text>
-          <Text>Days left</Text>
-        </View>
-        <View
-          style={{ height: 30, width: 1, backgroundColor: "lightgray" }}
-        ></View>
+      {loading && !image ? (
+        <ProfileSkeleton />
+      ) : (
+        <>
+          <View style={styles.backgroundCover}></View>
+          <View style={styles.header}>
+            <TouchableOpacity
+              style={{ position: "absolute", left: 0, top: 40 }}
+              onPress={() => router.back()}
+            >
+              <Image
+                source={require("../assets/images/arrow-left.png")}
+                style={{ height: 24, width: 24 }}
+              />
+            </TouchableOpacity>
+            <Image
+              source={{
+                uri: image
+                  ? image
+                  : "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
+              }}
+              onLoad={onLoad}
+              style={styles.avatar}
+            />
+            <Text style={styles.name}>{user && user.name}</Text>
+            <Text style={styles.subText}>Friend</Text>
+          </View>
+          <View style={styles.info}>
+            <View style={styles.infoDescription}>
+              <Text style={{ color: "#804C46", fontWeight: "bold" }}>
+                {dobObject && dobObject.day}
+              </Text>
+              <Text>{dobObject && dobObject.month}</Text>
+            </View>
+            <View
+              style={{ height: 30, width: 1, backgroundColor: "lightgray" }}
+            ></View>
+            <View style={styles.infoDescription}>
+              <Text style={{ color: "#804C46", fontWeight: "bold" }}>
+                {user && daysUntilBirthday(user.dob)}
+              </Text>
+              <Text>Days left</Text>
+            </View>
+            <View
+              style={{ height: 30, width: 1, backgroundColor: "lightgray" }}
+            ></View>
 
         <View style={styles.infoDescription}>
           <Text style={{ color: "#804C46", fontWeight: "bold" }}>
@@ -202,6 +237,7 @@ export default function UserProfileScreen() {
             
             />
         </ScrollView>
+
       )}
     </View>
   );

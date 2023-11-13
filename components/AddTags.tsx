@@ -8,15 +8,20 @@ import {
   ScrollView,
   Button,
   Image,
+  ActivityIndicator,
+  useWindowDimensions,
 } from "react-native";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import TitleBack from "./TitleBack";
 import { colors } from "../constants/Theme";
 import * as tagsService from "../utilities/tags-service";
 import * as friendsService from "../utilities/friends-service";
+import { useNavigation } from "expo-router";
 
 export default function AddTags() {
   const params = useLocalSearchParams();
+  const { width, height } = useWindowDimensions();
+  const navigation = useNavigation();
 
   const [searchTag, setSearchTag] = useState("");
   const [addedTags, setAddedTags] = useState([
@@ -86,17 +91,32 @@ export default function AddTags() {
           category: "Popular",
         });
       });
-    } catch (err) {
-    } finally {
+    } catch (err) {}
+    setTimeout(() => {
       setLoading(false);
-    }
-
-    router.replace("/");
-    setLoading(false);
+      navigation.dispatch({ type: "POP_TO_TOP" });
+    }, 3000);
   };
 
   return (
     <View style={styles.container}>
+      {loading && (
+        <View
+          style={{
+            position: "absolute",
+            top: -40,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 99,
+            alignSelf: "center",
+          }}
+        >
+          <ActivityIndicator size="large" color={colors.orange} />
+        </View>
+      )}
       <View style={{ flexDirection: "column", gap: 8, maxHeight: 160 }}>
         <TitleBack title={"Add Tags"} marginLeft={-100} />
         <Text style={{ textAlign: "center" }}>
@@ -142,44 +162,44 @@ export default function AddTags() {
         />
 
         <Text>Added Tags</Text>
-        <ScrollView
-          contentContainerStyle={{ maxHeight: 180 }}
-          ref={scrollViewRef}
-          onContentSizeChange={(width, height) => {
-            scrollViewSizeChanged(height);
-          }}
-        >
-          <View style={styles.addedTagsContainer}>
-            {addedTags.map((tag) => (
-              <Text key={tag} style={styles.tagSelectButton}>
-                {tag}
-              </Text>
-            ))}
-          </View>
-        </ScrollView>
-
-        <ScrollView
-          contentContainerStyle={{ maxHeight: 240, paddingBottom: 100 }}
-        >
-          {Object.entries(tagCategories).map(([category, tags]) => (
-            <View key={category}>
-              <Text>{category}</Text>
-              <View style={styles.tagList}>
-                {tags.map((tag) => (
-                  <TouchableOpacity
-                    key={tag}
-                    onPress={() => handleTagPress(tag)}
-                    style={styles.tagButton}
-                  >
-                    <Text style={{ fontFamily: "PilcrowRounded" }}>
-                      {tag} +
-                    </Text>
-                  </TouchableOpacity>
-                ))}
-              </View>
+        <View style={{ maxHeight: 140 }}>
+          <ScrollView
+            ref={scrollViewRef}
+            onContentSizeChange={(width, height) => {
+              scrollViewSizeChanged(height);
+            }}
+          >
+            <View style={styles.addedTagsContainer}>
+              {addedTags.map((tag) => (
+                <Text key={tag} style={styles.tagSelectButton}>
+                  {tag}
+                </Text>
+              ))}
             </View>
-          ))}
-        </ScrollView>
+          </ScrollView>
+        </View>
+        <View style={{ maxHeight: 240 }}>
+          <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+            {Object.entries(tagCategories).map(([category, tags]) => (
+              <View key={category}>
+                <Text>{category}</Text>
+                <View style={styles.tagList}>
+                  {tags.map((tag) => (
+                    <TouchableOpacity
+                      key={tag}
+                      onPress={() => handleTagPress(tag)}
+                      style={styles.tagButton}
+                    >
+                      <Text style={{ fontFamily: "PilcrowRounded" }}>
+                        {tag} +
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+            ))}
+          </ScrollView>
+        </View>
       </View>
       <View>
         <TouchableOpacity
