@@ -107,7 +107,7 @@ export default function MainScreen() {
     }
   };
 
-  const Item = ({ name, dob, _id, daysUntilBirthday, index }) => {
+  const Item = ({ name, dob, _id, daysUntilBirthday, index, favoriteGifts, id }) => {
     const [collapse, setCollapse] = useState(false);
 
     return (
@@ -175,84 +175,92 @@ export default function MainScreen() {
               <FontAwesome name="chevron-up" size={22} color="white" />
             )}
           </TouchableOpacity>
-          {collapse && (
+          {collapse ? (
+  <View
+    style={{
+      height: "auto",
+      width: "auto",
+      backgroundColor: colors.brightWhite,
+      borderBottomLeftRadius: 10,
+      borderBottomRightRadius: 10,
+    }}
+  >
+    <Text
+      style={{
+        fontFamily: "PilcrowRounded",
+        fontSize: 18,
+        padding: 12,
+      }}
+    >
+      Saved Gifts
+    </Text>
+    <View
+      style={{
+        flexDirection: "row",
+        justifyContent: "flex-start",
+        width: "auto",
+        gap: 8,
+        paddingHorizontal: 20,
+      }}
+    >
+      {favoriteGifts && favoriteGifts.length > 0 ? (
+        favoriteGifts.map((fav, idx) => (
+          <View key={idx}>
             <View
               style={{
-                height: "auto",
-                width: "auto",
-                backgroundColor: colors.brightWhite,
-                borderBottomLeftRadius: 10,
-                borderBottomRightRadius: 10,
+                height: 80,
+                width: 120,
+                backgroundColor: "white",
+                borderWidth: 1,
+                borderColor: "lightgray",
+                borderRadius: 8,
               }}
             >
-              <Text
-                style={{
-                  fontFamily: "PilcrowRounded",
-                  fontSize: 18,
-                  padding: 12,
-                }}
-              >
-                Saved Gifts
-              </Text>
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "flex-start",
-                  width: "auto",
-                  gap: 8,
-                  paddingHorizontal: 20,
-                }}
-              >
-                <View>
-                  <View
-                    style={{
-                      height: 80,
-                      width: 120,
-                      backgroundColor: "white",
-                      borderWidth: 1,
-                      borderColor: "lightgray",
-                      borderRadius: 8,
-                    }}
-                  >
-                    <FontAwesome
-                      name="heart"
-                      size={24}
-                      color="black"
-                      style={{ position: "absolute", bottom: 8, right: 8 }}
-                    />
-                  </View>
-                  <Text
-                    style={{
-                      fontFamily: "PilcrowRounded",
-                      fontSize: 18,
-                      padding: 12,
-                    }}
-                  >
-                    Raiders
-                  </Text>
-                </View>
-                <View
-                  style={{
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    width: 100,
-                    height: 100,
-                  }}
-                >
-                  <Image
-                    source={require("../assets/images/blackplus.png")}
-                    style={{ height: 40, width: 40 }}
-                  />
-                  <Text>Add New</Text>
-                </View>
-              </View>
+              <Image
+                source={fav.image}
+                style={{ height: 80, width: 120 }}
+              />
             </View>
-          )}
+            <Text
+              style={{
+                fontFamily: "PilcrowRounded",
+                fontSize: 18,
+                padding: 12,
+              }}
+            >
+              {fav.title}
+            </Text>
+          </View>
+        ))
+      ) : (
+        <View>
+          <Text>No favorite gifts at this time</Text>
+          <View
+            style={{
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              width: 100,
+              height: 100,
+            }}
+          >
+            <TouchableOpacity onPress={() => router.push(`/users/${id}`)}>
+              <Image
+                source={require("../assets/images/blackplus.png")}
+                style={{ height: 40, width: 40 }}
+              />
+            </TouchableOpacity>
+            <Text>Add New</Text>
+          </View>
+        </View>
+      )}
+    </View>
+  </View>
+) : null}
         </View>
       </>
     );
-  };
+  }
 
   return (
     <View style={styles.container}>
@@ -353,7 +361,7 @@ export default function MainScreen() {
         <FlatList
           style={{ zIndex: 99 }}
           data={filteredData}
-          renderItem={({ item, index }) => <Item {...item} index={index} />}
+          renderItem={({ item, index }) => <Item {...item} index={index} id={item._id} />}
           keyExtractor={(item) => item._id}
         />
       ) : (

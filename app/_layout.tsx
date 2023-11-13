@@ -15,6 +15,7 @@ import { colors } from "../constants/Theme";
 import { AuthProvider } from "../components/AuthContext";
 import "react-native-gesture-handler";
 import Header from "../components/Header";
+import { RecommendationProvider } from "../components/RecommendationContext";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -66,6 +67,7 @@ function RootLayoutNav() {
   return (
     <ThemeProvider value={DefaultTheme}>
       <AuthProvider>
+        <RecommendationProvider>
         <Stack>
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
@@ -103,6 +105,7 @@ function RootLayoutNav() {
             }}
           /> */}
         </Stack>
+        </RecommendationProvider>
       </AuthProvider>
     </ThemeProvider>
   );

@@ -2,12 +2,12 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
 
-import Gifts from "./Gifts";
+import Explore from "./Explore";
 import ProfileContent from "./ProfileContent";
 import { ScrollView } from "react-native-gesture-handler";
 import { FontAwesome } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import * as friendService from "../utilities/friends-service";
+import * as friendsService from "../utilities/friends-service";
 import {
   calculateAge,
   daysUntilBirthday,
@@ -34,7 +34,7 @@ interface Friend {
 
 export default function UserProfileScreen() {
   const router = useRouter();
-  const [selected, setSelected] = useState("profile");
+  const [activeTab, setActiveTab] = useState("profile");
   const [user, setUser] = useState<Friend | null>(null);
   const [image, setImage] = useState(null);
   const [dobObject, setDobObject] = useState({
@@ -42,16 +42,18 @@ export default function UserProfileScreen() {
     month: "",
     day: "",
   });
+  const [favorites, setFavorites] = useState([]);
   const [enableRecs, setEnableRecs] = useState<boolean>(false);
+  const [favError, setFavError] = useState('');
   const [loading, setLoading] = useState(true);
+
 
   const { id } = useLocalSearchParams();
 
   const fetchFriend = async () => {
     try {
-      const friendData = await friendService.retrieveFriend(id);
+      const friendData = await friendsService.retrieveFriend(id);
       if (friendData) {
-        console.log("THIS IS THE FRIEND DATA", friendData);
         const uniqueTimestamp = Date.now();
         friendData.photo = `${
           friendData.photo
@@ -59,14 +61,11 @@ export default function UserProfileScreen() {
             : "https://i.imgur.com/hCwHtRc.png"
         }?timestamp=${uniqueTimestamp}`;
         setUser(friendData);
+        setDobObject(splitDOB(friendData.dob));
+        setFavorites(friendData.favoriteGifts);
+        if (friendData.tags.length > 0) setEnableRecs(true);
       }
 
-      if (user) {
-        console.log("THIS IS THE FRIEND DATA", user);
-        setUser(user);
-        setDobObject(splitDOB(user.dob));
-        if (user.tags.length > 0) setEnableRecs(true);
-      }
     } catch (error) {
       console.error("Error fetching user: ", error);
     }
@@ -96,13 +95,39 @@ export default function UserProfileScreen() {
     fetchFriend();
   }, []);
 
-  const handleSelect = (value: string) => {
-    setSelected(value);
+  const toggleFavorite = async (recommendation, e) => {
+    e.preventDefault();
+    const idx = favorites.findIndex((fav) => fav.title.toLowerCase() === recommendation.title.toLowerCase());
+    if (idx > -1) {
+      // remove from favorites
+      try {
+        const item = favorites[idx];
+        const res = await friendsService.removeFromFavorites(id, item._id);
+        if (res)
+          setFavorites(favorites.slice(0, idx).concat(favorites.slice(idx + 1)));
+      } catch (error) {
+        setFavError(error.message);
+      }
+    } else {
+      // add to favorites
+      try {
+        const res = await friendsService.addToFavorites(id, recommendation);
+        setFavorites([...favorites, res.recommendation]);
+      } catch (error) {
+        setFavError(error.message);
+      }
+    }
   };
+
+  const handleSelect = (value: string) => {
+    setActiveTab(value);
+  };
+
 
   const onLoad = () => {
     setLoading(false);
   };
+
   return (
     <View style={styles.container}>
       {loading && !image ? (
@@ -152,64 +177,67 @@ export default function UserProfileScreen() {
               style={{ height: 30, width: 1, backgroundColor: "lightgray" }}
             ></View>
 
-            <View style={styles.infoDescription}>
-              <Text style={{ color: "#804C46", fontWeight: "bold" }}>
-                {user && calculateAge(user.dob)}
-              </Text>
-              <Text>Age</Text>
-            </View>
-            <TouchableOpacity
-              onPress={() => router.push(`/users/${id}/update`)}
-            >
-              <Image
-                source={require("../assets/images/pencil.png")}
-                style={{ height: 20, width: 20, right: -40 }}
-              />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.actionButtons}>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => handleSelect("profile")}
-            >
-              <Text
-                style={
-                  selected == "profile" ? styles.selected : styles.unselected
-                }
-              >
-                Profile
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.button}
-              onPress={() => handleSelect("gifts")}
-            >
-              <Text
-                style={
-                  selected == "profile" ? styles.unselected : styles.selected
-                }
-              >
-                Explore Gifts
-              </Text>
-            </TouchableOpacity>
-          </View>
+        <View style={styles.infoDescription}>
+          <Text style={{ color: "#804C46", fontWeight: "bold" }}>
+            {user && calculateAge(user.dob)}
+          </Text>
+          <Text>Age</Text>
+        </View>
+        <TouchableOpacity onPress={() => router.push(`/users/${id}/update`)}>
+          <Image
+            source={require("../assets/images/pencil.png")}
+            style={{ height: 20, width: 20, right: -40 }}
+          />
+        </TouchableOpacity>
+      </View>
+      <View style={styles.actionButtons}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => handleSelect("profile")}
+        >
+          <Text
+            style={activeTab == "profile" ? styles.selected : styles.unselected}
+          >
+            Profile
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => handleSelect("explore")}
+        >
+          <Text
+            style={activeTab == "profile" ? styles.unselected : styles.selected}
+          >
+            Explore Gifts
+          </Text>
+        </TouchableOpacity>
+      </View>
 
-          {selected == "profile" ? (
-            <ScrollView>
-              <ProfileContent
-                giftPreferences={user?.giftPreferences}
-                tags={user?.tags}
-                favoriteGifts={user?.favoriteGifts}
-              />
-            </ScrollView>
-          ) : (
-            <Gifts
-              isExplore={true}
-              favoriteGifts={null}
-              isEnabled={enableRecs}
+      {user && activeTab === "profile" && (
+        <ScrollView>
+          <ProfileContent
+            favorites={favorites}
+            giftPreferences={user.giftPreferences}
+            tags={user.tags}
+            toggleFavorite={toggleFavorite}
+            friendLocation={user.location}
+          />
+        </ScrollView>
+      )}
+      {user && activeTab === "explore" && (
+        <ScrollView>
+            <Explore 
+            enableRecs={enableRecs} 
+            toggleFavorite={toggleFavorite}
+            friend={user}
+            giftPreferences={user.giftPreferences}
+            tags={user.tags}
+            id={id}
+            friendLocation={user.location}
+            
             />
-          )}
-        </>
+        </ScrollView>
+
       )}
     </View>
   );
