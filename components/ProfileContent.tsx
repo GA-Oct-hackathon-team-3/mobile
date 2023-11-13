@@ -129,28 +129,33 @@ const ProfileContent = ({
       <View style={styles.giftTypeContainer}>
         <View style={styles.giftTop}>
           <Text>Favorited Gifts</Text>
-          <FontAwesome name="pencil" size={20} color="black" />
-          {favorites && favorites.length > 0 ? (
-            <FlatList
-              data={favorites}
-              renderItem={({ item }) => (
-                <GiftItem
-                  gift={item}
-                  toggleFavorite={toggleFavorite}
-                  isFavorite={true}
-                  location={friendLocation}
-                />
-              )}
-              keyExtractor={(item) => item.id}
-              numColumns={2}
+          <TouchableOpacity>
+            <Image
+              source={require("../assets/images/pencil.png")}
+              style={{ height: 20, width: 20 }}
             />
-          ) : (
-            <View style={styles.giftTop}>
-              <Text>No favorites</Text>
-              <FontAwesome name="pencil" size={20} color="black" />
-            </View>
-          )}
+          </TouchableOpacity>
         </View>
+        {favorites && favorites.length > 0 ? (
+          <FlatList
+            data={favorites}
+            renderItem={({ item }) => (
+              <GiftItem
+                gift={item}
+                toggleFavorite={toggleFavorite}
+                isFavorite={true}
+                location={friendLocation}
+              />
+            )}
+            keyExtractor={(item) => item.id}
+            numColumns={2}
+          />
+        ) : (
+          <View style={styles.giftTop}>
+            <Text>No favorites</Text>
+            <FontAwesome name="pencil" size={20} color="black" />
+          </View>
+        )}
       </View>
     </View>
   );

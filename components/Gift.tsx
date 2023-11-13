@@ -12,11 +12,12 @@ import {
 const GiftItem = ({ gift, toggleFavorite, isFavorite, location }) => {
   const [fillHeart, setFillHeart] = useState(isFavorite); // to toggle between empty or filled heart
   console.log("GIFT IMAGE", gift);
+  const image = gift.image ? gift.image : gift.ImgSrc;
   return (
     <View style={styles.itemContainer}>
       <View>
         <Image
-          source={{ uri: gift.imgSrc }}
+          source={{ uri: image }}
           alt={gift.imageSearchQuery}
           style={styles.giftImage}
         />
