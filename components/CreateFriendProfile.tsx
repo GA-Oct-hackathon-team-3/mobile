@@ -8,6 +8,8 @@ import {
   TouchableOpacity,
   useWindowDimensions,
   Image,
+  ActivityIndicator,
+  Dimensions,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
@@ -48,7 +50,8 @@ export default function CreateFriendsProfile() {
   const router = useRouter();
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [birthday, setBirthday] = useState(new Date().toDateString());
-
+  const [loading, setLoading] = useState(false);
+  const fullHeight = Dimensions.get("window").height;
   const [image, setImage] = useState(null);
 
   const currentDate = new Date();
@@ -109,6 +112,7 @@ export default function CreateFriendsProfile() {
   };
 
   const handleSubmit = async () => {
+    setLoading(true);
     const data = {
       ...formInput,
       giftPreferences: selectedPreferences.map((p) => p.toLowerCase()),
@@ -121,17 +125,36 @@ export default function CreateFriendsProfile() {
           uploadedPhoto
         );
         console.log(response, "PHOTO UPLOAD RESPONSE");
+        setLoading(false);
 
-        if (response!.ok && friendData) router.replace("/");
+        router.push(`/users/${friendData._id}/add-tags`);
         return;
       } catch (error) {}
     }
+    setLoading(false);
     if (friendData._id) router.push(`/users/${friendData._id}/add-tags`);
     return;
   };
 
   return (
-    <KeyboardAwareScrollView style={styles.container}>
+    <KeyboardAwareScrollView contentContainerStyle={styles.container}>
+      {loading && (
+        <View
+          style={{
+            position: "absolute",
+            top: -40,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 99,
+            alignSelf: "center",
+          }}
+        >
+          <ActivityIndicator size="large" color={colors.orange} />
+        </View>
+      )}
       <TitleBack title={"Create Friend Profile"} />
       <View
         style={{
@@ -339,6 +362,8 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "white",
+    fontFamily: "PilcrowMedium",
+    fontSize: 20,
   },
   container: {
     backgroundColor: colors.cream,
