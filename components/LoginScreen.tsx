@@ -1,6 +1,7 @@
 import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
+  Alert,
   Image,
   StyleSheet,
   Text,
@@ -29,17 +30,25 @@ export default function LoginScreen() {
   async function signInWithEmail() {
     setLoading(true);
 
-    const response = await UserController.login({
-      email: email,
-      password: password,
-    });
-    console.log("RESPONSE LOGIN: ", response);
-    if (response) {
-      setToken(response.token);
-      setUserData(response);
-    }
+    try {
+      const response = await UserController.login({
+        email: email,
+        password: password,
+      });
+      console.log("RESPONSE LOGIN: ", response);
+      if (response) {
+        setToken(response.token);
+        setUserData(response);
+      }
 
-    setLoading(false);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+      Alert.alert("Error", "Invalid Credentials or User not found");
+      setEmail("");
+      setPassword("");
+      setLoading(false);
+    }
   }
 
   async function signUpWithEmail() {

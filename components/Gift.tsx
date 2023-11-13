@@ -36,7 +36,7 @@ const GiftItem = ({ gift, toggleFavorite, isFavorite, location }) => {
         </TouchableOpacity>
       </View>
       <Text style={styles.giftName}>{gift.title}</Text>
-      <Text style={styles.giftPrice}>${gift.estimatedCost}</Text>
+      <Text style={styles.giftPrice}>{gift.estimatedCost}</Text>
     </View>
   );
 };
