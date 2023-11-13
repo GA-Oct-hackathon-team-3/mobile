@@ -325,8 +325,9 @@ export default function SignUpScreen() {
           style={{
             flexDirection: "row",
             justifyContent: "space-between",
+            alignItems: "center",
             backgroundColor: colors.brightWhite,
-            padding: 10,
+            padding: 8,
             borderRadius: 5,
             borderWidth: 1,
             borderColor: "#E0E0E0",
@@ -348,6 +349,59 @@ export default function SignUpScreen() {
               }}
             >
               Set Birthday
+            </Text>
+          </TouchableOpacity>
+        </View>
+        <Text style={styles.text}>Select Gender</Text>
+        <View style={{ flexDirection: "row" }}>
+          <TouchableOpacity
+            style={
+              gender === "male"
+                ? styles.buttonSelected
+                : styles.unselectedButton
+            }
+            onPress={() => setGender("male")}
+          >
+            <Text
+              style={
+                gender === "male" ? styles.selectedText : styles.unselectedText
+              }
+            >
+              Male
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={
+              gender === "female"
+                ? styles.buttonSelected
+                : styles.unselectedButton
+            }
+            onPress={() => setGender("female")}
+          >
+            <Text
+              style={
+                gender === "female"
+                  ? styles.selectedText
+                  : styles.unselectedText
+              }
+            >
+              Female
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={
+              gender === "other"
+                ? styles.buttonSelected
+                : styles.unselectedButton
+            }
+            onPress={() => setGender("other")}
+          >
+            <Text
+              style={
+                gender === "other" ? styles.selectedText : styles.unselectedText
+              }
+            >
+              Other
             </Text>
           </TouchableOpacity>
         </View>
@@ -411,7 +465,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   input: {
-    height: 40,
+    height: 32,
     borderColor: "lightgray",
     borderWidth: 1,
     borderRadius: 5,
@@ -438,7 +492,39 @@ const styles = StyleSheet.create({
   text: {
     color: "#3D3C3C",
     fontFamily: "PilcrowRounded",
-    fontSize: 18,
+    fontSize: 16,
+    fontWeight: "bold", // 'bold' typically covers font-weights of 600 or 700 in CSS
+    lineHeight: 18 * 1.2, // assuming "normal" is 1.2 times the font size
+    letterSpacing: 0.36,
+  },
+  unselectedButton: {
+    borderWidth: 1,
+    padding: 6,
+    borderRadius: 8,
+    borderColor: "#D9D9D9",
+    margin: 5,
+    backgroundColor: colors.brightWhite,
+  },
+  buttonSelected: {
+    borderWidth: 1,
+    padding: 6,
+    borderRadius: 8,
+    borderColor: "#D9D9D9",
+    margin: 5,
+    backgroundColor: colors.green,
+  },
+  selectedText: {
+    color: colors.brightWhite,
+    fontFamily: "PilcrowRounded",
+    fontSize: 14,
+    fontWeight: "bold", // 'bold' typically covers font-weights of 600 or 700 in CSS
+    lineHeight: 18 * 1.2, // assuming "normal" is 1.2 times the font size
+    letterSpacing: 0.36,
+  },
+  unselectedText: {
+    color: "black",
+    fontFamily: "PilcrowRounded",
+    fontSize: 14,
     fontWeight: "bold", // 'bold' typically covers font-weights of 600 or 700 in CSS
     lineHeight: 18 * 1.2, // assuming "normal" is 1.2 times the font size
     letterSpacing: 0.36,
