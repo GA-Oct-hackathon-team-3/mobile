@@ -14,6 +14,7 @@ import * as friendsService from "../utilities/friends-service";
 
 import GiftItem from "./Gift";
 import { useRecommendation } from "./providers/RecommendationContext";
+import GiftItemSkeleton from "./skeletons/GiftItemSkeleton";
 
 interface Explore {
   isExplore: boolean;
@@ -112,18 +113,29 @@ const Explore = ({
         {!showError ? (
           <>
             {refresh || (!recs.length && tags.length) ? (
-              <View>
-                <FontAwesome name="refresh" size={30} color={colors.purple} />
+              <View style={{ flex: 1, flexDirection: "column" }}>
+                <View style={{ flexDirection: "row", gap: 4 }}>
+                  <GiftItemSkeleton />
+
+                  <GiftItemSkeleton />
+                </View>
+                <View style={{ flexDirection: "row", gap: 4 }}>
+                  <GiftItemSkeleton />
+
+                  <GiftItemSkeleton />
+                </View>
               </View>
             ) : (
               <FlatList
                 data={recs}
-                renderItem={({ item }) => (
+                renderItem={({ item, index }) => (
                   <GiftItem
                     gift={{ ...item, image: item.imgSrc }}
                     toggleFavorite={toggleFavorite}
                     isFavorite={false}
                     location={friendLocation}
+                    index={index}
+                    length={recs.length}
                   />
                 )}
                 keyExtractor={(item, idx) => idx.toString()}

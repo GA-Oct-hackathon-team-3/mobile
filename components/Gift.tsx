@@ -9,12 +9,25 @@ import {
   TouchableOpacity,
 } from "react-native";
 
-const GiftItem = ({ gift, toggleFavorite, isFavorite, location }) => {
+function isOddAndLast(index, length) {
+  return index % 2 === 0 && index === length - 1;
+}
+
+const GiftItem = ({
+  gift,
+  toggleFavorite,
+  isFavorite,
+  location,
+  length,
+  index,
+}) => {
   const [fillHeart, setFillHeart] = useState(isFavorite); // to toggle between empty or filled heart
   console.log("GIFT IMAGE", gift);
   const image = gift.image ? gift.image : gift.ImgSrc;
+  const needsMargin = isOddAndLast(index, length);
+  console.log(needsMargin, "isOddAndLast", index, length);
   return (
-    <View style={styles.itemContainer}>
+    <View style={[styles.itemContainer, { flex: needsMargin ? 0.42 : 1 }]}>
       <View>
         <Image
           source={{ uri: image }}
@@ -47,7 +60,6 @@ const styles = StyleSheet.create({
     margin: 8,
     borderRadius: 8,
     padding: 16,
-    flex: 1, // This ensures the items take up equal space
     flexDirection: "column", // stack children vertically
     // alignItems: "center", // align items in the center horizontally
   },
