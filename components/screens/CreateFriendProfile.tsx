@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   TextInput,
@@ -9,23 +9,18 @@ import {
   useWindowDimensions,
   Image,
   ActivityIndicator,
-  Platform,
+  Dimensions,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { colors } from "../constants/Theme";
-import TitleBack from "./TitleBack";
-import { UserProfile } from "../constants/interfaces";
-import ToastManager, { Toast } from "toastify-react-native";
+import { useRouter } from "expo-router";
+import { colors } from "../../constants/Theme";
+import TitleBack from "../TitleBack";
+
+import * as friendsService from "../../utilities/friends-service";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
 
-import * as friendsService from "../utilities/friends-service";
-
 import { FontAwesome } from "@expo/vector-icons";
-
-function capitalizeFirstLetter(str) {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-}
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 function convertDateFormat(dateString) {
   let date = new Date(dateString);
@@ -39,8 +34,8 @@ function convertDateFormat(dateString) {
   return `${year}-${month}-${day}`;
 }
 
-export default function EditFriendProfile() {
-  const [formInput, setFormInput] = useState<UserProfile>({
+export default function CreateFriendsProfile() {
+  const [formInput, setFormInput] = useState({
     name: "",
     dob: "",
     gender: "",
@@ -48,25 +43,18 @@ export default function EditFriendProfile() {
     giftPreferences: [],
     giftCost: "",
   });
-  const { width, height } = useWindowDimensions;
+  const { width, height } = useWindowDimensions();
   const [selectedGender, setSelectedGender] = useState("");
   const [selectedPreferences, setSelectedPreferences] = useState([]);
   const [uploadedPhoto, setUploadedPhoto] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [friend, setFriend] = useState(null);
   const router = useRouter();
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [birthday, setBirthday] = useState(new Date().toDateString());
-
+  const [loading, setLoading] = useState(false);
+  const fullHeight = Dimensions.get("window").height;
   const [image, setImage] = useState(null);
 
   const currentDate = new Date();
-
-  const { id } = useLocalSearchParams();
-
-  const showToasts = () => {
-    Toast.success("Profile Updated");
-  };
 
   const showDatePicker = () => {
     setDatePickerVisibility(true);
@@ -81,34 +69,6 @@ export default function EditFriendProfile() {
     setBirthday(date.toDateString());
     setFormInput({ ...formInput, dob: convertDateFormat(date) });
     hideDatePicker();
-  };
-
-  const fetchFriend = async () => {
-    try {
-      const friendData = await friendsService.retrieveFriend(id);
-      if (friendData) {
-        const uniqueTimestamp = Date.now();
-        friendData.photo = `${
-          friendData.photo
-            ? friendData.photo
-            : "https://i.imgur.com/hCwHtRc.png"
-        }?timestamp=${uniqueTimestamp}`;
-        setFriend(friendData);
-
-        setFormInput(friendData);
-        setSelectedGender(capitalizeFirstLetter(friendData.gender));
-
-        if (friendData.giftPreferences.length > 0) {
-          let giftPrefs = friendData.giftPreferences.map((p) =>
-            capitalizeFirstLetter(p)
-          );
-          setSelectedPreferences(giftPrefs);
-        }
-        setImage(friendData.photo);
-      }
-    } catch (error) {
-      console.error("Error fetching friend: ", error);
-    }
   };
 
   const togglePreference = (preference) => {
@@ -131,7 +91,16 @@ export default function EditFriendProfile() {
     });
 
     if (!result.canceled) {
+      console.log(JSON.stringify(result), "IMAGE RESULT");
+      let { uri } = result;
+
+      let file = {
+        name: uri.split("/").pop(),
+        uri,
+        type: "image/jpeg",
+      };
       setImage(result.assets[0].uri);
+      setUploadedPhoto(file);
     }
   };
 
@@ -148,27 +117,45 @@ export default function EditFriendProfile() {
       ...formInput,
       giftPreferences: selectedPreferences.map((p) => p.toLowerCase()),
     };
+    const friendData = await friendsService.createFriend(data);
+    if (image) {
+      try {
+        const response = await friendsService.uploadPhoto(
+          friendData._id,
+          uploadedPhoto
+        );
+        console.log(response, "PHOTO UPLOAD RESPONSE");
+        setLoading(false);
 
-    try {
-      await friendsService.updateFriend(id, data);
-    } catch (error) {
-      console.error("Error updating friend: ", error);
-    } finally {
-      setLoading(false);
-      showToasts();
+        router.push(`/users/${friendData._id}/add-tags`);
+        return;
+      } catch (error) {}
     }
-
-    // if (friendData) router.replace("/");
+    setLoading(false);
+    if (friendData._id) router.push(`/users/${friendData._id}/add-tags`);
+    return;
   };
 
-  useEffect(() => {
-    fetchFriend();
-  }, []);
-
   return (
-    <View style={styles.container}>
-      <ToastManager />
-      <TitleBack title={"Edit Friend Profile"} />
+    <KeyboardAwareScrollView contentContainerStyle={styles.container}>
+      {loading && (
+        <View
+          style={{
+            position: "absolute",
+            top: -40,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 99,
+            alignSelf: "center",
+          }}
+        >
+          <ActivityIndicator size="large" color={colors.orange} />
+        </View>
+      )}
+      <TitleBack title={"Create Friend Profile"} />
       <View
         style={{
           flexDirection: "column",
@@ -193,14 +180,14 @@ export default function EditFriendProfile() {
             </TouchableOpacity>
           </View>
           <View style={styles.inputContainer}>
-            <Text style={styles.text}>Name</Text>
+            <Text>Name</Text>
             <TextInput
               placeholder="Name"
               style={styles.input}
               value={formInput.name}
               onChangeText={(text) => handleChange("name", text)}
             />
-            <Text style={styles.text}>Date of Birth</Text>
+            <Text>Date of Birth</Text>
             <DateTimePickerModal
               isVisible={isDatePickerVisible}
               mode="date"
@@ -219,7 +206,7 @@ export default function EditFriendProfile() {
                 borderColor: "#E0E0E0",
               }}
             >
-              <Text>{convertDateFormat(formInput.dob)}</Text>
+              <Text>{birthday}</Text>
               <TouchableOpacity
                 onPress={showDatePicker}
                 style={{
@@ -238,7 +225,14 @@ export default function EditFriendProfile() {
                 </Text>
               </TouchableOpacity>
             </View>
-            <Text style={styles.text}>Gender</Text>
+
+            {/* <TextInput
+              placeholder="yyyy-mm-dd"
+              style={styles.input}
+              value={formInput.dob}
+              onChangeText={(text) => handleChange("dob", text)}
+            /> */}
+            <Text>Gender</Text>
             <View style={styles.genderContainer}>
               <TouchableOpacity
                 style={[
@@ -250,7 +244,7 @@ export default function EditFriendProfile() {
                   handleChange("gender", "male");
                 }}
               >
-                <Text style={styles.text}>Male</Text>
+                <Text>Male</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -263,7 +257,7 @@ export default function EditFriendProfile() {
                   handleChange("gender", "female");
                 }}
               >
-                <Text style={styles.text}>Female</Text>
+                <Text>Female</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -280,7 +274,7 @@ export default function EditFriendProfile() {
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.text}>Location</Text>
+            <Text>Location</Text>
             <TextInput
               placeholder="Location"
               style={styles.input}
@@ -288,9 +282,7 @@ export default function EditFriendProfile() {
               onChangeText={(text) => handleChange("location", text)}
             />
 
-            <Text style={styles.text}>
-              Gift type Preferences (choose all that apply)
-            </Text>
+            <Text>Gift type Preferences (choose all that apply)</Text>
             <View style={styles.checkboxContainer}>
               {/* You can replace these with actual checkboxes or other components */}
               <TouchableOpacity
@@ -302,7 +294,7 @@ export default function EditFriendProfile() {
                 ]}
                 onPress={() => togglePreference("Present")}
               >
-                <Text style={styles.text}>Present</Text>
+                <Text>Present</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -314,7 +306,7 @@ export default function EditFriendProfile() {
                 ]}
                 onPress={() => togglePreference("Experience")}
               >
-                <Text style={styles.text}>Experience</Text>
+                <Text>Experience</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -326,12 +318,12 @@ export default function EditFriendProfile() {
                 ]}
                 onPress={() => togglePreference("Donation")}
               >
-                <Text style={styles.text}>Donation</Text>
+                <Text>Donation</Text>
               </TouchableOpacity>
             </View>
 
             <View style={styles.pickerContainer}>
-              <Text style={styles.text}>Gift Cost</Text>
+              <Text>Gift Cost</Text>
               <TextInput
                 placeholder="Gift Cost"
                 style={styles.input}
@@ -344,26 +336,17 @@ export default function EditFriendProfile() {
 
         <TouchableOpacity
           onPress={() => {
-            handleSubmit();
-            // router.replace("/");
+            router.push("/add-tags");
           }}
         >
           <View style={styles.button}>
-            {loading ? (
-              <ActivityIndicator
-                animating={loading}
-                size="large"
-                color={colors.brightWhite}
-              />
-            ) : (
-              <Text style={styles.buttonText} onPress={handleSubmit}>
-                Update
-              </Text>
-            )}
+            <Text style={styles.buttonText} onPress={handleSubmit}>
+              Continue to add tags
+            </Text>
           </View>
         </TouchableOpacity>
       </View>
-    </View>
+    </KeyboardAwareScrollView>
   );
 }
 
@@ -377,15 +360,10 @@ const styles = StyleSheet.create({
     width: "70%",
     alignSelf: "center",
   },
-  text: {
-    color: "black",
-    fontFamily: "PilcrowMedium",
-    fontSize: 14,
-  },
   buttonText: {
     color: "white",
-    fontSize: 24,
     fontFamily: "PilcrowMedium",
+    fontSize: 20,
   },
   container: {
     backgroundColor: colors.cream,
@@ -407,25 +385,24 @@ const styles = StyleSheet.create({
     backgroundColor: colors.brightWhite,
   },
   pickerContainer: {
+    borderWidth: 1,
     borderColor: "#E0E0E0",
-
-    gap: 6,
+    padding: 10,
   },
   genderContainer: {
+    borderWidth: 1,
     borderColor: "#E0E0E0",
     padding: 10,
     flexDirection: "row",
     gap: 20,
     alignItems: "center",
-    justifyContent: "space-around",
   },
   checkboxContainer: {
     flexDirection: "row",
-    justifyContent: "space-around",
+    justifyContent: "space-between",
   },
   genderButton: {
     padding: 10,
-    paddingHorizontal: 20,
     borderWidth: 1,
     borderColor: "#E0E0E0",
     borderRadius: 5,
@@ -439,7 +416,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#E0E0E0",
     borderRadius: 5,
-    backgroundColor: colors.brightWhite,
   },
   inputContainer: {
     flexDirection: "column",

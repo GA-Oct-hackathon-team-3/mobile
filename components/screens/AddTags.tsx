@@ -11,14 +11,13 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
-import { colors } from "../constants/Theme";
-import * as friendsService from "../utilities/friends-service";
-import * as tagsService from "../utilities/tags-service";
-import TitleBack from "./TitleBack";
+import { colors } from "../../constants/Theme";
+import * as friendsService from "../../utilities/friends-service";
+import * as tagsService from "../../utilities/tags-service";
+import TitleBack from "../TitleBack";
 
 export default function AddTags() {
   const params = useLocalSearchParams();
-  const { width, height } = useWindowDimensions();
   const navigation = useNavigation();
 
   const [searchTag, setSearchTag] = useState("");
@@ -129,11 +128,11 @@ export default function AddTags() {
           }}
         >
           <Image
-            source={require("../assets/images/singer.png")}
+            source={require("../../assets/images/singer.png")}
             style={{ height: 100, width: 100 }}
           />
           <Image
-            source={require("../assets/images/biker.png")}
+            source={require("../../assets/images/biker.png")}
             style={{
               height: 130,
               width: 100,
@@ -141,7 +140,7 @@ export default function AddTags() {
             }}
           />
           <Image
-            source={require("../assets/images/gardner.png")}
+            source={require("../../assets/images/gardner.png")}
             style={{
               height: 100,
               width: 100,

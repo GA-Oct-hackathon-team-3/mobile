@@ -1,10 +1,6 @@
-import { Stack, useLocalSearchParams } from "expo-router";
-import UserProfileScreen from "../../../components/Profile";
+import { Stack } from "expo-router";
+import UserProfileScreen from "../../../components/screens/Profile";
 const Page = () => {
-  const params = useLocalSearchParams();
-
-  const id = params.id;
-
   return (
     <>
       <Stack.Screen options={{ title: `User`, headerShown: false }} />

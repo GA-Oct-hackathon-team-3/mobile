@@ -13,18 +13,30 @@ import {
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { colors } from "../constants/Theme";
-import TitleBack from "./TitleBack";
-import { UserProfile } from "../constants/interfaces";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { colors } from "../../constants/Theme";
+import TitleBack from "../TitleBack";
+import { UserProfile } from "../../constants/interfaces";
+import ToastManager, { Toast } from "toastify-react-native";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
 
-import * as friendsService from "../utilities/friends-service";
+import * as friendsService from "../../utilities/friends-service";
 
 import { FontAwesome } from "@expo/vector-icons";
 
-export function capitalizeFirstLetter(str) {
+function capitalizeFirstLetter(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function convertDateFormat(dateString) {
+  let date = new Date(dateString);
+  let year = date.getUTCFullYear();
+
+  // Months in JavaScript are 0-indexed, so January is 0 and December is 11
+  // Adding 1 to get the month in the format 01-12
+  let month = ("0" + (date.getUTCMonth() + 1)).slice(-2);
+  let day = ("0" + date.getUTCDate()).slice(-2);
+
+  return `${year}-${month}-${day}`;
 }
 
 export default function EditFriendProfile() {
@@ -43,6 +55,8 @@ export default function EditFriendProfile() {
   const [loading, setLoading] = useState(false);
   const [friend, setFriend] = useState(null);
   const router = useRouter();
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [birthday, setBirthday] = useState(new Date().toDateString());
 
   const [image, setImage] = useState(null);
 
@@ -50,7 +64,24 @@ export default function EditFriendProfile() {
 
   const { id } = useLocalSearchParams();
 
-  const notify = () => toast("Profile updated.");
+  const showToasts = () => {
+    Toast.success("Profile Updated");
+  };
+
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+  const handleConfirm = (date) => {
+    console.warn("A date has been picked: ", date);
+    setBirthday(date.toDateString());
+    setFormInput({ ...formInput, dob: convertDateFormat(date) });
+    hideDatePicker();
+  };
 
   const fetchFriend = async () => {
     try {
@@ -112,8 +143,6 @@ export default function EditFriendProfile() {
   };
 
   const handleSubmit = async () => {
-    notify();
-
     setLoading(true);
     const data = {
       ...formInput,
@@ -125,9 +154,8 @@ export default function EditFriendProfile() {
     } catch (error) {
       console.error("Error updating friend: ", error);
     } finally {
-      setTimeout(() => {
-        setLoading(false);
-      }, 1000);
+      setLoading(false);
+      showToasts();
     }
 
     // if (friendData) router.replace("/");
@@ -139,10 +167,7 @@ export default function EditFriendProfile() {
 
   return (
     <View style={styles.container}>
-      <ToastContainer
-        position="top-center"
-        style={{ fontFamily: "PilcrowMedium", fontSize: 18 }}
-      />
+      <ToastManager />
       <TitleBack title={"Edit Friend Profile"} />
       <View
         style={{
@@ -176,12 +201,43 @@ export default function EditFriendProfile() {
               onChangeText={(text) => handleChange("name", text)}
             />
             <Text style={styles.text}>Date of Birth</Text>
-            <TextInput
-              placeholder="yyyy-mm-dd"
-              style={styles.input}
-              value={formInput.dob}
-              onChangeText={(text) => handleChange("dob", text)}
+            <DateTimePickerModal
+              isVisible={isDatePickerVisible}
+              mode="date"
+              onConfirm={handleConfirm}
+              onCancel={hideDatePicker}
             />
+
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                backgroundColor: colors.brightWhite,
+                padding: 10,
+                borderRadius: 5,
+                borderWidth: 1,
+                borderColor: "#E0E0E0",
+              }}
+            >
+              <Text>{convertDateFormat(formInput.dob)}</Text>
+              <TouchableOpacity
+                onPress={showDatePicker}
+                style={{
+                  backgroundColor: colors.orange,
+                  padding: 5,
+                  borderRadius: 5,
+                }}
+              >
+                <Text
+                  style={{
+                    fontFamily: "PilcrowMedium",
+                    color: colors.brightWhite,
+                  }}
+                >
+                  Set Birthday
+                </Text>
+              </TouchableOpacity>
+            </View>
             <Text style={styles.text}>Gender</Text>
             <View style={styles.genderContainer}>
               <TouchableOpacity

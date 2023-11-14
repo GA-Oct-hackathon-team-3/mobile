@@ -13,7 +13,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import * as friendsService from "../utilities/friends-service";
 
 import GiftItem from "./Gift";
-import { useRecommendation } from "./RecommendationContext";
+import { useRecommendation } from "./providers/RecommendationContext";
 
 interface Explore {
   isExplore: boolean;

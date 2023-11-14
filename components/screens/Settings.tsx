@@ -2,7 +2,7 @@ import { FontAwesome, MaterialCommunityIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useNavigation } from "expo-router/src/useNavigation";
 import React, { useState } from "react";
-import { colors } from "../constants/Theme";
+import { colors } from "../../constants/Theme";
 
 import {
   View,
@@ -11,9 +11,9 @@ import {
   TouchableOpacity,
   StyleSheet,
 } from "react-native";
-import TitleBack from "./TitleBack";
+import TitleBack from "../TitleBack";
 import * as WebBrowser from "expo-web-browser";
-import { useAuth } from "./AuthContext";
+import { useAuth } from "../providers/AuthContext";
 
 const SettingsScreen = () => {
   const [name, setName] = useState("");

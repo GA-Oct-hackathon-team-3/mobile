@@ -1,15 +1,15 @@
 // Import necessary components and libraries
 import React, { useEffect, useState } from "react";
 import { StyleSheet, View, Text, TouchableOpacity, Image } from "react-native";
-import Gifts from "./Gifts";
-import ProfileContent from "./ProfileContent";
+import Gifts from "../Gifts";
+import ProfileContent from "../ProfileContent";
 import { ScrollView } from "react-native-gesture-handler";
 import { FontAwesome } from "@expo/vector-icons";
-import { colors } from "../constants/Theme";
-import { useAuth } from "./AuthContext";
-import * as UserAPI from "../utilities/users-api";
+import { colors } from "../../constants/Theme";
+import { useAuth } from "../providers/AuthContext";
+import * as UserAPI from "../../utilities/users-api";
 import { useRouter } from "expo-router";
-import ProfileSkeleton from "./skeletons/ProfileSkeleton";
+import ProfileSkeleton from "../skeletons/ProfileSkeleton";
 
 export default function CurrentUserProfileScreen() {
   const [selected, setSelected] = useState("profile");
@@ -100,7 +100,7 @@ export default function CurrentUserProfileScreen() {
               <Text style={styles.subText}>Age</Text>
             </View>
             <Image
-              source={require("../assets/images/pencil.png")}
+              source={require("../../assets/images/pencil.png")}
               style={{ height: 20, width: 20, right: -40 }}
             />
           </View>

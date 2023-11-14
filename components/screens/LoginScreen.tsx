@@ -11,9 +11,9 @@ import {
 } from "react-native";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import { useAuth } from "../components/AuthContext";
-import { colors } from "../constants/Theme";
-import * as UserController from "../utilities/users-service";
+import { useAuth } from "../providers/AuthContext";
+import { colors } from "../../constants/Theme";
+import * as UserController from "../../utilities/users-service";
 
 const oceanBlue = "#007AFF";
 const white = "#fff";
@@ -51,16 +51,6 @@ export default function LoginScreen() {
     }
   }
 
-  async function signUpWithEmail() {
-    setLoading(true);
-
-    setLoading(false);
-  }
-
-  const signUpPressed = () => {
-    router.push("/signup");
-  };
-
   return (
     <KeyboardAwareScrollView
       contentContainerStyle={[styles.container, { width: width }]}
@@ -76,7 +66,7 @@ export default function LoginScreen() {
         }}
       >
         <Image
-          source={require("../assets/images/Prently1.png")}
+          source={require("../../assets/images/Prently1.png")}
           style={{
             width: 240,
             height: 80,
@@ -97,7 +87,7 @@ export default function LoginScreen() {
           }
         >
           <Image
-            source={require("../assets/images/arrow-left.png")}
+            source={require("../../assets/images/arrow-left.png")}
             style={{ height: 24, width: 24 }}
           />
         </TouchableOpacity>
@@ -107,7 +97,7 @@ export default function LoginScreen() {
       <View style={styles.logoContainer}>
         <Image
           style={styles.logo}
-          source={require("../assets/images/present.png")}
+          source={require("../../assets/images/present.png")}
         />
       </View>
       <View style={{ gap: 12 }}>

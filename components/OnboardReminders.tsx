@@ -12,11 +12,11 @@ function OnboardReminders({ handleDismissReminder }: Props) {
       <View style={styles.peopleContainer}>
         <Image
           source={require("../assets/images/man.png")}
-          style={{ width: 80, height: 180 }}
+          style={styles.man}
         />
         <Image
           source={require("../assets/images/woman.png")}
-          style={{ width: 60, height: 160 }}
+          style={styles.woman}
         />
       </View>
 
@@ -88,6 +88,11 @@ const styles = StyleSheet.create({
     backgroundColor: colors.green,
     borderRadius: 20,
   },
+  woman: {
+    width: 60,
+    height: 160,
+  },
+  man: { width: 80, height: 180 },
 });
 
 export default OnboardReminders;

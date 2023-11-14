@@ -1,5 +1,5 @@
 import React from "react";
-import AddTags from "../../../components/AddTags";
+import AddTags from "../../../components/screens/AddTags";
 import { Stack } from "expo-router";
 import Header from "../../../components/Header";
 

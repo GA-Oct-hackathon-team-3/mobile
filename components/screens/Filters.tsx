@@ -8,13 +8,12 @@ import {
   TouchableOpacity,
   useWindowDimensions,
 } from "react-native";
-import { colors } from "../constants/Theme";
-import TitleBack from "./TitleBack";
-import { FontAwesome } from "@expo/vector-icons";
+import { colors } from "../../constants/Theme";
+import TitleBack from "../TitleBack";
 import { Slider } from "@miblanchard/react-native-slider";
 import { useLocalSearchParams } from "expo-router";
 import { capitalizeFirstLetter } from "./EditFriendProfile.web";
-import * as friendsService from "../utilities/friends-service";
+import * as friendsService from "../../utilities/friends-service";
 
 const marks = [
   {
@@ -160,12 +159,12 @@ const Filters = () => {
           <TouchableOpacity onPress={() => handlePress("budget")}>
             {show === "budget" ? (
               <Image
-                source={require("../assets/images/minus.png")}
+                source={require("../../assets/images/minus.png")}
                 style={{ height: 30, width: 30 }}
               />
             ) : (
               <Image
-                source={require("../assets/images/blackplus.png")}
+                source={require("../../assets/images/blackplus.png")}
                 style={{ height: 30, width: 30 }}
               />
             )}
@@ -219,12 +218,12 @@ const Filters = () => {
           <TouchableOpacity onPress={() => handlePress("tags")}>
             {show === "tags" ? (
               <Image
-                source={require("../assets/images/minus.png")}
+                source={require("../../assets/images/minus.png")}
                 style={{ height: 30, width: 30 }}
               />
             ) : (
               <Image
-                source={require("../assets/images/blackplus.png")}
+                source={require("../../assets/images/blackplus.png")}
                 style={{ height: 30, width: 30 }}
               />
             )}
@@ -268,12 +267,12 @@ const Filters = () => {
           <TouchableOpacity onPress={() => handlePress("gifttype")}>
             {show === "gifttype" ? (
               <Image
-                source={require("../assets/images/minus.png")}
+                source={require("../../assets/images/minus.png")}
                 style={{ height: 30, width: 30 }}
               />
             ) : (
               <Image
-                source={require("../assets/images/blackplus.png")}
+                source={require("../../assets/images/blackplus.png")}
                 style={{ height: 30, width: 30 }}
               />
             )}

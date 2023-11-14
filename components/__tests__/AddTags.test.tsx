@@ -4,7 +4,7 @@ import {
   screen,
   act,
 } from "@testing-library/react-native";
-import AddTags from "../AddTags";
+import AddTags from "../screens/AddTags";
 import { NavigationContainer } from "@react-navigation/native";
 import fetch from "jest-fetch-mock";
 import * as friendsService from "../../utilities/friends-service";

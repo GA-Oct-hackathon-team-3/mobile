@@ -10,14 +10,14 @@ import {
   Image,
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import TitleBack from "./TitleBack";
-import { colors } from "../constants/Theme";
-import * as friendsService from "../utilities/friends-service";
-import * as tagsService from "../utilities/tags-service";
+import TitleBack from "../TitleBack";
+import { colors } from "../../constants/Theme";
+import * as friendsService from "../../utilities/friends-service";
+import * as tagsService from "../../utilities/tags-service";
 import { capitalizeFirstLetter } from "./EditFriendProfile.web";
 import ToastManager, { Toast } from "toastify-react-native";
-import { useAuth } from "./AuthContext";
-import * as UserApi from "../utilities/users-api";
+import { useAuth } from "../providers/AuthContext";
+import * as UserApi from "../../utilities/users-api";
 
 export default function EditTags() {
   const params = useLocalSearchParams();
@@ -122,11 +122,11 @@ export default function EditTags() {
           }}
         >
           <Image
-            source={require("../assets/images/singer.png")}
+            source={require("../../assets/images/singer.png")}
             style={{ height: 100, width: 100 }}
           />
           <Image
-            source={require("../assets/images/biker.png")}
+            source={require("../../assets/images/biker.png")}
             style={{
               height: 130,
               width: 100,
@@ -134,7 +134,7 @@ export default function EditTags() {
             }}
           />
           <Image
-            source={require("../assets/images/gardner.png")}
+            source={require("../../assets/images/gardner.png")}
             style={{
               height: 100,
               width: 100,

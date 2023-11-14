@@ -38,7 +38,7 @@ const LandingPage = () => {
       </View>
       <View>
         <Image
-          source={require("../assets/images/landingpage.png")}
+          source={require("../../assets/images/landingpage.png")}
           style={[{ height: height * 0.6, width: width }]}
         />
 

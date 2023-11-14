@@ -10,14 +10,14 @@ import {
   View,
 } from "react-native";
 import ToastManager, { Toast } from "toastify-react-native";
-import { colors } from "../constants/Theme";
-import * as friendsService from "../utilities/friends-service";
-import AddBirthdayButton from "./AddBirthdayButton";
-import { useAuth } from "./AuthContext";
-import BirthdayItem from "./BirthdayItem";
-import OnboardReminders from "./OnboardReminders";
-import Onboarding from "./Onboarding";
-import MainScreenSkeleton from "./skeletons/MainScreenSkeleton";
+import { colors } from "../../constants/Theme";
+import * as friendsService from "../../utilities/friends-service";
+import AddBirthdayButton from "../AddBirthdayButton";
+import { useAuth } from "../providers/AuthContext";
+import BirthdayItem from "../BirthdayItem";
+import OnboardReminders from "../OnboardReminders";
+import Onboarding from "../Onboarding";
+import MainScreenSkeleton from "../skeletons/MainScreenSkeleton";
 
 export default function MainScreen() {
   const router = useRouter();
@@ -118,7 +118,7 @@ export default function MainScreen() {
           ) : (
             <View style={styles.emptyBirthdayContainer}>
               <Image
-                source={require("../assets/images/sadface.png")}
+                source={require("../../assets/images/sadface.png")}
                 style={{ height: 100, width: 100 }}
               />
               <Text

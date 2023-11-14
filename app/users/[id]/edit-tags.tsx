@@ -1,7 +1,7 @@
 import { Stack } from "expo-router";
 import React from "react";
 import Header from "../../../components/Header";
-import EditTags from "../../../components/EditTags";
+import EditTags from "../../../components/screens/EditTags";
 
 const Page = () => {
   return (

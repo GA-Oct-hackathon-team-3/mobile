@@ -1,5 +1,5 @@
 import React from "react";
-import Filters from "../../../components/Filters";
+import Filters from "../../../components/screens/Filters";
 import { Stack } from "expo-router";
 import Header from "../../../components/Header";
 
@@ -13,8 +13,6 @@ const Page = () => {
           header: () => <Header />,
         }}
       />
-      {/* <View style={{ height: 40, backgroundColor: colors.cream }}></View> */}
-      {/* <Header /> */}
 
       <Filters />
     </>

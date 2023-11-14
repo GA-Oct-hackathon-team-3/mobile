@@ -1,10 +1,7 @@
-import { StatusBar } from "expo-status-bar";
-import { Platform, StyleSheet, SafeAreaView, View } from "react-native";
-
-import CreateFriendsProfile from "../components/CreateFriendProfile";
+import { StyleSheet } from "react-native";
 import { Stack } from "expo-router";
-import { colors } from "../constants/Theme";
 import Header from "../components/Header";
+import CreateFriendsProfile from "../components/screens/CreateFriendProfile";
 
 export default function Page() {
   return (
@@ -16,8 +13,6 @@ export default function Page() {
           header: () => <Header />,
         }}
       />
-      {/* <View style={{ height: 40, backgroundColor: colors.cream }}></View> */}
-      {/* <Header /> */}
 
       <CreateFriendsProfile />
     </>

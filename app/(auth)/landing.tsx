@@ -1,5 +1,5 @@
 import React from "react";
-import LandingPage from "../../components/LandingPage";
+import LandingPage from "../../components/screens/LandingPage";
 import { Stack } from "expo-router";
 
 const Page = () => {

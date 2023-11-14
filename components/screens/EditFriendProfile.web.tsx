@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   View,
   TextInput,
@@ -9,33 +9,26 @@ import {
   useWindowDimensions,
   Image,
   ActivityIndicator,
-  Dimensions,
+  Platform,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import { useRouter } from "expo-router";
-import { colors } from "../constants/Theme";
-import TitleBack from "./TitleBack";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { colors } from "../../constants/Theme";
+import TitleBack from "../TitleBack";
+import { UserProfile } from "../../constants/interfaces";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-import * as friendsService from "../utilities/friends-service";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
+import * as friendsService from "../../utilities/friends-service";
 
 import { FontAwesome } from "@expo/vector-icons";
-import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
-function convertDateFormat(dateString) {
-  let date = new Date(dateString);
-  let year = date.getUTCFullYear();
-
-  // Months in JavaScript are 0-indexed, so January is 0 and December is 11
-  // Adding 1 to get the month in the format 01-12
-  let month = ("0" + (date.getUTCMonth() + 1)).slice(-2);
-  let day = ("0" + date.getUTCDate()).slice(-2);
-
-  return `${year}-${month}-${day}`;
+export function capitalizeFirstLetter(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-export default function CreateFriendsProfile() {
-  const [formInput, setFormInput] = useState({
+export default function EditFriendProfile() {
+  const [formInput, setFormInput] = useState<UserProfile>({
     name: "",
     dob: "",
     gender: "",
@@ -43,32 +36,48 @@ export default function CreateFriendsProfile() {
     giftPreferences: [],
     giftCost: "",
   });
-  const { width, height } = useWindowDimensions();
+  const { width, height } = useWindowDimensions;
   const [selectedGender, setSelectedGender] = useState("");
   const [selectedPreferences, setSelectedPreferences] = useState([]);
   const [uploadedPhoto, setUploadedPhoto] = useState(null);
-  const router = useRouter();
-  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [birthday, setBirthday] = useState(new Date().toDateString());
   const [loading, setLoading] = useState(false);
-  const fullHeight = Dimensions.get("window").height;
+  const [friend, setFriend] = useState(null);
+  const router = useRouter();
+
   const [image, setImage] = useState(null);
 
   const currentDate = new Date();
 
-  const showDatePicker = () => {
-    setDatePickerVisibility(true);
-  };
+  const { id } = useLocalSearchParams();
 
-  const hideDatePicker = () => {
-    setDatePickerVisibility(false);
-  };
+  const notify = () => toast("Profile updated.");
 
-  const handleConfirm = (date) => {
-    console.warn("A date has been picked: ", date);
-    setBirthday(date.toDateString());
-    setFormInput({ ...formInput, dob: convertDateFormat(date) });
-    hideDatePicker();
+  const fetchFriend = async () => {
+    try {
+      const friendData = await friendsService.retrieveFriend(id);
+      if (friendData) {
+        const uniqueTimestamp = Date.now();
+        friendData.photo = `${
+          friendData.photo
+            ? friendData.photo
+            : "https://i.imgur.com/hCwHtRc.png"
+        }?timestamp=${uniqueTimestamp}`;
+        setFriend(friendData);
+
+        setFormInput(friendData);
+        setSelectedGender(capitalizeFirstLetter(friendData.gender));
+
+        if (friendData.giftPreferences.length > 0) {
+          let giftPrefs = friendData.giftPreferences.map((p) =>
+            capitalizeFirstLetter(p)
+          );
+          setSelectedPreferences(giftPrefs);
+        }
+        setImage(friendData.photo);
+      }
+    } catch (error) {
+      console.error("Error fetching friend: ", error);
+    }
   };
 
   const togglePreference = (preference) => {
@@ -91,16 +100,7 @@ export default function CreateFriendsProfile() {
     });
 
     if (!result.canceled) {
-      console.log(JSON.stringify(result), "IMAGE RESULT");
-      let { uri } = result;
-
-      let file = {
-        name: uri.split("/").pop(),
-        uri,
-        type: "image/jpeg",
-      };
       setImage(result.assets[0].uri);
-      setUploadedPhoto(file);
     }
   };
 
@@ -112,50 +112,38 @@ export default function CreateFriendsProfile() {
   };
 
   const handleSubmit = async () => {
+    notify();
+
     setLoading(true);
     const data = {
       ...formInput,
       giftPreferences: selectedPreferences.map((p) => p.toLowerCase()),
     };
-    const friendData = await friendsService.createFriend(data);
-    if (image) {
-      try {
-        const response = await friendsService.uploadPhoto(
-          friendData._id,
-          uploadedPhoto
-        );
-        console.log(response, "PHOTO UPLOAD RESPONSE");
-        setLoading(false);
 
-        router.push(`/users/${friendData._id}/add-tags`);
-        return;
-      } catch (error) {}
+    try {
+      await friendsService.updateFriend(id, data);
+    } catch (error) {
+      console.error("Error updating friend: ", error);
+    } finally {
+      setTimeout(() => {
+        setLoading(false);
+      }, 1000);
     }
-    setLoading(false);
-    if (friendData._id) router.push(`/users/${friendData._id}/add-tags`);
-    return;
+
+    // if (friendData) router.replace("/");
   };
 
+  useEffect(() => {
+    fetchFriend();
+  }, []);
+
   return (
-    <KeyboardAwareScrollView contentContainerStyle={styles.container}>
-      {loading && (
-        <View
-          style={{
-            position: "absolute",
-            top: -40,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 99,
-            alignSelf: "center",
-          }}
-        >
-          <ActivityIndicator size="large" color={colors.orange} />
-        </View>
-      )}
-      <TitleBack title={"Create Friend Profile"} />
+    <View style={styles.container}>
+      <ToastContainer
+        position="top-center"
+        style={{ fontFamily: "PilcrowMedium", fontSize: 18 }}
+      />
+      <TitleBack title={"Edit Friend Profile"} />
       <View
         style={{
           flexDirection: "column",
@@ -180,59 +168,21 @@ export default function CreateFriendsProfile() {
             </TouchableOpacity>
           </View>
           <View style={styles.inputContainer}>
-            <Text>Name</Text>
+            <Text style={styles.text}>Name</Text>
             <TextInput
               placeholder="Name"
               style={styles.input}
               value={formInput.name}
               onChangeText={(text) => handleChange("name", text)}
             />
-            <Text>Date of Birth</Text>
-            <DateTimePickerModal
-              isVisible={isDatePickerVisible}
-              mode="date"
-              onConfirm={handleConfirm}
-              onCancel={hideDatePicker}
-            />
-
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                backgroundColor: colors.brightWhite,
-                padding: 10,
-                borderRadius: 5,
-                borderWidth: 1,
-                borderColor: "#E0E0E0",
-              }}
-            >
-              <Text>{birthday}</Text>
-              <TouchableOpacity
-                onPress={showDatePicker}
-                style={{
-                  backgroundColor: colors.orange,
-                  padding: 5,
-                  borderRadius: 5,
-                }}
-              >
-                <Text
-                  style={{
-                    fontFamily: "PilcrowMedium",
-                    color: colors.brightWhite,
-                  }}
-                >
-                  Set Birthday
-                </Text>
-              </TouchableOpacity>
-            </View>
-
-            {/* <TextInput
+            <Text style={styles.text}>Date of Birth</Text>
+            <TextInput
               placeholder="yyyy-mm-dd"
               style={styles.input}
               value={formInput.dob}
               onChangeText={(text) => handleChange("dob", text)}
-            /> */}
-            <Text>Gender</Text>
+            />
+            <Text style={styles.text}>Gender</Text>
             <View style={styles.genderContainer}>
               <TouchableOpacity
                 style={[
@@ -244,7 +194,7 @@ export default function CreateFriendsProfile() {
                   handleChange("gender", "male");
                 }}
               >
-                <Text>Male</Text>
+                <Text style={styles.text}>Male</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -257,7 +207,7 @@ export default function CreateFriendsProfile() {
                   handleChange("gender", "female");
                 }}
               >
-                <Text>Female</Text>
+                <Text style={styles.text}>Female</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -274,7 +224,7 @@ export default function CreateFriendsProfile() {
               </TouchableOpacity>
             </View>
 
-            <Text>Location</Text>
+            <Text style={styles.text}>Location</Text>
             <TextInput
               placeholder="Location"
               style={styles.input}
@@ -282,7 +232,9 @@ export default function CreateFriendsProfile() {
               onChangeText={(text) => handleChange("location", text)}
             />
 
-            <Text>Gift type Preferences (choose all that apply)</Text>
+            <Text style={styles.text}>
+              Gift type Preferences (choose all that apply)
+            </Text>
             <View style={styles.checkboxContainer}>
               {/* You can replace these with actual checkboxes or other components */}
               <TouchableOpacity
@@ -294,7 +246,7 @@ export default function CreateFriendsProfile() {
                 ]}
                 onPress={() => togglePreference("Present")}
               >
-                <Text>Present</Text>
+                <Text style={styles.text}>Present</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -306,7 +258,7 @@ export default function CreateFriendsProfile() {
                 ]}
                 onPress={() => togglePreference("Experience")}
               >
-                <Text>Experience</Text>
+                <Text style={styles.text}>Experience</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -318,12 +270,12 @@ export default function CreateFriendsProfile() {
                 ]}
                 onPress={() => togglePreference("Donation")}
               >
-                <Text>Donation</Text>
+                <Text style={styles.text}>Donation</Text>
               </TouchableOpacity>
             </View>
 
             <View style={styles.pickerContainer}>
-              <Text>Gift Cost</Text>
+              <Text style={styles.text}>Gift Cost</Text>
               <TextInput
                 placeholder="Gift Cost"
                 style={styles.input}
@@ -336,17 +288,26 @@ export default function CreateFriendsProfile() {
 
         <TouchableOpacity
           onPress={() => {
-            router.push("/add-tags");
+            handleSubmit();
+            // router.replace("/");
           }}
         >
           <View style={styles.button}>
-            <Text style={styles.buttonText} onPress={handleSubmit}>
-              Continue to add tags
-            </Text>
+            {loading ? (
+              <ActivityIndicator
+                animating={loading}
+                size="large"
+                color={colors.brightWhite}
+              />
+            ) : (
+              <Text style={styles.buttonText} onPress={handleSubmit}>
+                Update
+              </Text>
+            )}
           </View>
         </TouchableOpacity>
       </View>
-    </KeyboardAwareScrollView>
+    </View>
   );
 }
 
@@ -360,10 +321,15 @@ const styles = StyleSheet.create({
     width: "70%",
     alignSelf: "center",
   },
+  text: {
+    color: "black",
+    fontFamily: "PilcrowMedium",
+    fontSize: 14,
+  },
   buttonText: {
     color: "white",
+    fontSize: 24,
     fontFamily: "PilcrowMedium",
-    fontSize: 20,
   },
   container: {
     backgroundColor: colors.cream,
@@ -385,24 +351,25 @@ const styles = StyleSheet.create({
     backgroundColor: colors.brightWhite,
   },
   pickerContainer: {
-    borderWidth: 1,
     borderColor: "#E0E0E0",
-    padding: 10,
+
+    gap: 6,
   },
   genderContainer: {
-    borderWidth: 1,
     borderColor: "#E0E0E0",
     padding: 10,
     flexDirection: "row",
     gap: 20,
     alignItems: "center",
+    justifyContent: "space-around",
   },
   checkboxContainer: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-around",
   },
   genderButton: {
     padding: 10,
+    paddingHorizontal: 20,
     borderWidth: 1,
     borderColor: "#E0E0E0",
     borderRadius: 5,
@@ -416,6 +383,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#E0E0E0",
     borderRadius: 5,
+    backgroundColor: colors.brightWhite,
   },
   inputContainer: {
     flexDirection: "column",

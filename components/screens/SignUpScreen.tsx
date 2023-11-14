@@ -13,9 +13,9 @@ import {
 } from "react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-import { colors } from "../constants/Theme";
-import * as usersService from "../utilities/users-service";
-import { useAuth } from "./AuthContext";
+import { colors } from "../../constants/Theme";
+import * as usersService from "../../utilities/users-service";
+import { useAuth } from "../providers/AuthContext";
 
 function convertDateFormat(dateString: string) {
   let date = new Date(dateString);
@@ -251,13 +251,13 @@ export default function SignUpScreen() {
             }}
           >
             <Image
-              source={require("../assets/images/arrow-left.png")}
+              source={require("../../assets/images/arrow-left.png")}
               style={{ height: 24, width: 24, left: 20 }}
             />
           </View>
         </TouchableOpacity>
         <Image
-          source={require("../assets/images/Prently1.png")}
+          source={require("../../assets/images/Prently1.png")}
           style={{ width: 240, height: 80, resizeMode: "contain" }}
         />
         <View></View>

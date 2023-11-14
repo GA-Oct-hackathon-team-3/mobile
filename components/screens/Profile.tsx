@@ -5,16 +5,16 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import * as ImageManipulator from "expo-image-manipulator";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { ScrollView } from "react-native-gesture-handler";
-import { colors } from "../constants/Theme";
-import * as friendsService from "../utilities/friends-service";
+import { colors } from "../../constants/Theme";
+import * as friendsService from "../../utilities/friends-service";
 import {
   calculateAge,
   daysUntilBirthday,
   splitDOB,
-} from "../utilities/helpers";
-import Explore from "./Explore";
-import ProfileContent from "./ProfileContent";
-import ProfileSkeleton from "./skeletons/ProfileSkeleton";
+} from "../../utilities/helpers";
+import Explore from "../Explore";
+import ProfileContent from "../ProfileContent";
+import ProfileSkeleton from "../skeletons/ProfileSkeleton";
 
 interface Friend {
   name: string;
@@ -122,7 +122,7 @@ export default function UserProfileScreen() {
               onPress={() => router.back()}
             >
               <Image
-                source={require("../assets/images/arrow-left.png")}
+                source={require("../../assets/images/arrow-left.png")}
                 style={{ height: 24, width: 24 }}
               />
             </TouchableOpacity>
@@ -167,7 +167,7 @@ export default function UserProfileScreen() {
               onPress={() => router.push(`/users/${id}/update`)}
             >
               <Image
-                source={require("../assets/images/pencil.png")}
+                source={require("../../assets/images/pencil.png")}
                 style={{ height: 20, width: 20, right: -40 }}
               />
             </TouchableOpacity>

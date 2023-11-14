@@ -1,6 +1,6 @@
 import React from "react";
 import { View, Text } from "react-native";
-import EditFriendProfile from "../../../components/EditFriendProfile";
+import EditFriendProfile from "../../../components/screens/EditFriendProfile";
 import { Stack } from "expo-router";
 import Header from "../../../components/Header";
 

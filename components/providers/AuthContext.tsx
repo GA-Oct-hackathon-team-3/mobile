@@ -2,7 +2,7 @@ import { useRouter, useSegments } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import React, { useContext, useEffect, useState } from "react";
 import { Platform } from "react-native";
-import { getToken, getUser } from "../utilities/users-service";
+import { getToken, getUser } from "../../utilities/users-service";
 
 interface AuthContextInterface {
   token: string | null;

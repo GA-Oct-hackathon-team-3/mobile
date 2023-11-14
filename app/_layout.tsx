@@ -12,10 +12,10 @@ import { Pressable, View, useColorScheme, Image, Text } from "react-native";
 
 import Colors from "../constants/Colors";
 import { colors } from "../constants/Theme";
-import { AuthProvider } from "../components/AuthContext";
+import { AuthProvider } from "../components/providers/AuthContext";
 import "react-native-gesture-handler";
 import Header from "../components/Header";
-import { RecommendationProvider } from "../components/RecommendationContext";
+import { RecommendationProvider } from "../components/providers/RecommendationContext";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -68,43 +68,17 @@ function RootLayoutNav() {
     <ThemeProvider value={DefaultTheme}>
       <AuthProvider>
         <RecommendationProvider>
-        <Stack>
-          <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-
-          {/* <Stack.Screen
-            name="add-friend"
-            options={{
-              title: "Create Friend Profile",
-              headerShown: true,
-              header: () => (
-                <View
-                  style={{
-                    height: "100%",
-                    width: "100%",
-                    backgroundColor: colors.cream,
-                  }}
-                >
-                  <Text>Test</Text>
-                </View>
-              ),
-            }}
-          /> */}
-          <Stack.Screen
-            name="settings"
-            options={{
-              title: "Settings",
-              header: () => <Header />,
-            }}
-          />
-          {/* <Stack.Screen
-            name="add-tags"
-            options={{
-              headerShown: true,
-              title: "Add Tags",
-            }}
-          /> */}
-        </Stack>
+          <Stack>
+            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="settings"
+              options={{
+                title: "Settings",
+                header: () => <Header />,
+              }}
+            />
+          </Stack>
         </RecommendationProvider>
       </AuthProvider>
     </ThemeProvider>

@@ -2,9 +2,9 @@
   "expo": {
     "name": "project",
     "slug": "project",
-    "version": "1.0.3",
+    "version": "1.0.5",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/appicon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {

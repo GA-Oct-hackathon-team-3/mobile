@@ -1,7 +1,6 @@
 import { Stack } from "expo-router";
 import React from "react";
-import LoginScreen from "../../components/LoginScreen";
-import { View, Image } from "react-native";
+import LoginScreen from "../../components/screens/LoginScreen";
 
 const Page = () => {
   return (
