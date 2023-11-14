@@ -120,7 +120,7 @@ const Explore = ({
                 data={recs}
                 renderItem={({ item }) => (
                   <GiftItem
-                    gift={item}
+                    gift={{ ...item, image: item.imgSrc }}
                     toggleFavorite={toggleFavorite}
                     isFavorite={false}
                     location={friendLocation}
