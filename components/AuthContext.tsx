@@ -19,7 +19,22 @@ interface AuthContextInterface {
   dismissOnboarding: () => Promise<void>;
 }
 
-const AuthContext = React.createContext<AuthContextInterface | null>(null);
+const initialState: AuthContextInterface = {
+  token: null,
+  setToken: () => {}, // No-op function for initial state
+  login: () => {}, // Replace with actual login logic
+  logout: async () => {}, // Replace with actual logout logic
+  onboarded: false,
+  setOnboarded: () => {}, // No-op function for initial state
+  userData: null, // Replace 'null' with the actual initial state for userData
+  setUserData: () => {}, // No-op function for initial state
+  showReminders: true,
+  setShowReminders: () => {}, // No-op function for initial state
+  dismissReminders: async () => {}, // Replace with actual logic for dismissing reminders
+  dismissOnboarding: async () => {}, // Replace with actual logic for dismissing onboarding
+};
+
+const AuthContext = React.createContext<AuthContextInterface>(initialState);
 
 export function useProtectedRoute(token) {
   const segments = useSegments();

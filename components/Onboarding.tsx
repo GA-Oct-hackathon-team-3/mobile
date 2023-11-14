@@ -11,7 +11,11 @@ import { useRouter } from "expo-router";
 import { FontAwesome } from "@expo/vector-icons";
 import { useState } from "react";
 
-const Onboarding = ({ dismissOnboarding }) => {
+interface Props {
+  dismissOnboarding: () => void;
+}
+
+const Onboarding = ({ dismissOnboarding }: Props) => {
   const { width, height } = useWindowDimensions();
   const router = useRouter();
   const [showNext, setShowNext] = useState(false);

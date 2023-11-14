@@ -17,7 +17,7 @@ import { colors } from "../constants/Theme";
 import * as usersService from "../utilities/users-service";
 import { useAuth } from "./AuthContext";
 
-function convertDateFormat(dateString) {
+function convertDateFormat(dateString: string) {
   let date = new Date(dateString);
   let year = date.getUTCFullYear();
 
@@ -46,7 +46,7 @@ export default function SignUpScreen() {
   const { height, width } = useWindowDimensions();
   const [passwordValidity, setPasswordValidity] = useState(false);
   const [requiredMessage, setRequiredMessage] = useState("");
-  const { setToken, setUserData, setupUserData } = useAuth();
+  const { setToken } = useAuth();
 
   const handleConfirm = (date: Date) => {
     setBirthday(date.toDateString());
