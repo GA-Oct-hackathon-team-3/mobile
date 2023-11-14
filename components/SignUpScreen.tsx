@@ -46,10 +46,9 @@ export default function SignUpScreen() {
   const { height, width } = useWindowDimensions();
   const [passwordValidity, setPasswordValidity] = useState(false);
   const [requiredMessage, setRequiredMessage] = useState("");
-  const { setToken, setUserData } = useAuth();
+  const { setToken, setUserData, setupUserData } = useAuth();
 
-  const handleConfirm = (date) => {
-    console.warn("A date has been picked: ", date);
+  const handleConfirm = (date: Date) => {
     setBirthday(date.toDateString());
     setDob(convertDateFormat(date));
     hideDatePicker();
@@ -70,7 +69,7 @@ export default function SignUpScreen() {
   useEffect(() => {
     validatePassword(password);
   }, [password]);
-  const submitHandler = async (evt) => {
+  const submitHandler = async (evt: React.TouchEvent) => {
     evt.preventDefault();
     setLoading(true);
     const valid = validateForm();
@@ -92,9 +91,9 @@ export default function SignUpScreen() {
     if (valid) setRequiredMessage("");
     try {
       const userData = await usersService.register(data);
+      console.log(userData, "THIS IS THE USER DATA");
       if (userData) {
         setToken(userData.token);
-        setUserData(userData);
       }
 
       router.replace("/");
@@ -117,7 +116,7 @@ export default function SignUpScreen() {
     else return true;
   }
 
-  function validatePassword(password) {
+  function validatePassword(password: string) {
     // Initialize the validity to true
     let passwordValidity = true;
     let requiredMessage = "";
@@ -199,19 +198,18 @@ export default function SignUpScreen() {
     return match;
   }
 
-  function handleFormMessage(string) {
+  function handleFormMessage(string: string) {
     setLoading(false);
-    // handles scrolling to top to display various reasons for why form is not valid for submit
 
     setRequiredMessage(string);
     return;
   }
 
-  const handleChangePassword = (value) => {
+  const handleChangePassword = (value: string) => {
     setPassword(value);
   };
 
-  const handleChangeConfirmPassword = (value) => {
+  const handleChangeConfirmPassword = (value: string) => {
     setConfirmPassword(value);
   };
 
@@ -405,15 +403,7 @@ export default function SignUpScreen() {
             </Text>
           </TouchableOpacity>
         </View>
-        {/* <Picker
-        selectedValue={gender}
-        onValueChange={(itemValue) => setGender(itemValue)}
-        style={styles.picker}
-      >
-        <Picker.Item label="Not Specified" value="Not Specified" />
-        <Picker.Item label="Male" value="Male" />
-        <Picker.Item label="Female" value="Female" />
-      </Picker> */}
+
         <Text style={styles.text}>Location</Text>
         <TextInput
           style={styles.input}
@@ -465,7 +455,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   input: {
-    height: 32,
+    height: 34,
     borderColor: "lightgray",
     borderWidth: 1,
     borderRadius: 5,

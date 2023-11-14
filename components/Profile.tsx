@@ -1,22 +1,20 @@
-import React, { useEffect, useState } from "react";
-import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import { Image } from "expo-image";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-import Explore from "./Explore";
-import ProfileContent from "./ProfileContent";
+import * as ImageManipulator from "expo-image-manipulator";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { ScrollView } from "react-native-gesture-handler";
-import { FontAwesome } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { colors } from "../constants/Theme";
 import * as friendsService from "../utilities/friends-service";
 import {
   calculateAge,
   daysUntilBirthday,
   splitDOB,
 } from "../utilities/helpers";
-import { useLocalSearchParams } from "expo-router";
-import { colors } from "../constants/Theme";
+import Explore from "./Explore";
+import ProfileContent from "./ProfileContent";
 import ProfileSkeleton from "./skeletons/ProfileSkeleton";
-import * as ImageManipulator from "expo-image-manipulator";
 
 interface Friend {
   name: string;
@@ -69,26 +67,6 @@ export default function UserProfileScreen() {
     }
   };
 
-  const setupImage = async () => {
-    const imageResult = await ImageManipulator.manipulateAsync(
-      user.photo,
-      [
-        { resize: { width: 200, height: 200 } },
-
-        { flip: ImageManipulator.FlipType.Vertical },
-      ],
-      { compress: 0.5, format: ImageManipulator.SaveFormat.PNG }
-    );
-    setImage(imageResult.uri);
-    setLoading(false);
-  };
-
-  useEffect(() => {
-    if (user) {
-      setupImage();
-    }
-  }, [user]);
-
   useEffect(() => {
     fetchFriend();
   }, []);
@@ -126,12 +104,14 @@ export default function UserProfileScreen() {
   };
 
   const onLoad = () => {
-    setLoading(false);
+    setTimeout(() => {
+      setLoading(false);
+    }, 2000);
   };
 
   return (
     <View style={styles.container}>
-      {loading && !image ? (
+      {loading && !user ? (
         <ProfileSkeleton />
       ) : (
         <>
@@ -148,8 +128,8 @@ export default function UserProfileScreen() {
             </TouchableOpacity>
             <Image
               source={{
-                uri: image
-                  ? image
+                uri: user.photo
+                  ? user.photo
                   : "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
               }}
               onLoad={onLoad}

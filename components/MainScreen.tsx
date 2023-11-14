@@ -1,49 +1,23 @@
-import { FontAwesome } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
   FlatList,
   Image,
+  Modal,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
-  useWindowDimensions,
 } from "react-native";
+import ToastManager, { Toast } from "toastify-react-native";
 import { colors } from "../constants/Theme";
 import * as friendsService from "../utilities/friends-service";
-import { formatDate } from "../utilities/helpers";
+import AddBirthdayButton from "./AddBirthdayButton";
 import { useAuth } from "./AuthContext";
-// import { Skeleton } from "moti/skeleton";
-import { Skeleton } from "moti/skeleton";
-import ToastManager, { Toast } from "toastify-react-native";
-import BirthdaySkeleton from "./skeletons/BirthdaySkeleton";
-import ReminderSkeleton from "./skeletons/ReminderSkeleton";
-import SearchBarSkeleton from "./skeletons/SearchBarSkeleton";
-
-const itemColors = [
-  "#FE6797",
-  "#418BFA",
-  "#EDB600",
-  "#FA7F39",
-  "#53CF85",
-  "#FE6797",
-  "#418BFA",
-  "#EDB600",
-  "#FA7F39",
-  "#53CF85",
-  "#FE6797",
-  "#418BFA",
-  "#EDB600",
-  "#FA7F39",
-  "#53CF85",
-  "#FE6797",
-  "#418BFA",
-  "#EDB600",
-  "#FA7F39",
-  "#53CF85",
-];
+import BirthdayItem from "./BirthdayItem";
+import Onboarding from "./Onboarding";
+import MainScreenSkeleton from "./skeletons/MainScreenSkeleton";
 
 export default function MainScreen() {
   const router = useRouter();
@@ -52,13 +26,17 @@ export default function MainScreen() {
   const [upcomingBirthdays, setUpcomingBirthdays] = useState([]);
   const [laterBirthdays, setLaterBirthdays] = useState([]);
   const [birthdays, setBirthdays] = useState([]);
-  const { onboarded } = useAuth();
-  const [showTutorial, setShowTutorial] = useState(false);
-  const { width, height } = useWindowDimensions();
-  const [showNext, setShowNext] = useState(false);
-  const [showReminders, setShowReminders] = useState(true);
   const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+
+  const {
+    showReminders,
+    setShowReminders,
+    dismissReminders,
+    onboarded,
+    setOnboarded,
+    dismissOnboarding,
+  } = useAuth();
 
   useEffect(() => {
     const fetchFriends = async () => {
@@ -66,29 +44,15 @@ export default function MainScreen() {
         const friends = await friendsService.retrieveFriends();
         setFilteredData(friends);
         setData(friends);
+        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching friends: ", error);
         setFilteredData(null);
+        setIsLoading(false);
       }
     };
     fetchFriends();
   }, []);
-
-  useEffect(() => {
-    // setTimeout(() => {
-    //   if (!onboarded) {
-    //     setShowTutorial(true);
-    //   }
-    // }, 1000);
-  }, []);
-
-  useEffect(() => {
-    setTimeout(() => {
-      setIsLoading(false);
-    }, 5000);
-  }, []);
-
-  const colorMode = "light";
 
   const showToasts = () => {
     Toast.success("Friend Created");
@@ -107,498 +71,109 @@ export default function MainScreen() {
     }
   };
 
-  const Item = ({
-    name,
-    dob,
-    _id,
-    daysUntilBirthday,
-    index,
-    favoriteGifts,
-    id,
-  }) => {
-    const [collapse, setCollapse] = useState(false);
+  const handleDismissReminder = async () => {
+    setShowReminders(false);
+    await dismissReminders();
+  };
 
-    return (
-      <>
-        <View key={_id} style={{ marginTop: 20 }}>
-          <TouchableOpacity
-            style={styles.item}
-            onPress={() => {
-              router.push(`/users/${_id}`);
-            }}
-          >
-            <View style={styles.itemTextContainer}>
-              <View style={{ flexDirection: "row", gap: 10 }}>
-                <FontAwesome
-                  name="birthday-cake"
-                  size={30}
-                  color={itemColors[index]}
+  const addPressed = () => {
+    router.push("/add-friend");
+  };
+  return (
+    <View style={styles.container}>
+      <ToastManager />
+      {isLoading ? (
+        <MainScreenSkeleton />
+      ) : (
+        <>
+          <View style={styles.searchContainer}>
+            <TextInput
+              style={styles.searchBar}
+              value={searchQuery}
+              onChangeText={handleSearch}
+              placeholder="Search by name, data, month..."
+            />
+          </View>
+
+          {showReminders ? (
+            <View style={styles.remindersContainer}>
+              <View style={styles.peopleContainer}>
+                <Image
+                  source={require("../assets/images/man.png")}
+                  style={{ width: 80, height: 180 }}
                 />
-                <View style={{ flexDirection: "column" }}>
-                  <Text style={styles.name}>{name}</Text>
-                  <Text style={[styles.birthday]}>{formatDate(dob)}</Text>
-                </View>
+                <Image
+                  source={require("../assets/images/woman.png")}
+                  style={{ width: 60, height: 160 }}
+                />
               </View>
-            </View>
-            <View style={styles.card}>
-              <View style={styles.content}>
-                <Text style={[styles.days, { color: itemColors[index] }]}>
-                  {daysUntilBirthday}
+
+              <View style={styles.remindTextContainer}>
+                <TouchableOpacity
+                  onPress={handleDismissReminder}
+                  style={styles.dismissCircle}
+                >
+                  <Image
+                    source={require("../assets/images/close.png")}
+                    style={styles.close}
+                  />
+                </TouchableOpacity>
+                <Text style={styles.remindersText}>
+                  Your reminders will show up here!
                 </Text>
-                <Text style={styles.label}>Days Left</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              setCollapse(!collapse);
-            }}
-            style={{
-              borderBottomRightRadius: collapse ? 0 : 10,
-              borderBottomLeftRadius: collapse ? 0 : 10,
-              flexDirection: "row",
-              padding: 10,
-              backgroundColor: itemColors[index],
-              justifyContent: "flex-end",
-              alignItems: "center",
-              gap: 10,
-            }}
-          >
-            <Text
-              style={{
-                color: "#FDF7ED",
-                fontFamily: "PilcrowRounded", // This should match the name you've set up in your React Native project.
-                fontSize: 16,
-                fontStyle: "normal",
-                // fontWeight: "700", // You might need to adjust the fontFamily instead to specify the weight.
-                lineHeight: 19, // Approximation based on "normal" in CSS.
-                letterSpacing: 0.48,
-              }}
-            >
-              {collapse ? "Collapse" : "View Saved Gifts"}
-            </Text>
-            {!collapse ? (
-              <FontAwesome name="chevron-down" size={22} color="white" />
-            ) : (
-              <FontAwesome name="chevron-up" size={22} color="white" />
-            )}
-          </TouchableOpacity>
-          {collapse ? (
-            <View
-              style={{
-                height: "auto",
-                width: "auto",
-                backgroundColor: colors.brightWhite,
-                borderBottomLeftRadius: 10,
-                borderBottomRightRadius: 10,
-              }}
-            >
-              <Text
-                style={{
-                  fontFamily: "PilcrowRounded",
-                  fontSize: 18,
-                  padding: 12,
-                }}
-              >
-                Saved Gifts
-              </Text>
-              <View
-                style={{
-                  flexDirection: "row",
-                  justifyContent: "flex-start",
-                  width: "auto",
-                  gap: 8,
-                  paddingHorizontal: 20,
-                }}
-              >
-                {favoriteGifts && favoriteGifts.length > 0 ? (
-                  favoriteGifts.map((fav, idx) => (
-                    <View key={idx}>
-                      <View
-                        style={{
-                          height: 80,
-                          width: 120,
-                          backgroundColor: "white",
-                          borderWidth: 1,
-                          borderColor: "lightgray",
-                          borderRadius: 8,
-                        }}
-                      >
-                        <Image
-                          source={{ uri: fav.image }}
-                          style={{ height: 80, width: 120 }}
-                        />
-                      </View>
-                      <Text
-                        style={{
-                          fontFamily: "PilcrowRounded",
-                          fontSize: 18,
-                          paddingVertical: 12,
-                          textAlign: "center",
-                        }}
-                      >
-                        {fav.title}
-                      </Text>
-                    </View>
-                  ))
-                ) : (
-                  <View>
-                    <Text>No favorite gifts at this time</Text>
-                    <View
-                      style={{
-                        flexDirection: "column",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        width: 100,
-                        height: 100,
-                      }}
-                    >
-                      <TouchableOpacity
-                        onPress={() => router.push(`/users/${id}`)}
-                      >
-                        <Image
-                          source={require("../assets/images/blackplus.png")}
-                          style={{ height: 40, width: 40 }}
-                        />
-                      </TouchableOpacity>
-                      <Text>Add New</Text>
-                    </View>
-                  </View>
-                )}
               </View>
             </View>
           ) : null}
-        </View>
-      </>
-    );
-  };
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.searchContainer}>
-        {isLoading ? (
-          <SearchBarSkeleton />
-        ) : (
-          <TextInput
-            style={styles.searchBar}
-            value={searchQuery}
-            onChangeText={handleSearch}
-            placeholder="Search by name, data, month..."
-          />
-        )}
-      </View>
+          <View>
+            <Text
+              style={[
+                styles.headerText,
+                { paddingTop: showReminders ? 40 : 20 },
+              ]}
+            >
+              Upcoming
+            </Text>
+          </View>
 
-      <ToastManager />
-
-      {showReminders &&
-        (isLoading ? (
-          <ReminderSkeleton />
-        ) : (
-          <View style={styles.remindersContainer}>
-            <View style={styles.peopleContainer}>
+          {filteredData && filteredData.length > 0 ? (
+            <FlatList
+              style={{ zIndex: 99 }}
+              data={filteredData}
+              renderItem={({ item, index }) => (
+                <BirthdayItem {...item} index={index} id={item._id} />
+              )}
+              keyExtractor={(item) => item._id}
+            />
+          ) : (
+            <View style={styles.emptyBirthdayContainer}>
               <Image
-                source={require("../assets/images/man.png")}
-                style={{ width: 80, height: 180 }}
+                source={require("../assets/images/sadface.png")}
+                style={{ height: 100, width: 100 }}
               />
-              <Image
-                source={require("../assets/images/woman.png")}
-                style={{ width: 60, height: 160 }}
-              />
-            </View>
-
-            <View style={styles.remindTextContainer}>
-              <TouchableOpacity
-                onPress={() => setShowReminders(false)}
-                style={{
-                  position: "absolute",
-                  top: -25,
-                  right: -12,
-                  height: 30,
-                  width: 30,
-                  justifyContent: "center",
-                  alignItems: "center",
-                  backgroundColor: colors.green,
-                  borderRadius: 20,
-                }}
-              >
-                <Image
-                  source={require("../assets/images/close.png")}
-                  style={{ height: 18, width: 18 }}
-                />
-              </TouchableOpacity>
               <Text
                 style={{
-                  fontFamily: "Helvetica Neue",
-                  fontSize: 24,
-                  paddingTop: 10,
-                  fontWeight: "300",
+                  fontFamily: "PilcrowRounded",
+                  maxWidth: 200,
+                  fontSize: 16,
                 }}
               >
-                Your reminders will show up here!
+                No birthdays to display-add a friend below to start gifting!
               </Text>
             </View>
-          </View>
-        ))}
-      <View>
-        {isLoading ? (
-          <View style={{ marginTop: 20 }}>
-            <Skeleton
-              height={40}
-              width={200}
-              colorMode={colorMode}
-              radius={"square"}
-            />
-          </View>
-        ) : (
-          <Text
-            style={{
-              fontFamily: "Helvetica Neue",
-              fontSize: 24,
-              paddingTop: showReminders ? 40 : 20,
-            }}
-          >
-            Upcoming
-          </Text>
-        )}
-      </View>
+          )}
 
-      {isLoading ? (
-        <>
-          <BirthdaySkeleton />
-          <BirthdaySkeleton />
-          <BirthdaySkeleton />
+          <Modal
+            animationType="fade"
+            transparent={true}
+            visible={!onboarded}
+            onRequestClose={dismissOnboarding}
+          >
+            <Onboarding dismissOnboarding={dismissOnboarding} />
+          </Modal>
+
+          <AddBirthdayButton addPressed={addPressed} />
         </>
-      ) : filteredData && filteredData.length > 0 ? (
-        <FlatList
-          style={{ zIndex: 99 }}
-          data={filteredData}
-          renderItem={({ item, index }) => (
-            <Item {...item} index={index} id={item._id} />
-          )}
-          keyExtractor={(item) => item._id}
-        />
-      ) : (
-        <View
-          style={{
-            backgroundColor: colors.brightWhite,
-            marginTop: 20,
-
-            flexDirection: "row",
-            justifyContent: "flex-start",
-            alignItems: "center",
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.25,
-            shadowRadius: 3.84,
-            elevation: 5,
-            borderRadius: 10,
-            gap: 8,
-          }}
-        >
-          <Image
-            source={require("../assets/images/sadface.png")}
-            style={{ height: 100, width: 100 }}
-          />
-          <Text
-            style={{
-              fontFamily: "PilcrowRounded",
-              maxWidth: 200,
-              fontSize: 16,
-            }}
-          >
-            No birthdays to display-add a friend below to start gifting!
-          </Text>
-        </View>
-      )}
-      {/* <Modal
-        animationType="fade"
-        transparent={true}
-        visible={!showTutorial}
-        onRequestClose={() => setShowTutorial(false)}
-      >
-        <TouchableOpacity
-          style={[styles.modalBackground, { height: height, borderWidth: 2 }]}
-          onPress={() => {
-            setShowNext(false);
-            setShowTutorial(false);
-          }}
-        >
-          {showNext ? (
-            <>
-              <View
-                style={{
-                  width: width * 0.8,
-                  height: 200,
-                  backgroundColor: "white",
-                  borderRadius: 20,
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <View
-                  style={{
-                    padding: 20,
-                    gap: 12,
-                    alignItems: "center",
-                    width: "90%",
-                  }}
-                >
-                  <Text style={styles.welcomeText}>
-                    {
-                      "Add a new friend profile\nto get personalized\ngift ideas."
-                    }
-                  </Text>
-                  <TouchableOpacity onPress={() => setShowTutorial(false)}>
-                    <Text
-                      style={{
-                        textDecorationLine: "underline",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      Skip for now
-                    </Text>
-                  </TouchableOpacity>
-                </View>
-              </View>
-
-              <Image
-                source={require("../assets/images/hand.png")}
-                style={{
-                  height: 200,
-                  width: 300,
-                  // transform: [{ rotate: "5deg" }],
-                  position: "absolute",
-                  top: height * 0.65,
-                  left: -40,
-                  transform: [{ rotate: "15deg" }],
-                }}
-              />
-              <TouchableOpacity
-                onPress={() => {
-                  setShowTutorial(false);
-                  router.push("/add-friend");
-                  // showToasts();
-                }}
-                style={styles.floatingButtonContainer}
-              >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: 12,
-                  }}
-                >
-                  <FontAwesome name="plus" size={20} color="white" />
-                  <Text style={styles.addText}>Add Friend</Text>
-                </View>
-              </TouchableOpacity>
-            </>
-          ) : (
-            <View
-              style={{
-                backgroundColor: "white",
-                alignItems: "center",
-                paddingHorizontal: 20,
-                paddingTop: 20,
-                height: height * 0.6,
-                borderRadius: 20,
-                zIndex: 1,
-                width: width * 0.8,
-              }}
-            >
-              <View
-                style={{
-                  paddingTop: 20,
-                  flexDirection: "column",
-                  justifyContent: "space-around",
-                  flex: 1,
-                  width: "80%",
-                  alignItems: "center",
-                }}
-              >
-                <Text style={[{ fontSize: 24, fontFamily: "PilcrowBold" }]}>
-                  Welcome to your Presently Dashboard!
-                </Text>
-                <View>
-                  <Text style={[styles.aboutText, { paddingBottom: 14 }]}>
-                    Here you can:
-                  </Text>
-                  <Text style={[styles.aboutText, { paddingLeft: 10 }]}>
-                    {
-                      "\u2022 see birthdays that are coming up soon. \n\n \u2022 search for a friend to view their profile or saved gifts."
-                    }
-                  </Text>
-                </View>
-                <TouchableOpacity
-                  style={styles.getStartedButton}
-                  onPress={() => {
-                    setShowNext(true);
-                  }}
-                >
-                  <View
-                    style={{
-                      height: 60,
-                      width: "auto",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: "white",
-                        fontSize: 24,
-                      }}
-                    >
-                      Continue
-                    </Text>
-                  </View>
-                </TouchableOpacity>
-              </View>
-            </View>
-          )}
-        </TouchableOpacity>
-      </Modal> */}
-      {isLoading ? (
-        <></>
-      ) : (
-        // <View style={styles.modalBackground}>
-        //   <View style={styles.skelButtonContainer}>
-        //     <View
-        //       style={{
-        //         flexDirection: "column",
-        //         alignItems: "center",
-        //         justifyContent: "center",
-        //         gap: 12,
-        //       }}
-        //     >
-        //       <Skeleton
-        //         width={80}
-        //         height={60}
-        //         colorMode="light"
-        //         radius={"square"}
-        //       />
-        //     </View>
-        //   </View>
-        // </View>
-        <TouchableOpacity
-          onPress={() => router.push("/add-friend")}
-          style={styles.floatingButtonContainer}
-        >
-          <View
-            style={{
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 12,
-            }}
-          >
-            <Image
-              source={require("../assets/images/plus.png")}
-              style={{ height: 24, width: 24 }}
-            />
-            <Text style={styles.addText}>Add Friend</Text>
-          </View>
-        </TouchableOpacity>
       )}
     </View>
   );
@@ -694,21 +269,6 @@ const styles = StyleSheet.create({
 
     // Just to distinguish between the views
   },
-
-  // floatingButtonContainer: {
-  //   position: "absolute",
-  //   bottom: 10,
-  //   right: 10,
-  //   width: 140,
-  //   height: 50,
-  //   borderRadius: 20,
-  //   backgroundColor: "#53CF85",
-  //   alignItems: "center",
-  //   justifyContent: "center",
-  //   borderColor: "white",
-  //   borderWidth: 2,
-  //   zIndex: 1,
-  // },
   addText: {
     color: "#FFF",
     fontFamily: "PilcrowRounded", // Make sure the font is set up in your project.
@@ -821,5 +381,44 @@ const styles = StyleSheet.create({
     borderColor: "white",
     borderWidth: 2,
     backgroundColor: colors.brightWhite,
+  },
+  emptyBirthdayContainer: {
+    backgroundColor: colors.brightWhite,
+    marginTop: 20,
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    borderRadius: 10,
+    gap: 8,
+  },
+  dismissCircle: {
+    position: "absolute",
+    top: -25,
+    right: -12,
+    height: 30,
+    width: 30,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: colors.green,
+    borderRadius: 20,
+  },
+  remindersText: {
+    fontFamily: "Helvetica Neue",
+    fontSize: 24,
+    paddingTop: 10,
+    fontWeight: "300",
+  },
+  headerText: {
+    fontFamily: "Helvetica Neue",
+    fontSize: 24,
+  },
+  close: {
+    height: 18,
+    width: 18,
   },
 });

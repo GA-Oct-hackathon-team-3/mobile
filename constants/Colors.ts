@@ -17,3 +17,26 @@ export default {
     tabIconSelected: tintColorDark,
   },
 };
+
+export const itemColors = [
+  "#FE6797",
+  "#418BFA",
+  "#EDB600",
+  "#FA7F39",
+  "#53CF85",
+  "#FE6797",
+  "#418BFA",
+  "#EDB600",
+  "#FA7F39",
+  "#53CF85",
+  "#FE6797",
+  "#418BFA",
+  "#EDB600",
+  "#FA7F39",
+  "#53CF85",
+  "#FE6797",
+  "#418BFA",
+  "#EDB600",
+  "#FA7F39",
+  "#53CF85",
+];

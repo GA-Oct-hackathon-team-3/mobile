@@ -1,19 +1,31 @@
-import React, { createContext, useState, useContext, useEffect } from "react";
-import { Platform } from "react-native";
-import * as SecureStore from "expo-secure-store";
 import { useRouter, useSegments } from "expo-router";
-import { getOnboarded } from "../utilities/storage";
+import * as SecureStore from "expo-secure-store";
+import React, { useContext, useEffect, useState } from "react";
+import { Platform } from "react-native";
 import { getToken, getUser } from "../utilities/users-service";
 
-const AuthContext = createContext(null);
+interface AuthContextInterface {
+  token: string | null;
+  setToken: React.Dispatch<React.SetStateAction<string | null>>;
+  login: (dummyUser: any) => void;
+  logout: () => Promise<void>;
+  onboarded: boolean;
+  setOnboarded: React.Dispatch<React.SetStateAction<boolean>>;
+  userData: any;
+  setUserData: React.Dispatch<React.SetStateAction<any>>;
+  showReminders: boolean;
+  setShowReminders: React.Dispatch<React.SetStateAction<boolean>>;
+  dismissReminders: () => Promise<void>;
+  dismissOnboarding: () => Promise<void>;
+}
+
+const AuthContext = React.createContext<AuthContextInterface | null>(null);
 
 export function useProtectedRoute(token) {
   const segments = useSegments();
   const router = useRouter();
 
   React.useEffect(() => {
-    const inAuthGroup = segments[0] === "(auth)";
-
     if (Platform.OS === "ios" || Platform.OS === "android") {
       setTimeout(() => {
         if (!token) {
@@ -38,18 +50,17 @@ export const AuthProvider = ({ children }) => {
   const [token, setToken] = useState(null);
   const [onboarded, setOnboarded] = useState(false);
   const [userData, setUserData] = useState(null);
-  // For simplicity, we're just tracking a user object. Set to null for no user.
+  const [showReminders, setShowReminders] = useState(true);
 
   useEffect(() => {
-    getUserToken();
-  }, []);
+    setupUserData();
+  }, [token]);
 
   const getUserToken = async () => {
     if (Platform.OS === "web") {
       let token = await getToken();
       if (token) {
         setToken(token);
-        getOnboarded();
         let data = await getUser();
         setUserData(data);
       }
@@ -57,24 +68,91 @@ export const AuthProvider = ({ children }) => {
       let token = await getToken();
       if (token) {
         setToken(token);
-        getOnboarded();
         let data = await getUser();
         setUserData(data);
       }
     }
   };
 
+  const setupUserData = async () => {
+    try {
+      await getOnboarded();
+    } catch (error) {
+      console.log(error, "ERROR ONBOARDED");
+    }
+    try {
+      await getUserToken();
+    } catch (error) {
+      console.log(error, "ERROR GETTING USER TOKEN");
+    }
+    try {
+      await getShowReminders();
+    } catch (error) {
+      console.log(error, "ERROR GETTING SHOW REMINDERS");
+    }
+    return;
+  };
+
+  const getOnboarded = async () => {
+    if (Platform.OS === "web") {
+      const value = localStorage.getItem("onboarded");
+      if (value === "true") setOnboarded(true);
+      else setOnboarded(false);
+    } else {
+      const value = await SecureStore.getItemAsync("onboarded");
+      console.log(value, "THIS IS ONBOARDED");
+      if (value === "true") setOnboarded(true);
+      else setOnboarded(false);
+    }
+  };
+
+  const dismissOnboarding = async () => {
+    if (Platform.OS === "web") {
+      localStorage.setItem("onboarded", "true");
+      await getOnboarded();
+    } else {
+      await SecureStore.setItemAsync("onboarded", "true");
+      await getOnboarded();
+    }
+  };
+
   useProtectedRoute(token);
 
-  // Dummy login/logout functions. In real-world, you'll integrate actual auth logic here.
   const login = (dummyUser) => {};
 
   const logout = async () => {
     setToken(null);
     if (Platform.OS === "web") {
       localStorage.removeItem("token");
+      localStorage.removeItem("showReminders");
+      localStorage.removeItem("onboarded");
     } else {
       await SecureStore.deleteItemAsync("token");
+      await SecureStore.deleteItemAsync("showReminders");
+      await SecureStore.deleteItemAsync("onboarded");
+    }
+  };
+
+  const dismissReminders = async () => {
+    if (Platform.OS === "web") {
+      localStorage.setItem("showReminders", "false");
+      await getShowReminders();
+    } else {
+      await SecureStore.setItemAsync("showReminders", "false");
+      await getShowReminders();
+    }
+  };
+
+  const getShowReminders = async () => {
+    if (Platform.OS === "web") {
+      const value = localStorage.getItem("showReminders");
+      if (value === "false") setShowReminders(false);
+      else setShowReminders(true);
+    } else {
+      const value = await SecureStore.getItemAsync("showReminders");
+      console.log("this is the value: ", value);
+      if (value === "false") setShowReminders(false);
+      else setShowReminders(true);
     }
   };
 
@@ -89,6 +167,10 @@ export const AuthProvider = ({ children }) => {
         setOnboarded,
         userData,
         setUserData,
+        setShowReminders,
+        showReminders,
+        dismissReminders,
+        dismissOnboarding,
       }}
     >
       {children}

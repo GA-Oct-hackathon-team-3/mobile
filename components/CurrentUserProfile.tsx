@@ -10,7 +10,6 @@ import { useAuth } from "./AuthContext";
 import * as UserAPI from "../utilities/users-api";
 import { useRouter } from "expo-router";
 import ProfileSkeleton from "./skeletons/ProfileSkeleton";
-import * as ImageManipulator from "expo-image-manipulator";
 
 export default function CurrentUserProfileScreen() {
   const [selected, setSelected] = useState("profile");
@@ -38,31 +37,9 @@ export default function CurrentUserProfileScreen() {
     } catch (error) {}
   };
 
-  const setupImage = async () => {
-    if (user && user.photo) {
-      const imageResult = await ImageManipulator.manipulateAsync(
-        user.photo,
-        [
-          { resize: { width: 200, height: 200 } },
-
-          { flip: ImageManipulator.FlipType.Vertical },
-        ],
-        { compress: 0.5, format: ImageManipulator.SaveFormat.PNG }
-      );
-      setImage(imageResult.uri);
-      setLoading(false);
-    }
-  };
-
   const goToSettings = () => {
     router.push("/settings");
   };
-
-  useEffect(() => {
-    if (user) {
-      setupImage();
-    }
-  }, [user]);
 
   const onLoad = () => {
     setLoading(false);
@@ -91,8 +68,8 @@ export default function CurrentUserProfileScreen() {
             {user && (
               <Image
                 source={{
-                  uri: image
-                    ? image
+                  uri: user.photo
+                    ? user.photo
                     : "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
                 }}
                 style={styles.avatar}
