@@ -7,6 +7,7 @@ import {
   Image,
   TouchableOpacity,
   useWindowDimensions,
+  ScrollView,
 } from "react-native";
 import { colors } from "../../constants/Theme";
 import TitleBack from "../TitleBack";
@@ -231,24 +232,26 @@ const Filters = () => {
         </View>
 
         {show === "tags" && (
-          <View style={styles.tagsSection}>
-            {tags.map((tag, idx) => (
-              <TouchableOpacity
-                style={[
-                  styles.tag,
-                  {
-                    backgroundColor: selectedTags.includes(tag)
-                      ? colors.green
-                      : "lightgray",
-                  },
-                ]}
-                key={idx}
-                onPress={() => handleChangeTag(tag)}
-              >
-                <Text style={styles.selectTagText}>{tag}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+          <ScrollView style={{ maxHeight: 200 }}>
+            <View style={styles.tagsSection}>
+              {tags.map((tag, idx) => (
+                <TouchableOpacity
+                  style={[
+                    styles.tag,
+                    {
+                      backgroundColor: selectedTags.includes(tag)
+                        ? colors.green
+                        : "lightgray",
+                    },
+                  ]}
+                  key={idx}
+                  onPress={() => handleChangeTag(tag)}
+                >
+                  <Text style={styles.selectTagText}>{tag}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </ScrollView>
         )}
 
         <View
@@ -406,7 +409,7 @@ const styles = StyleSheet.create({
   tagsSection: {
     flexDirection: "row",
     flexWrap: "wrap",
-    maxHeight: 100,
+
     paddingHorizontal: 40,
     alignItems: "center",
     gap: 12,
