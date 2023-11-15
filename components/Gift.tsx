@@ -13,6 +13,15 @@ function isOddAndLast(index, length) {
   return index % 2 === 0 && index === length - 1;
 }
 
+interface GiftProps {
+  gift: any;
+  toggleFavorite: () => void;
+  isFavorite: boolean;
+  location: string;
+  length: number;
+  index: number;
+}
+
 const GiftItem = ({
   gift,
   toggleFavorite,
@@ -20,7 +29,7 @@ const GiftItem = ({
   location,
   length,
   index,
-}) => {
+}: GiftProps) => {
   const [fillHeart, setFillHeart] = useState(isFavorite); // to toggle between empty or filled heart
   const image = gift.image ? gift.image : gift.ImgSrc;
   const needsMargin = isOddAndLast(index, length);

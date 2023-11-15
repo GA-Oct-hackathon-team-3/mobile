@@ -14,6 +14,7 @@ import Explore from "../Explore";
 import ProfileContent from "../ProfileContent";
 import ProfileSkeleton from "../skeletons/ProfileSkeleton";
 import { useUser } from "../providers/UserContext";
+import { useMainContext } from "../providers/MainContext";
 
 interface Friend {
   name: string;
@@ -45,7 +46,8 @@ export default function UserProfileScreen() {
   const [loading, setLoading] = useState(true);
   const { user, fetchFriend } = useUser();
 
-  const { id } = useLocalSearchParams();
+  const { id, bgColor } = useLocalSearchParams();
+  const { fetchFriends } = useMainContext();
 
   // const fetchFriend = async () => {
   //   try {
@@ -85,6 +87,7 @@ export default function UserProfileScreen() {
   }, [user]);
 
   const toggleFavorite = async (recommendation, e) => {
+    console.log("TOGGLE FAVORITE CALLED");
     e.preventDefault();
     const idx = favorites.findIndex(
       (fav) => fav.title.toLowerCase() === recommendation.title.toLowerCase()
@@ -93,6 +96,7 @@ export default function UserProfileScreen() {
       // remove from favorites
       try {
         const item = favorites[idx];
+        console.log("SAVING ITEM", item);
         const res = await friendsService.removeFromFavorites(id, item._id);
         if (res)
           setFavorites(
@@ -106,6 +110,7 @@ export default function UserProfileScreen() {
       try {
         const res = await friendsService.addToFavorites(id, recommendation);
         setFavorites([...favorites, res.recommendation]);
+        fetchFriends();
       } catch (error) {
         setFavError(error.message);
       }
@@ -125,10 +130,12 @@ export default function UserProfileScreen() {
   return (
     <View style={styles.container}>
       {loading && !user ? (
-        <ProfileSkeleton />
+        <ProfileSkeleton isCurrUser={false} />
       ) : (
         <>
-          <View style={styles.backgroundCover}></View>
+          <View
+            style={[styles.backgroundCover, { backgroundColor: bgColor }]}
+          ></View>
           <View style={styles.header}>
             <TouchableOpacity
               style={{ position: "absolute", left: 0, top: 40 }}
@@ -309,7 +316,6 @@ const styles = StyleSheet.create({
     height: 140,
     right: 0,
     top: 0,
-    backgroundColor: colors.orange,
     borderBottomLeftRadius: 8,
     borderBottomRightRadius: 8,
   },

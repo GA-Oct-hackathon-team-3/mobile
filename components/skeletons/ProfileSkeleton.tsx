@@ -3,7 +3,7 @@ import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { colors } from "../../constants/Theme";
 import { Skeleton } from "moti/skeleton";
 import ProfileContentSkeleton from "./ProfileContentSkeleton";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { Image } from "expo-image";
 
 type Props = {
@@ -13,10 +13,13 @@ type Props = {
 function ProfileSkeleton({ isCurrUser = false }: Props) {
   const colorMode = "light";
   const router = useRouter();
+  const { bgColor } = useLocalSearchParams();
 
   return (
     <>
-      <View style={styles.backgroundCover}></View>
+      <View
+        style={[styles.backgroundCover, { backgroundColor: bgColor }]}
+      ></View>
       <View style={styles.header}>
         {!isCurrUser && (
           <TouchableOpacity
@@ -144,7 +147,6 @@ const styles = StyleSheet.create({
     height: 140,
     right: 0,
     top: 0,
-    backgroundColor: colors.orange,
     borderBottomLeftRadius: 8,
     borderBottomRightRadius: 8,
   },

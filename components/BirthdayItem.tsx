@@ -6,6 +6,7 @@ import { itemColors } from "../constants/Colors";
 import { formatDate } from "../utilities/helpers";
 
 import { colors } from "../constants/Theme";
+import { ScrollView } from "react-native-gesture-handler";
 
 interface Props {
   name: string;
@@ -37,7 +38,10 @@ const BirthdayItem = ({
         <TouchableOpacity
           style={styles.item}
           onPress={() => {
-            router.push(`/users/${_id}`);
+            router.push({
+              pathname: `/users/${_id}`,
+              params: { bgColor: itemColors[index] },
+            });
           }}
         >
           <View style={styles.itemTextContainer}>
@@ -144,60 +148,65 @@ const BirthdayItem = ({
                 paddingHorizontal: 20,
               }}
             >
-              {favoriteGifts && favoriteGifts.length > 0 ? (
-                favoriteGifts.map((fav, idx) => (
-                  <View key={idx}>
+              <ScrollView
+                scrollEnabled={favoriteGifts.length > 2 ? true : false}
+                horizontal={true}
+              >
+                {favoriteGifts && favoriteGifts.length > 0 ? (
+                  favoriteGifts.map((fav, idx) => (
+                    <View key={idx}>
+                      <View
+                        style={{
+                          height: 80,
+                          width: 120,
+                          backgroundColor: "white",
+                          borderWidth: 1,
+                          borderColor: "lightgray",
+                          borderRadius: 8,
+                        }}
+                      >
+                        <Image
+                          source={{ uri: fav.image }}
+                          style={{ height: 80, width: 120 }}
+                        />
+                      </View>
+                      <Text
+                        style={{
+                          fontFamily: "PilcrowRounded",
+                          fontSize: 18,
+                          paddingVertical: 12,
+                          textAlign: "center",
+                        }}
+                      >
+                        {fav.title}
+                      </Text>
+                    </View>
+                  ))
+                ) : (
+                  <View>
+                    <Text>No favorite gifts at this time</Text>
                     <View
                       style={{
-                        height: 80,
-                        width: 120,
-                        backgroundColor: "white",
-                        borderWidth: 1,
-                        borderColor: "lightgray",
-                        borderRadius: 8,
+                        flexDirection: "column",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        width: 100,
+                        height: 100,
                       }}
                     >
-                      <Image
-                        source={{ uri: fav.image }}
-                        style={{ height: 80, width: 120 }}
-                      />
+                      <TouchableOpacity
+                        onPress={() => router.push(`/users/${id}`)}
+                      >
+                        <Image
+                          source={require("../assets/images/blackplus.png")}
+                          style={{ height: 40, width: 40 }}
+                        />
+                      </TouchableOpacity>
+                      <Text>Add New</Text>
                     </View>
-                    <Text
-                      style={{
-                        fontFamily: "PilcrowRounded",
-                        fontSize: 18,
-                        paddingVertical: 12,
-                        textAlign: "center",
-                      }}
-                    >
-                      {fav.title}
-                    </Text>
                   </View>
-                ))
-              ) : (
-                <View>
-                  <Text>No favorite gifts at this time</Text>
-                  <View
-                    style={{
-                      flexDirection: "column",
-                      justifyContent: "center",
-                      alignItems: "center",
-                      width: 100,
-                      height: 100,
-                    }}
-                  >
-                    <TouchableOpacity
-                      onPress={() => router.push(`/users/${id}`)}
-                    >
-                      <Image
-                        source={require("../assets/images/blackplus.png")}
-                        style={{ height: 40, width: 40 }}
-                      />
-                    </TouchableOpacity>
-                    <Text>Add New</Text>
-                  </View>
-                </View>
-              )}
+                )}
+              </ScrollView>
             </View>
           </View>
         ) : null}
