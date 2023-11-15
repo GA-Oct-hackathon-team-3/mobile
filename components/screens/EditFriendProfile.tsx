@@ -22,6 +22,8 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 import * as friendsService from "../../utilities/friends-service";
 
 import { FontAwesome } from "@expo/vector-icons";
+import { useUser } from "../providers/UserContext";
+import { useMainContext } from "../providers/MainContext";
 
 function capitalizeFirstLetter(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -57,6 +59,8 @@ export default function EditFriendProfile() {
   const router = useRouter();
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [birthday, setBirthday] = useState(new Date().toDateString());
+  const { fetchFriend } = useUser();
+  const { fetchFriends } = useMainContext();
 
   const [image, setImage] = useState(null);
 
@@ -83,7 +87,7 @@ export default function EditFriendProfile() {
     hideDatePicker();
   };
 
-  const fetchFriend = async () => {
+  const fetchUser = async () => {
     try {
       const friendData = await friendsService.retrieveFriend(id);
       if (friendData) {
@@ -150,7 +154,10 @@ export default function EditFriendProfile() {
     };
 
     try {
-      await friendsService.updateFriend(id, data);
+      await friendsService.updateFriend(id, data).then(() => {
+        fetchFriend();
+        fetchFriends();
+      });
     } catch (error) {
       console.error("Error updating friend: ", error);
     } finally {
@@ -162,7 +169,7 @@ export default function EditFriendProfile() {
   };
 
   useEffect(() => {
-    fetchFriend();
+    fetchUser();
   }, []);
 
   return (

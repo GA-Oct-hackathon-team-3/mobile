@@ -115,7 +115,6 @@ export const AuthProvider = ({ children }) => {
       else setOnboarded(false);
     } else {
       const value = await SecureStore.getItemAsync("onboarded");
-      console.log(value, "THIS IS ONBOARDED");
       if (value === "true") setOnboarded(true);
       else setOnboarded(false);
     }

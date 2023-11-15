@@ -100,9 +100,9 @@ const ProfileContent = ({
             />
           </TouchableOpacity>
         </View>
-        <ScrollView contentContainerStyle={styles.tagsSection}>
-          {tags && tags.length > 0 ? (
-            tags.map((tag, idx) => (
+        {tags && tags.length > 0 ? (
+          <ScrollView contentContainerStyle={styles.tagsSection}>
+            {tags.map((tag, idx) => (
               <View style={styles.tag} key={idx}>
                 <Text
                   key={idx}
@@ -115,15 +115,26 @@ const ProfileContent = ({
                   {tag.title}
                 </Text>
               </View>
-            ))
-          ) : (
-            <View>
-              <Text>
-                Your friend doesn't have any tags. Click edit to add them.
-              </Text>
-            </View>
-          )}
-        </ScrollView>
+            ))}
+          </ScrollView>
+        ) : (
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              gap: 20,
+
+              paddingHorizontal: 60,
+              flexDirection: "row",
+            }}
+          >
+            <FontAwesome name={"tag"} size={40} color={"lightgray"} />
+            <Text style={styles.text}>
+              Your friend doesn't have any tags. Click edit to add them.
+            </Text>
+          </View>
+        )}
       </View>
 
       <View style={styles.giftTypeContainer}>
@@ -151,9 +162,22 @@ const ProfileContent = ({
             numColumns={2}
           />
         ) : (
-          <View style={styles.giftTop}>
-            <Text>No favorites</Text>
-            <FontAwesome name="pencil" size={20} color="black" />
+          <View
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              gap: 20,
+
+              paddingHorizontal: 60,
+              flexDirection: "row",
+            }}
+          >
+            <FontAwesome name={"heart"} size={40} color={"lightgray"} />
+            <Text style={styles.text}>
+              No favorites to display. Go to Explore Gifts tab to favorite
+              gifts.{" "}
+            </Text>
           </View>
         )}
       </View>

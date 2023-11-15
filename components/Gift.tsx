@@ -22,10 +22,8 @@ const GiftItem = ({
   index,
 }) => {
   const [fillHeart, setFillHeart] = useState(isFavorite); // to toggle between empty or filled heart
-  console.log("GIFT IMAGE", gift);
   const image = gift.image ? gift.image : gift.ImgSrc;
   const needsMargin = isOddAndLast(index, length);
-  console.log(needsMargin, "isOddAndLast", index, length);
   return (
     <View style={[styles.itemContainer, { flex: needsMargin ? 0.42 : 1 }]}>
       <View>

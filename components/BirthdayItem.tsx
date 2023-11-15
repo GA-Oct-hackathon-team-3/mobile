@@ -15,6 +15,7 @@ interface Props {
   index: number;
   favoriteGifts: any[];
   id: string;
+  photo: string;
 }
 
 const BirthdayItem = ({
@@ -25,6 +26,7 @@ const BirthdayItem = ({
   index,
   favoriteGifts,
   id,
+  photo,
 }: Props) => {
   const [collapse, setCollapse] = useState(false);
   const router = useRouter();
@@ -39,12 +41,27 @@ const BirthdayItem = ({
           }}
         >
           <View style={styles.itemTextContainer}>
-            <View style={{ flexDirection: "row", gap: 10 }}>
-              <FontAwesome
-                name="birthday-cake"
-                size={30}
-                color={itemColors[index]}
-              />
+            <View
+              style={{
+                flexDirection: "row",
+                gap: 10,
+                alignItems: "center",
+              }}
+            >
+              {photo ? (
+                <Image
+                  source={{ uri: photo }}
+                  height={50}
+                  width={50}
+                  style={{ borderRadius: 25 }}
+                />
+              ) : (
+                <FontAwesome
+                  name="birthday-cake"
+                  size={30}
+                  color={itemColors[index]}
+                />
+              )}
               <View style={{ flexDirection: "column" }}>
                 <Text style={styles.name}>{name}</Text>
                 <Text style={[styles.birthday]}>{formatDate(dob)}</Text>
@@ -78,7 +95,7 @@ const BirthdayItem = ({
           <Text
             style={{
               color: "#FDF7ED",
-              fontFamily: "PilcrowRounded", // This should match the name you've set up in your React Native project.
+              fontFamily: "PilcrowMedium", // This should match the name you've set up in your React Native project.
               fontSize: 16,
               fontStyle: "normal",
               // fontWeight: "700", // You might need to adjust the fontFamily instead to specify the weight.
@@ -89,9 +106,14 @@ const BirthdayItem = ({
             {collapse ? "Collapse" : "View Saved Gifts"}
           </Text>
           {!collapse ? (
-            <FontAwesome name="chevron-down" size={22} color="white" />
+            <FontAwesome
+              name="chevron-down"
+              size={22}
+              color="white"
+              thin={true}
+            />
           ) : (
-            <FontAwesome name="chevron-up" size={22} color="white" />
+            <FontAwesome name="chevron-up" size={22} color="white" thin />
           )}
         </TouchableOpacity>
         {collapse ? (

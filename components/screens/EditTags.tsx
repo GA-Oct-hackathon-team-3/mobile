@@ -18,6 +18,7 @@ import { capitalizeFirstLetter } from "./EditFriendProfile.web";
 import ToastManager, { Toast } from "toastify-react-native";
 import { useAuth } from "../providers/AuthContext";
 import * as UserApi from "../../utilities/users-api";
+import { useUser } from "../providers/UserContext";
 
 export default function EditTags() {
   const params = useLocalSearchParams();
@@ -53,6 +54,8 @@ export default function EditTags() {
   };
   const router = useRouter();
   const scrollViewRef = useRef<ScrollView>();
+  const { user, fetchFriend } = useUser();
+  const { id } = useLocalSearchParams();
 
   const fetchTags = async () => {
     let friendData = await friendsService.retrieveFriend(params.id);
@@ -95,10 +98,12 @@ export default function EditTags() {
           category: "Popular",
         });
       });
+
       showToasts();
     } catch (err) {
     } finally {
       setLoading(false);
+      fetchFriend(id);
     }
 
     setLoading(false);

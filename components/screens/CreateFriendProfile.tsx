@@ -21,6 +21,7 @@ import DateTimePickerModal from "react-native-modal-datetime-picker";
 
 import { FontAwesome } from "@expo/vector-icons";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { useMainContext } from "../providers/MainContext";
 
 function convertDateFormat(dateString) {
   let date = new Date(dateString);
@@ -53,6 +54,7 @@ export default function CreateFriendsProfile() {
   const [loading, setLoading] = useState(false);
   const fullHeight = Dimensions.get("window").height;
   const [image, setImage] = useState(null);
+  const { fetchFriends } = useMainContext();
 
   const currentDate = new Date();
 
@@ -126,11 +128,13 @@ export default function CreateFriendsProfile() {
         );
         console.log(response, "PHOTO UPLOAD RESPONSE");
         setLoading(false);
+        fetchFriends();
 
         router.push(`/users/${friendData._id}/add-tags`);
         return;
       } catch (error) {}
     }
+    fetchFriends();
     setLoading(false);
     if (friendData._id) router.push(`/users/${friendData._id}/add-tags`);
     return;

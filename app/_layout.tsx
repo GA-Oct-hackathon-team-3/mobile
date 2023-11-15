@@ -16,6 +16,8 @@ import { AuthProvider } from "../components/providers/AuthContext";
 import "react-native-gesture-handler";
 import Header from "../components/Header";
 import { RecommendationProvider } from "../components/providers/RecommendationContext";
+import UserProvider from "../components/providers/UserContext";
+import MainProvider from "../components/providers/MainContext";
 
 export {
   // Catch any errors thrown by the Layout component.
@@ -67,19 +69,23 @@ function RootLayoutNav() {
   return (
     <ThemeProvider value={DefaultTheme}>
       <AuthProvider>
-        <RecommendationProvider>
-          <Stack>
-            <Stack.Screen name="(auth)" options={{ headerShown: false }} />
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="settings"
-              options={{
-                title: "Settings",
-                header: () => <Header />,
-              }}
-            />
-          </Stack>
-        </RecommendationProvider>
+        <MainProvider>
+          <RecommendationProvider>
+            <UserProvider>
+              <Stack>
+                <Stack.Screen name="(auth)" options={{ headerShown: false }} />
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen
+                  name="settings"
+                  options={{
+                    title: "Settings",
+                    header: () => <Header />,
+                  }}
+                />
+              </Stack>
+            </UserProvider>
+          </RecommendationProvider>
+        </MainProvider>
       </AuthProvider>
     </ThemeProvider>
   );

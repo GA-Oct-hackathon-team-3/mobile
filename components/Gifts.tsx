@@ -46,24 +46,31 @@ const Gifts = ({ isExplore, favoriteGifts, isEnabled }) => {
   return (
     <View style={styles.container}>
       {isExplore ? (
-        <View style={styles.exploreHeader}>
-          <View style={styles.textRec}>
-            <Text>Personalized Recommendations</Text>
-            {isEnabled ? (
-              "recommendations go here"
-            ) : (
-              // <FlatList
-              //   data={}
-              //   renderItem={({ item }) => <GiftItem item={item} />}
-              //   keyExtractor={(item) => item.id}
-              //   numColumns={2}
-              // />
-              <Text>Add tags to get personalized gift recommendations</Text>
-            )}
+        <>
+          <View style={styles.exploreHeader}>
+            <View style={styles.textRec}>
+              <Text>Personalized Recommendations</Text>
+            </View>
+            <FontAwesome name="refresh" size={20} color="black" />
+            <FontAwesome name="filter" size={20} color="black" />
           </View>
-          <FontAwesome name="refresh" size={20} color="black" />
-          <FontAwesome name="filter" size={20} color="black" />
-        </View>
+          <View
+            style={{
+              flex: 1,
+              alignItems: "center",
+              justifyContent: "flex-start",
+              gap: 20,
+              height: 400,
+              paddingTop: 40,
+              paddingHorizontal: 40,
+            }}
+          >
+            <FontAwesome name={"tags"} size={60} color={"lightgray"} />
+            <Text style={styles.text}>
+              Add tags to get personalized gift recommendations
+            </Text>
+          </View>
+        </>
       ) : (
         <View style={styles.giftTop}>
           <Text>Favorited Gifts</Text>

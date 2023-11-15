@@ -18,13 +18,18 @@ import BirthdayItem from "../BirthdayItem";
 import OnboardReminders from "../OnboardReminders";
 import Onboarding from "../Onboarding";
 import MainScreenSkeleton from "../skeletons/MainScreenSkeleton";
+import { useMainContext } from "../providers/MainContext";
 
 export default function MainScreen() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredData, setFilteredData] = useState([]);
-  const [data, setData] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const {
+    isLoading,
+    friends,
+    filteredFriends,
+    fetchFriends,
+    setFilteredFriends,
+  } = useMainContext();
 
   const {
     showReminders,
@@ -34,36 +39,20 @@ export default function MainScreen() {
     dismissOnboarding,
   } = useAuth();
 
-  useEffect(() => {
-    const fetchFriends = async () => {
-      try {
-        const friends = await friendsService.retrieveFriends();
-        setFilteredData(friends);
-        setData(friends);
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Error fetching friends: ", error);
-        setFilteredData(null);
-        setIsLoading(false);
-      }
-    };
-    fetchFriends();
-  }, []);
-
   const showToasts = () => {
     Toast.success("Friend Created");
   };
 
   const handleSearch = (query: string) => {
     setSearchQuery(query);
-    if (query && data.length > 0) {
-      setFilteredData(
-        data.filter((item: any) =>
+    if (query && friends.length > 0) {
+      setFilteredFriends(
+        friends.filter((item: any) =>
           item.name.toLowerCase().includes(query.toLowerCase())
         )
       );
     } else {
-      setFilteredData(data);
+      setFilteredFriends(friends);
     }
   };
 
@@ -106,16 +95,16 @@ export default function MainScreen() {
             </Text>
           </View>
 
-          {filteredData && filteredData.length > 0 ? (
+          {filteredFriends && filteredFriends.length > 0 ? (
             <FlatList
               style={{ zIndex: 99 }}
-              data={filteredData}
+              data={filteredFriends}
               renderItem={({ item, index }) => (
                 <BirthdayItem {...item} index={index} id={item._id} />
               )}
               keyExtractor={(item) => item._id}
             />
-          ) : (
+          ) : friends.length < 1 ? (
             <View style={styles.emptyBirthdayContainer}>
               <Image
                 source={require("../../assets/images/sadface.png")}
@@ -129,6 +118,22 @@ export default function MainScreen() {
                 }}
               >
                 No birthdays to display-add a friend below to start gifting!
+              </Text>
+            </View>
+          ) : (
+            <View style={styles.emptyBirthdayContainer}>
+              <Image
+                source={require("../../assets/images/sadface.png")}
+                style={{ height: 100, width: 100 }}
+              />
+              <Text
+                style={{
+                  fontFamily: "PilcrowRounded",
+                  maxWidth: 200,
+                  fontSize: 16,
+                }}
+              >
+                No birthdays found! Try searching for a different name.
               </Text>
             </View>
           )}

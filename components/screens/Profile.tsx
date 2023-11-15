@@ -1,8 +1,6 @@
 import { Image } from "expo-image";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-
-import * as ImageManipulator from "expo-image-manipulator";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { ScrollView } from "react-native-gesture-handler";
 import { colors } from "../../constants/Theme";
@@ -15,6 +13,7 @@ import {
 import Explore from "../Explore";
 import ProfileContent from "../ProfileContent";
 import ProfileSkeleton from "../skeletons/ProfileSkeleton";
+import { useUser } from "../providers/UserContext";
 
 interface Friend {
   name: string;
@@ -33,7 +32,7 @@ interface Friend {
 export default function UserProfileScreen() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("profile");
-  const [user, setUser] = useState<Friend | null>(null);
+  // const [user, setUser] = useState<Friend | null>(null);
   const [image, setImage] = useState(null);
   const [dobObject, setDobObject] = useState({
     year: "",
@@ -44,32 +43,46 @@ export default function UserProfileScreen() {
   const [enableRecs, setEnableRecs] = useState<boolean>(false);
   const [favError, setFavError] = useState("");
   const [loading, setLoading] = useState(true);
+  const { user, fetchFriend } = useUser();
 
   const { id } = useLocalSearchParams();
 
-  const fetchFriend = async () => {
-    try {
-      const friendData = await friendsService.retrieveFriend(id);
-      if (friendData) {
-        const uniqueTimestamp = Date.now();
-        friendData.photo = `${
-          friendData.photo
-            ? friendData.photo
-            : "https://i.imgur.com/hCwHtRc.png"
-        }?timestamp=${uniqueTimestamp}`;
-        setUser(friendData);
-        setDobObject(splitDOB(friendData.dob));
-        setFavorites(friendData.favoriteGifts);
-        if (friendData.tags.length > 0) setEnableRecs(true);
-      }
-    } catch (error) {
-      console.error("Error fetching user: ", error);
-    }
-  };
+  // const fetchFriend = async () => {
+  //   try {
+  //     const friendData = await friendsService.retrieveFriend(id);
+  //     if (friendData) {
+  //       const uniqueTimestamp = Date.now();
+  //       friendData.photo = `${
+  //         friendData.photo
+  //           ? friendData.photo
+  //           : "https://i.imgur.com/hCwHtRc.png"
+  //       }?timestamp=${uniqueTimestamp}`;
+  //       setUser(friendData);
+  //       setDobObject(splitDOB(friendData.dob));
+  //       setFavorites(friendData.favoriteGifts);
+  //       if (friendData.tags.length > 0) setEnableRecs(true);
+  //     }
+  //   } catch (error) {
+  //     console.error("Error fetching user: ", error);
+  //   }
+  // };
 
   useEffect(() => {
-    fetchFriend();
-  }, []);
+    console.log("USER USER PROFILE", user);
+    if (user) {
+      const uniqueTimestamp = Date.now();
+      user.photo = `${
+        user.photo ? user.photo : "https://i.imgur.com/hCwHtRc.png"
+      }?timestamp=${uniqueTimestamp}`;
+
+      setDobObject(splitDOB(user.dob));
+      setFavorites(user.favoriteGifts);
+      if (user.tags.length > 0) setEnableRecs(true);
+
+      setLoading(false);
+    }
+    // fetchFriend();
+  }, [user]);
 
   const toggleFavorite = async (recommendation, e) => {
     e.preventDefault();

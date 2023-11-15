@@ -1,20 +1,19 @@
 import { FontAwesome } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import {
-  View,
-  Image,
-  Text,
-  StyleSheet,
   FlatList,
+  StyleSheet,
+  Text,
   TouchableOpacity,
+  View,
 } from "react-native";
-import { colors } from "../constants/Theme";
-import { useLocalSearchParams, useRouter } from "expo-router";
 import * as friendsService from "../utilities/friends-service";
 
 import GiftItem from "./Gift";
 import { useRecommendation } from "./providers/RecommendationContext";
 import GiftItemSkeleton from "./skeletons/GiftItemSkeleton";
+import { colors } from "../constants/Theme";
 
 interface Explore {
   isExplore: boolean;
@@ -49,29 +48,30 @@ const Explore = ({
   const [filteredTags, setFilteredTags] = useState(tags);
   const [budget, setBudget] = useState(null);
 
-  useEffect(() => {
-    const getRecommendations = async () => {
-      const requestBody = {
-        giftTypes: filteredGiftTypes,
-        tags: filteredTags,
-      };
-      if (budget) requestBody.budget = budget;
-      setIsRecommending(true);
-      try {
-        const recom = await friendsService.getRecommendations(id, requestBody);
-        console.log(recom);
-        setRefresh(false);
-        setRecs(recom.recommendations);
-        updateCache(id, recom.recommendations);
-        setIsRecommending(false);
-        setShowError(false);
-      } catch (error) {
-        setShowError(true);
-        setIsRecommending(false);
-        setRefresh(false);
-      }
+  const getRecommendations = async () => {
+    setRefresh(true);
+    const requestBody = {
+      giftTypes: filteredGiftTypes,
+      tags: filteredTags,
     };
+    if (budget) requestBody.budget = budget;
+    setIsRecommending(true);
+    try {
+      const recom = await friendsService.getRecommendations(id, requestBody);
+      console.log(recom);
+      setRefresh(false);
+      setRecs(recom.recommendations);
+      updateCache(id, recom.recommendations);
+      setIsRecommending(false);
+      setShowError(false);
+    } catch (error) {
+      setShowError(true);
+      setIsRecommending(false);
+      setRefresh(false);
+    }
+  };
 
+  useEffect(() => {
     if (enableRecs && (!recs.length || refresh)) {
       if (!refresh) {
         if (cache[id] && cache[id].length) setRecs(cache[id]);
@@ -100,7 +100,7 @@ const Explore = ({
         <View style={styles.textRec}>
           <Text>Personalized Recommendations</Text>
         </View>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={getRecommendations}>
           <FontAwesome name="refresh" size={20} color="black" />
         </TouchableOpacity>
         <TouchableOpacity
@@ -116,12 +116,10 @@ const Explore = ({
               <View style={{ flex: 1, flexDirection: "column" }}>
                 <View style={{ flexDirection: "row", gap: 4 }}>
                   <GiftItemSkeleton />
-
                   <GiftItemSkeleton />
                 </View>
                 <View style={{ flexDirection: "row", gap: 4 }}>
                   <GiftItemSkeleton />
-
                   <GiftItemSkeleton />
                 </View>
               </View>
@@ -144,15 +142,43 @@ const Explore = ({
             )}
           </>
         ) : (
-          <View>
-            <Text>
+          <View
+            style={{
+              flex: 1,
+              alignItems: "center",
+              justifyContent: "flex-start",
+              gap: 20,
+              height: 400,
+              paddingTop: 40,
+              paddingHorizontal: 40,
+            }}
+          >
+            <FontAwesome
+              name={"exclamation-triangle"}
+              size={60}
+              color={colors.green}
+            />
+            <Text style={styles.text}>
               It appears our servers are too busy, try again in a few seconds
             </Text>
           </View>
         )}
         {!enableRecs && (
-          <View>
-            <Text>Add tags to get personalized gift recommendations</Text>
+          <View
+            style={{
+              flex: 1,
+              alignItems: "center",
+              justifyContent: "flex-start",
+              gap: 20,
+              height: 400,
+              paddingTop: 40,
+              paddingHorizontal: 40,
+            }}
+          >
+            <FontAwesome name={"tags"} size={60} color={"lightgray"} />
+            <Text style={styles.text}>
+              Add tags to get personalized gift recommendations
+            </Text>
           </View>
         )}
       </View>
@@ -191,8 +217,8 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   text: {
-    fontFamily: "PilcrowMedium",
-    fontSize: 16,
+    fontFamily: "PilcrowRounded",
+    fontSize: 18,
   },
   headerText: {
     fontFamily: "PilcrowMedium",
