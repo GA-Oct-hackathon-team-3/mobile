@@ -214,232 +214,234 @@ export default function SignUpScreen() {
   };
 
   return (
-    <KeyboardAwareScrollView contentContainerStyle={styles.container}>
-      {loading && (
-        <View
-          style={{
-            position: "absolute",
-            height: height,
-            width: width,
-            alignItems: "center",
-            justifyContent: "center",
-          }}
-        >
-          <ActivityIndicator size="large" color={colors.orange} />
-        </View>
-      )}
-      <View
-        style={{
-          position: "absolute",
-          flexDirection: "row",
-          width: width,
-          height: 100,
-          alignItems: "center",
-          justifyContent: "space-between",
-          top: 40,
-        }}
-      >
-        <TouchableOpacity
-          onPress={() =>
-            router.canGoBack() ? router.back() : router.replace("/landing")
-          }
-        >
+    <>
+      <KeyboardAwareScrollView contentContainerStyle={styles.container}>
+        {loading && (
           <View
             style={{
-              flexDirection: "column",
+              position: "absolute",
+              height: height,
+              width: width,
+              alignItems: "center",
               justifyContent: "center",
             }}
           >
-            <Image
-              source={require("../../assets/images/arrow-left.png")}
-              style={{ height: 24, width: 24, left: 20 }}
-            />
+            <ActivityIndicator size="large" color={colors.orange} />
           </View>
-        </TouchableOpacity>
-        <Image
-          source={require("../../assets/images/Prently1.png")}
-          style={{ width: 240, height: 80, resizeMode: "contain" }}
-        />
-        <View></View>
-      </View>
-      <View
-        style={{
-          alignSelf: "center",
-          justifyContent: "center",
-          alignItems: "center",
-          paddingTop: 120,
-        }}
-      >
-        <Text style={[styles.text, { fontSize: 24 }]}>Sign Up</Text>
-        <Text style={[styles.text, { fontSize: 12 }]}>{requiredMessage}</Text>
-      </View>
-
-      <View style={{ flexDirection: "column", gap: 4 }}>
-        <Text style={styles.text}>Name *</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Name"
-          onChangeText={setName}
-          value={name}
-        />
-        <Text style={styles.text}>Password *</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Create Password"
-          onChangeText={(value) => handleChangePassword(value)}
-          value={password}
-          secureTextEntry={true}
-        />
-        <Text style={styles.text}>Confirm Password *</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Re-type to Confirm Password"
-          onChangeText={(value) => handleChangeConfirmPassword(value)}
-          value={confirmPassword}
-          secureTextEntry={true}
-        />
-        <Text style={styles.text}>Email *</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Email"
-          onChangeText={setEmail}
-          value={email}
-        />
-        <Text style={styles.text}>Phone Number</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Phone Number"
-          onChangeText={setPhoneNumber}
-          value={phoneNumber}
-        />
-        <Text style={styles.text}>Birthday *</Text>
-        <DateTimePickerModal
-          isVisible={isDatePickerVisible}
-          mode="date"
-          onConfirm={handleConfirm}
-          onCancel={hideDatePicker}
-          isDarkModeEnabled={false}
-        />
+        )}
         <View
           style={{
+            position: "absolute",
             flexDirection: "row",
-            justifyContent: "space-between",
+            width: width,
+            height: 100,
             alignItems: "center",
-            backgroundColor: colors.brightWhite,
-            padding: 8,
-            borderRadius: 5,
-            borderWidth: 1,
-            borderColor: "#E0E0E0",
+            justifyContent: "space-between",
+            top: 40,
           }}
         >
-          <Text>{birthday}</Text>
           <TouchableOpacity
-            onPress={showDatePicker}
-            style={{
-              backgroundColor: colors.orange,
-              padding: 5,
-              borderRadius: 5,
-            }}
+            onPress={() =>
+              router.canGoBack() ? router.back() : router.replace("/landing")
+            }
           >
-            <Text
+            <View
               style={{
-                fontFamily: "PilcrowMedium",
-                color: colors.brightWhite,
+                flexDirection: "column",
+                justifyContent: "center",
               }}
             >
-              Set Birthday
-            </Text>
+              <Image
+                source={require("../../assets/images/arrow-left.png")}
+                style={{ height: 24, width: 24, left: 20 }}
+              />
+            </View>
           </TouchableOpacity>
+          <Image
+            source={require("../../assets/images/Prently1.png")}
+            style={{
+              width: 140,
+              height: 60,
+              resizeMode: "contain",
+              alignSelf: "center",
+              marginRight: 8,
+            }}
+          />
+          <View></View>
         </View>
-        <Text style={styles.text}>Select Gender</Text>
-        <View style={{ flexDirection: "row" }}>
-          <TouchableOpacity
-            style={
-              gender === "male"
-                ? styles.buttonSelected
-                : styles.unselectedButton
-            }
-            onPress={() => setGender("male")}
-          >
-            <Text
-              style={
-                gender === "male" ? styles.selectedText : styles.unselectedText
-              }
-            >
-              Male
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={
-              gender === "female"
-                ? styles.buttonSelected
-                : styles.unselectedButton
-            }
-            onPress={() => setGender("female")}
-          >
-            <Text
-              style={
-                gender === "female"
-                  ? styles.selectedText
-                  : styles.unselectedText
-              }
-            >
-              Female
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={
-              gender === "other"
-                ? styles.buttonSelected
-                : styles.unselectedButton
-            }
-            onPress={() => setGender("other")}
-          >
-            <Text
-              style={
-                gender === "other" ? styles.selectedText : styles.unselectedText
-              }
-            >
-              Other
-            </Text>
-          </TouchableOpacity>
+        <View
+          style={{
+            alignSelf: "center",
+            justifyContent: "center",
+            alignItems: "center",
+            paddingTop: 100,
+          }}
+        >
+          <Text style={[styles.text, { fontSize: 24 }]}>Sign Up</Text>
+          <Text style={[styles.text, { fontSize: 12 }]}>{requiredMessage}</Text>
         </View>
 
-        <Text style={styles.text}>Location</Text>
-        <TextInput
-          style={styles.input}
-          placeholder="Location"
-          onChangeText={setLocation}
-          value={location}
-        />
-      </View>
+        <View style={{ flexDirection: "column", gap: 4 }}>
+          <Text style={styles.text}>Name *</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Name"
+            onChangeText={setName}
+            value={name}
+          />
+          <Text style={styles.text}>Password *</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Create Password"
+            onChangeText={(value) => handleChangePassword(value)}
+            value={password}
+            secureTextEntry={true}
+          />
+          <Text style={styles.text}>Confirm Password *</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Re-type to Confirm Password"
+            onChangeText={(value) => handleChangeConfirmPassword(value)}
+            value={confirmPassword}
+            secureTextEntry={true}
+          />
+          <Text style={styles.text}>Email *</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Email"
+            onChangeText={setEmail}
+            value={email}
+          />
+          <Text style={styles.text}>Phone Number</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Phone Number"
+            onChangeText={setPhoneNumber}
+            value={phoneNumber}
+          />
+          <Text style={styles.text}>Birthday *</Text>
+          <DateTimePickerModal
+            isVisible={isDatePickerVisible}
+            mode="date"
+            onConfirm={handleConfirm}
+            onCancel={hideDatePicker}
+          />
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              backgroundColor: colors.brightWhite,
+              padding: 8,
+              borderRadius: 5,
+              borderWidth: 1,
+              borderColor: "#E0E0E0",
+            }}
+          >
+            <Text>{birthday}</Text>
+            <TouchableOpacity
+              onPress={showDatePicker}
+              style={{
+                backgroundColor: colors.orange,
+                padding: 5,
+                borderRadius: 5,
+              }}
+            >
+              <Text
+                style={{
+                  fontFamily: "PilcrowMedium",
+                  color: colors.brightWhite,
+                }}
+              >
+                Set Birthday
+              </Text>
+            </TouchableOpacity>
+          </View>
+          <Text style={styles.text}>Select Gender</Text>
+          <View style={{ flexDirection: "row" }}>
+            <TouchableOpacity
+              style={
+                gender === "male"
+                  ? styles.buttonSelected
+                  : styles.unselectedButton
+              }
+              onPress={() => setGender("male")}
+            >
+              <Text
+                style={
+                  gender === "male"
+                    ? styles.selectedText
+                    : styles.unselectedText
+                }
+              >
+                Male
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={
+                gender === "female"
+                  ? styles.buttonSelected
+                  : styles.unselectedButton
+              }
+              onPress={() => setGender("female")}
+            >
+              <Text
+                style={
+                  gender === "female"
+                    ? styles.selectedText
+                    : styles.unselectedText
+                }
+              >
+                Female
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={
+                gender === "other"
+                  ? styles.buttonSelected
+                  : styles.unselectedButton
+              }
+              onPress={() => setGender("other")}
+            >
+              <Text
+                style={
+                  gender === "other"
+                    ? styles.selectedText
+                    : styles.unselectedText
+                }
+              >
+                Other
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          <Text style={styles.text}>Location</Text>
+          <TextInput
+            style={styles.input}
+            placeholder="Location"
+            onChangeText={setLocation}
+            value={location}
+          />
+        </View>
+      </KeyboardAwareScrollView>
       <TouchableOpacity
         disabled={false}
         onPress={submitHandler}
         style={styles.submitButton}
       >
-        <View
+        <Text
           style={{
-            width: 240,
-            height: 80,
-            justifyContent: "center",
-            alignItems: "center",
+            color: "white",
+            fontSize: 24,
+            fontFamily: "PilcrowMedium",
+
+            textAlign: "center",
           }}
         >
-          <Text
-            style={{
-              color: "white",
-              fontSize: 24,
-              fontFamily: "PilcrowMedium",
-
-              textAlign: "center",
-            }}
-          >
-            Create account
-          </Text>
-        </View>
+          Create account
+        </Text>
       </TouchableOpacity>
-    </KeyboardAwareScrollView>
+    </>
   );
 }
 
@@ -448,7 +450,8 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
     backgroundColor: colors.cream,
-    justifyContent: "space-between",
+    justifyContent: "flex-start",
+    gap: 8,
   },
   logo: {
     fontSize: 24,
@@ -463,6 +466,7 @@ const styles = StyleSheet.create({
     padding: 10,
     marginBottom: 10,
     backgroundColor: "white",
+    fontSize: 11,
   },
   picker: {
     height: 50,
@@ -472,13 +476,15 @@ const styles = StyleSheet.create({
   submitButton: {
     backgroundColor: colors.green,
     borderRadius: 20,
-    height: 40,
-    width: 300,
-    alignItems: "center",
+    height: 60,
+
+    position: "absolute",
+    left: 40,
+    right: 40,
+    bottom: 20,
+
+    alignItems: "center", // Center children horizontally
     justifyContent: "center",
-    padding: 30,
-    marginTop: 20,
-    alignSelf: "center",
   },
   text: {
     color: "#3D3C3C",

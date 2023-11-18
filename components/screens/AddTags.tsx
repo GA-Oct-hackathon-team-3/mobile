@@ -21,12 +21,7 @@ export default function AddTags() {
   const navigation = useNavigation();
 
   const [searchTag, setSearchTag] = useState("");
-  const [addedTags, setAddedTags] = useState([
-    "Pokemon",
-    "Rock Climbing",
-    "Chicago",
-    "Male",
-  ]);
+  const [addedTags, setAddedTags] = useState([]);
   const tagCategories = {
     "Popular Tags": ["Movie Buff", "Minimal", "Quirky"],
     Aesthetic: ["Grunge", "Minimal", "Quirky"],
@@ -60,12 +55,6 @@ export default function AddTags() {
 
   useEffect(() => {}, [addedTags]);
 
-  const handleTagPress = (tag) => {
-    if (!addedTags.includes(tag)) {
-      setAddedTags((prev) => [...prev, tag]);
-    }
-  };
-
   const handleSearchSubmit = () => {
     if (!addedTags.includes(searchTag) && searchTag !== "") {
       setAddedTags((prev) => [...prev, searchTag]);
@@ -93,6 +82,14 @@ export default function AddTags() {
       setLoading(false);
       navigation.dispatch({ type: "POP_TO_TOP" });
     }, 3000);
+  };
+
+  const handleTagPress = (tag) => {
+    if (!addedTags.includes(tag)) {
+      setAddedTags((prev) => [...prev, tag]);
+    } else {
+      setAddedTags((prev) => prev.filter((t) => t !== tag));
+    }
   };
 
   return (
@@ -167,10 +164,16 @@ export default function AddTags() {
             }}
           >
             <View style={styles.addedTagsContainer}>
-              {addedTags.map((tag) => (
-                <Text key={tag} style={styles.tagSelectButton}>
-                  {tag}
-                </Text>
+              {addedTags.map((tag, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.tagSelectButton}
+                  onPress={() => handleTagPress(tag)}
+                >
+                  <Text style={{ fontFamily: "PilcrowMedium", color: "white" }}>
+                    {tag}
+                  </Text>
+                </TouchableOpacity>
               ))}
             </View>
           </ScrollView>
@@ -273,7 +276,7 @@ const styles = StyleSheet.create({
     margin: 5,
     backgroundColor: colors.purple,
     color: colors.brightWhite,
-    fontFamily: "PilcrowRounded",
+    fontFamily: "PilcrowMedium",
     opacity: 0.95,
   },
   button: {

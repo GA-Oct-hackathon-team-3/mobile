@@ -22,7 +22,7 @@ const DeleteUser = () => {
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
   const [feedback, setFeedback] = useState(""); // To handle feedback input
   const router = useRouter();
-  const { userData } = useAuth();
+  const { userData, logout } = useAuth();
   const handleDelete = async () => {
     console.log(userData.id, "THIS IS THE USER DATA");
 
@@ -36,7 +36,7 @@ const DeleteUser = () => {
 
   const confirmDelete = async () => {
     await confirmDeleteUser(confirmToken);
-    await logOut();
+    await logout();
     setShowConfirmPopup(false);
     router.replace("/landing");
     // Add logic to handle navigation or response after deletion

@@ -1,8 +1,8 @@
 {
   "expo": {
     "name": "Presently",
-    "slug": "proj",
-    "version": "1.0.6",
+    "slug": "project",
+    "version": "1.0.7",
     "orientation": "portrait",
     "icon": "./assets/images/appicon.png",
     "scheme": "myapp",

@@ -197,7 +197,6 @@ export default function CreateFriendsProfile() {
               mode="date"
               onConfirm={handleConfirm}
               onCancel={hideDatePicker}
-              isDarkModeEnabled={false}
             />
 
             <View
@@ -327,15 +326,13 @@ export default function CreateFriendsProfile() {
               </TouchableOpacity>
             </View>
 
-            <View style={styles.pickerContainer}>
-              <Text>Gift Cost</Text>
-              <TextInput
-                placeholder="Gift Cost"
-                style={styles.input}
-                value={formInput.giftCost}
-                onChangeText={(text) => handleChange("giftCost", text)}
-              />
-            </View>
+            <Text>Gift Cost</Text>
+            <TextInput
+              placeholder="Gift Cost"
+              style={styles.input}
+              value={formInput.giftCost}
+              onChangeText={(text) => handleChange("giftCost", text)}
+            />
           </View>
         </View>
 
