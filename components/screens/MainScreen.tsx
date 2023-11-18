@@ -66,7 +66,6 @@ export default function MainScreen() {
     router.push("/add-friend");
   };
 
-  const logUserOut = async () => [await logOut()];
   return (
     <View style={styles.container}>
       <ToastManager />
