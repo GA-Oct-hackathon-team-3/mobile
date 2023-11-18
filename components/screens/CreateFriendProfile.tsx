@@ -10,6 +10,7 @@ import {
   Image,
   ActivityIndicator,
   Dimensions,
+  Alert,
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
@@ -113,15 +114,25 @@ export default function CreateFriendsProfile() {
     }));
   };
 
+  const showAlert = () => {
+    Alert.alert(
+      "Unable to Create Friend",
+      "Make sure to fill out all the required fields",
+      [{ text: "OK", onPress: () => console.log("OK Pressed") }]
+    );
+  };
+
   const handleSubmit = async () => {
     setLoading(true);
     const data = {
       ...formInput,
       giftPreferences: selectedPreferences.map((p) => p.toLowerCase()),
     };
-    const friendData = await friendsService.createFriend(data);
-    if (image) {
-      try {
+
+    try {
+      const friendData = await friendsService.createFriend(data);
+
+      if (image) {
         const response = await friendsService.uploadPhoto(
           friendData._id,
           uploadedPhoto
@@ -132,11 +143,16 @@ export default function CreateFriendsProfile() {
 
         router.push(`/users/${friendData._id}/add-tags`);
         return;
-      } catch (error) {}
+      }
+      if (friendData._id) router.push(`/users/${friendData._id}/add-tags`);
+    } catch (error) {
+      console.log(error, "CREATE FRIEND ERROR");
+      showAlert();
+      setLoading(false);
     }
+
     fetchFriends();
     setLoading(false);
-    if (friendData._id) router.push(`/users/${friendData._id}/add-tags`);
     return;
   };
 
@@ -184,14 +200,14 @@ export default function CreateFriendsProfile() {
             </TouchableOpacity>
           </View>
           <View style={styles.inputContainer}>
-            <Text>Name</Text>
+            <Text>Name *</Text>
             <TextInput
               placeholder="Name"
               style={styles.input}
               value={formInput.name}
               onChangeText={(text) => handleChange("name", text)}
             />
-            <Text>Date of Birth</Text>
+            <Text>Date of Birth *</Text>
             <DateTimePickerModal
               isVisible={isDatePickerVisible}
               mode="date"
@@ -236,7 +252,7 @@ export default function CreateFriendsProfile() {
               value={formInput.dob}
               onChangeText={(text) => handleChange("dob", text)}
             /> */}
-            <Text>Gender</Text>
+            <Text>Gender *</Text>
             <View style={styles.genderContainer}>
               <TouchableOpacity
                 style={[
@@ -336,15 +352,9 @@ export default function CreateFriendsProfile() {
           </View>
         </View>
 
-        <TouchableOpacity
-          onPress={() => {
-            router.push("/add-tags");
-          }}
-        >
+        <TouchableOpacity onPress={handleSubmit}>
           <View style={styles.button}>
-            <Text style={styles.buttonText} onPress={handleSubmit}>
-              Continue to add tags
-            </Text>
+            <Text style={styles.buttonText}>Continue to add tags</Text>
           </View>
         </TouchableOpacity>
       </View>
