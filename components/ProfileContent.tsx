@@ -13,7 +13,7 @@ import GiftItem from "./Gift";
 import { colors } from "../constants/Theme";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import { useRouter, useLocalSearchParams } from "expo-router";
-
+import { capitalizeFirstLetter } from "../utilities/helpers";
 const ProfileContent = ({
   giftPreferences,
   tags,
@@ -114,7 +114,7 @@ const ProfileContent = ({
                     color: colors.brightWhite,
                   }}
                 >
-                  {tag.title}
+                  {capitalizeFirstLetter(tag.title)}
                 </Text>
               </View>
             ))}
@@ -142,12 +142,6 @@ const ProfileContent = ({
       <View style={styles.giftTypeContainer}>
         <View style={styles.giftTop}>
           <Text>Favorited Gifts</Text>
-          <TouchableOpacity>
-            <Image
-              source={require("../assets/images/pencil.png")}
-              style={{ height: 20, width: 20 }}
-            />
-          </TouchableOpacity>
         </View>
         {favorites && favorites.length > 0 ? (
           <FlatList

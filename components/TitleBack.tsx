@@ -8,9 +8,15 @@ import {
 } from "react-native";
 import { useRouter } from "expo-router";
 
-const TitleBack = ({ title, marginLeft, paddingRight }) => {
+const TitleBack = ({ title, marginLeft, paddingRight, fetchFriend = null }) => {
   const router = useRouter();
   const { width } = useWindowDimensions();
+  const backPressed = () => {
+    if (fetchFriend) {
+      fetchFriend();
+    }
+    router.back();
+  };
   return (
     <View
       style={{
@@ -20,7 +26,7 @@ const TitleBack = ({ title, marginLeft, paddingRight }) => {
         paddingRight: paddingRight ? paddingRight : 0,
       }}
     >
-      <TouchableOpacity onPress={() => router.back()}>
+      <TouchableOpacity onPress={backPressed}>
         <Image
           source={require("../assets/images/arrow-left.png")}
           style={{

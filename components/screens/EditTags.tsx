@@ -1,37 +1,31 @@
-import React, { useRef, useState, useEffect } from "react";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import React, { useEffect, useRef, useState } from "react";
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  TextInput,
-  ScrollView,
-  Button,
   Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { useRouter, useLocalSearchParams } from "expo-router";
-import TitleBack from "../TitleBack";
+import ToastManager, { Toast } from "toastify-react-native";
 import { colors } from "../../constants/Theme";
 import * as friendsService from "../../utilities/friends-service";
 import * as tagsService from "../../utilities/tags-service";
-import { capitalizeFirstLetter } from "./EditFriendProfile.web";
-import ToastManager, { Toast } from "toastify-react-native";
-import { useAuth } from "../providers/AuthContext";
-import * as UserApi from "../../utilities/users-api";
+import TitleBack from "../TitleBack";
 import { useUser } from "../providers/UserContext";
+import { capitalizeFirstLetter } from "../../utilities/helpers";
+import { FontAwesome } from "@expo/vector-icons";
 
 export default function EditTags() {
   const params = useLocalSearchParams();
   const [loading, setLoading] = useState(false);
 
   const [searchTag, setSearchTag] = useState("");
-  const [addedTags, setAddedTags] = useState([
-    "Pokemon",
-    "Rock Climbing",
-    "Chicago",
-    "Male",
-  ]);
+  const [addedTags, setAddedTags] = useState([]);
   const [friend, setFriend] = useState(null);
+  const [userTags, setUserTags] = useState([]);
 
   const showToasts = () => {
     Toast.success("Tags Updated");
@@ -56,12 +50,22 @@ export default function EditTags() {
   const scrollViewRef = useRef<ScrollView>();
   const { user, fetchFriend } = useUser();
   const { id } = useLocalSearchParams();
+  const searchTagLower = searchTag.toLowerCase();
+  const includesTag = addedTags.some(
+    (tag) => tag.toLowerCase() === searchTagLower
+  );
 
   const fetchTags = async () => {
     let friendData = await friendsService.retrieveFriend(params.id);
 
     setAddedTags(
       friendData.tags.map((tag) => capitalizeFirstLetter(tag.title))
+    );
+    setUserTags(
+      friendData.tags.map((tag) => ({
+        id: tag._id,
+        tag: capitalizeFirstLetter(tag.title),
+      }))
     );
     setFriend(friendData);
   };
@@ -92,22 +96,41 @@ export default function EditTags() {
 
   const handleSubmit = async () => {
     setLoading(true);
+    console.log("addedTags and userTags", addedTags, "     ", userTags);
+    const tagsToRemove = userTags.filter((obj) => !addedTags.includes(obj.tag));
+    console.log(tagsToRemove, "TAGS TO REMOVE");
 
     try {
-      addedTags.forEach(async (tag) => {
-        await tagsService.addTag(friend._id, {
+      const addTagPromises = addedTags.map((tag) =>
+        tagsService.addTag(friend._id, {
           title: tag,
           category: "Popular",
-        });
-      });
+        })
+      );
+
+      // Create an array of promises for removing tags
+      const removeTagPromises = tagsToRemove.map((tag) =>
+        tagsService.removeTag(friend._id, tag.id)
+      );
+      if (addedTags.length === 0 && tagsToRemove.length > 0) {
+        console.log("JUST REMOVE TAGS");
+        await Promise.all([...removeTagPromises]);
+      } else if (addedTags.length > 0 && tagsToRemove.length === 0) {
+        console.log("JUST ADD TAGS");
+        await Promise.all([...addTagPromises]);
+      } else if (addedTags.length > 0 && tagsToRemove.length > 0) {
+        console.log("ADD AND REMOVE TAGS");
+        await Promise.all([...addTagPromises, ...removeTagPromises]);
+      }
+
+      fetchFriend();
 
       showToasts();
     } catch (err) {
       console.log("ERROR", err);
-    } finally {
       setLoading(false);
     }
-    fetchFriend();
+
     setLoading(false);
   };
 
@@ -151,13 +174,43 @@ export default function EditTags() {
         </View>
       </View>
       <View style={styles.topContainer}>
-        <TextInput
-          placeholder="Type to create custom tag"
-          value={searchTag}
-          onChangeText={setSearchTag}
-          onSubmitEditing={handleSearchSubmit}
-          style={styles.input}
-        />
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+
+            paddingBottom: 20,
+          }}
+        >
+          <TextInput
+            placeholder="Type to create custom tag"
+            value={searchTag}
+            onChangeText={setSearchTag}
+            onSubmitEditing={handleSearchSubmit}
+            style={styles.input}
+            placeholderTextColor={"gray"}
+          />
+          <TouchableOpacity
+            onPress={handleSearchSubmit}
+            disabled={searchTag === "" || addedTags.includes(searchTag)}
+            style={{
+              position: "relative",
+              right: 32,
+              top: 0,
+              bottom: 0,
+              height: 30,
+              width: 30,
+            }}
+          >
+            <FontAwesome
+              name={"plus-circle"}
+              size={30}
+              color={
+                !includesTag && searchTag !== "" ? colors.green : "lightgray"
+              }
+            />
+          </TouchableOpacity>
+        </View>
 
         <Text>Added Tags</Text>
         <View style={{ maxHeight: 140 }}>
@@ -251,9 +304,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#E0E0E0",
     padding: 10,
-    marginBottom: 20,
+
     backgroundColor: colors.brightWhite,
     borderRadius: 10,
+    width: "100%",
+    position: "relative",
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
   },
   addedTagsContainer: {
     flexDirection: "row",

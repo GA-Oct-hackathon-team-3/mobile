@@ -108,3 +108,7 @@ export function profileDobValidation(dateOfBirth) {
   if (dob > currentDate) return false;
   else return true;
 }
+
+export function capitalizeFirstLetter(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
