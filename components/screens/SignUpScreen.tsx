@@ -318,6 +318,7 @@ export default function SignUpScreen() {
           mode="date"
           onConfirm={handleConfirm}
           onCancel={hideDatePicker}
+          isDarkModeEnabled={false}
         />
         <View
           style={{

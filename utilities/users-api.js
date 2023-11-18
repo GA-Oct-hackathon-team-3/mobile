@@ -21,3 +21,11 @@ export function checkToken() {
 export function getCurrentUser() {
   return sendRequest(`${BASE_URL}users/profile/all`);
 }
+
+export function deleteUser(user) {
+  return sendRequest(`${BASE_URL}users`, "DELETE", user);
+}
+
+export function confirmDeleteUser(token) {
+  return sendRequest(`${BASE_URL}users/confirm-delete`, "POST", token);
+}

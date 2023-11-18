@@ -1,6 +1,7 @@
 import { StyleSheet } from "react-native";
 import { Stack } from "expo-router";
 import Header from "../components/Header";
+
 import CreateFriendsProfile from "../components/screens/CreateFriendProfile";
 
 export default function Page() {

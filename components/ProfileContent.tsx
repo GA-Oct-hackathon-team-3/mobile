@@ -25,6 +25,8 @@ const ProfileContent = ({
   const router = useRouter();
   const params = useLocalSearchParams();
 
+  console.log(giftPreferences, "GIFT PREFERENCES");
+
   return (
     <View style={styles.container}>
       <View style={styles.giftTypeContainer}>
@@ -46,7 +48,7 @@ const ProfileContent = ({
             style={[
               styles.giftTypeSquare,
               {
-                backgroundColor: giftPreferences?.includes("Experience")
+                backgroundColor: giftPreferences?.includes("experience")
                   ? "lightgrey"
                   : "white",
               },
@@ -59,7 +61,7 @@ const ProfileContent = ({
             style={[
               styles.giftTypeSquare,
               {
-                backgroundColor: giftPreferences?.includes("Present")
+                backgroundColor: giftPreferences?.includes("present")
                   ? "lightgrey"
                   : "white",
               },
@@ -72,7 +74,7 @@ const ProfileContent = ({
             style={[
               styles.giftTypeSquare,
               {
-                backgroundColor: giftPreferences?.includes("Donation")
+                backgroundColor: giftPreferences?.includes("donation")
                   ? "lightgrey"
                   : "white",
               },

@@ -24,6 +24,7 @@ import * as friendsService from "../../utilities/friends-service";
 import { FontAwesome } from "@expo/vector-icons";
 import { useUser } from "../providers/UserContext";
 import { useMainContext } from "../providers/MainContext";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 function capitalizeFirstLetter(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
@@ -173,7 +174,7 @@ export default function EditFriendProfile() {
   }, []);
 
   return (
-    <View style={styles.container}>
+    <KeyboardAwareScrollView contentContainerStyle={styles.container}>
       <ToastManager />
       <TitleBack title={"Edit Friend Profile"} />
       <View
@@ -213,6 +214,7 @@ export default function EditFriendProfile() {
               mode="date"
               onConfirm={handleConfirm}
               onCancel={hideDatePicker}
+              isDarkModeEnabled={false}
             />
 
             <View
@@ -370,7 +372,7 @@ export default function EditFriendProfile() {
           </View>
         </TouchableOpacity>
       </View>
-    </View>
+    </KeyboardAwareScrollView>
   );
 }
 

@@ -31,6 +31,9 @@ const MainProvider = ({ children }) => {
   const fetchFriends = async () => {
     try {
       const friends = await friendsService.retrieveFriends();
+      console.log(JSON.stringify(friends));
+      friends.sort((a, b) => a.daysUntilBirthday - b.daysUntilBirthday);
+
       setFilteredFriends(friends);
       setFriends(friends);
       setIsLoading(false);

@@ -60,3 +60,30 @@ export function logOut() {
     ? localStorage.removeItem("token")
     : SecureStore.deleteItemAsync("token");
 }
+
+export async function deleteUser(id) {
+  console.log(id, "THIS IS THE ID");
+  try {
+    const response = await usersAPI.deleteUser({ user: id });
+    console.log(response, "THIS IS THE RESPONSE DELETE USER");
+    return response;
+  } catch (err) {
+    console.log(err, "THIS IS THE ERROR");
+    return null;
+  }
+}
+
+export async function confirmDeleteUser(confirmToken) {
+  const token = await getToken();
+  if (token) {
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    const userId = payload.id;
+    const response = await usersAPI.confirmDeleteUser({
+      confirmationToken: confirmToken,
+    });
+
+    return response;
+  }
+
+  return null;
+}

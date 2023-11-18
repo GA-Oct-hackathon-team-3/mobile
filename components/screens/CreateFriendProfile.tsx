@@ -197,6 +197,7 @@ export default function CreateFriendsProfile() {
               mode="date"
               onConfirm={handleConfirm}
               onCancel={hideDatePicker}
+              isDarkModeEnabled={false}
             />
 
             <View
@@ -420,6 +421,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: "#E0E0E0",
     borderRadius: 5,
+    backgroundColor: colors.brightWhite,
   },
   inputContainer: {
     flexDirection: "column",

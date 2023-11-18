@@ -30,6 +30,10 @@ interface Friend {
   favoriteGifts: string[];
 }
 
+interface ToggleFavoriteProps {
+  recommendation: any;
+}
+
 export default function UserProfileScreen() {
   const router = useRouter();
   const [activeTab, setActiveTab] = useState("profile");
@@ -49,28 +53,7 @@ export default function UserProfileScreen() {
   const { id, bgColor } = useLocalSearchParams();
   const { fetchFriends } = useMainContext();
 
-  // const fetchFriend = async () => {
-  //   try {
-  //     const friendData = await friendsService.retrieveFriend(id);
-  //     if (friendData) {
-  //       const uniqueTimestamp = Date.now();
-  //       friendData.photo = `${
-  //         friendData.photo
-  //           ? friendData.photo
-  //           : "https://i.imgur.com/hCwHtRc.png"
-  //       }?timestamp=${uniqueTimestamp}`;
-  //       setUser(friendData);
-  //       setDobObject(splitDOB(friendData.dob));
-  //       setFavorites(friendData.favoriteGifts);
-  //       if (friendData.tags.length > 0) setEnableRecs(true);
-  //     }
-  //   } catch (error) {
-  //     console.error("Error fetching user: ", error);
-  //   }
-  // };
-
   useEffect(() => {
-    console.log("USER USER PROFILE", user);
     if (user) {
       const uniqueTimestamp = Date.now();
       user.photo = `${
@@ -83,12 +66,10 @@ export default function UserProfileScreen() {
 
       setLoading(false);
     }
-    // fetchFriend();
   }, [user]);
 
-  const toggleFavorite = async (recommendation, e) => {
-    console.log("TOGGLE FAVORITE CALLED");
-    e.preventDefault();
+  const toggleFavorite = async ({ recommendation }: ToggleFavoriteProps) => {
+    // e.preventDefault();
     const idx = favorites.findIndex(
       (fav) => fav.title.toLowerCase() === recommendation.title.toLowerCase()
     );
@@ -96,7 +77,6 @@ export default function UserProfileScreen() {
       // remove from favorites
       try {
         const item = favorites[idx];
-        console.log("SAVING ITEM", item);
         const res = await friendsService.removeFromFavorites(id, item._id);
         if (res)
           setFavorites(

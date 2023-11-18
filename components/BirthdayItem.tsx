@@ -306,20 +306,6 @@ const styles = StyleSheet.create({
     // Just to distinguish between the views
   },
 
-  // floatingButtonContainer: {
-  //   position: "absolute",
-  //   bottom: 10,
-  //   right: 10,
-  //   width: 140,
-  //   height: 50,
-  //   borderRadius: 20,
-  //   backgroundColor: "#53CF85",
-  //   alignItems: "center",
-  //   justifyContent: "center",
-  //   borderColor: "white",
-  //   borderWidth: 2,
-  //   zIndex: 1,
-  // },
   addText: {
     color: "#FFF",
     fontFamily: "PilcrowRounded", // Make sure the font is set up in your project.

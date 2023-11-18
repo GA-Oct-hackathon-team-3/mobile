@@ -19,6 +19,7 @@ import OnboardReminders from "../OnboardReminders";
 import Onboarding from "../Onboarding";
 import MainScreenSkeleton from "../skeletons/MainScreenSkeleton";
 import { useMainContext } from "../providers/MainContext";
+import { logOut } from "../../utilities/users-service";
 
 export default function MainScreen() {
   const router = useRouter();
@@ -64,6 +65,8 @@ export default function MainScreen() {
   const addPressed = () => {
     router.push("/add-friend");
   };
+
+  const logUserOut = async () => [await logOut()];
   return (
     <View style={styles.container}>
       <ToastManager />
@@ -77,6 +80,7 @@ export default function MainScreen() {
               value={searchQuery}
               onChangeText={handleSearch}
               placeholder="Search by name, data, month..."
+              placeholderTextColor={"gray"}
             />
           </View>
 
@@ -167,6 +171,8 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     marginBottom: 10,
     height: 40,
+    borderWidth: 0.5,
+    borderColor: "lightgray",
   },
   remindTextContainer: {
     width: 200,

@@ -73,6 +73,8 @@ export default function EditTags() {
   const handleTagPress = (tag) => {
     if (!addedTags.includes(tag)) {
       setAddedTags((prev) => [...prev, tag]);
+    } else {
+      setAddedTags((prev) => prev.filter((t) => t !== tag));
     }
   };
 
@@ -101,11 +103,11 @@ export default function EditTags() {
 
       showToasts();
     } catch (err) {
+      console.log("ERROR", err);
     } finally {
       setLoading(false);
-      fetchFriend(id);
     }
-
+    fetchFriend();
     setLoading(false);
   };
 
@@ -167,9 +169,21 @@ export default function EditTags() {
           >
             <View style={styles.addedTagsContainer}>
               {addedTags.map((tag) => (
-                <Text key={tag} style={styles.tagSelectButton}>
-                  {tag}
-                </Text>
+                <TouchableOpacity
+                  key={tag}
+                  onPress={() => handleTagPress(tag)}
+                  style={styles.tagSelectButton}
+                >
+                  <Text
+                    key={tag}
+                    style={{
+                      fontFamily: "PilcrowMedium",
+                      color: colors.brightWhite,
+                    }}
+                  >
+                    {tag}
+                  </Text>
+                </TouchableOpacity>
               ))}
             </View>
           </ScrollView>
@@ -271,6 +285,7 @@ const styles = StyleSheet.create({
     borderColor: "#D9D9D9",
     margin: 5,
     backgroundColor: colors.green,
+    color: colors.brightWhite,
 
     opacity: 0.95,
   },

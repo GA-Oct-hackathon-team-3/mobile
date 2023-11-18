@@ -108,6 +108,26 @@ const SettingsScreen = () => {
               alignSelf: "center",
             }}
           ></View>
+          <View style={styles.filterContainer}>
+            <Text style={{ fontFamily: "PilcrowMedium", fontSize: 18 }}>
+              Delete Account
+            </Text>
+            <TouchableOpacity
+              onPress={() => {
+                router.push("/delete-user");
+              }}
+            >
+              <FontAwesome name="chevron-right" size={16} color={"black"} />
+            </TouchableOpacity>
+          </View>
+          <View
+            style={{
+              height: 1,
+              width: "80%",
+              backgroundColor: "black",
+              alignSelf: "center",
+            }}
+          ></View>
 
           <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
             <Text style={styles.logoutText}>Logout</Text>
