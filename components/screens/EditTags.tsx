@@ -99,6 +99,7 @@ export default function EditTags() {
     console.log("addedTags and userTags", addedTags, "     ", userTags);
     const tagsToRemove = userTags.filter((obj) => !addedTags.includes(obj.tag));
     console.log(tagsToRemove, "TAGS TO REMOVE");
+    console.log(friend._id, "FRIEND ID");
 
     try {
       const addTagPromises = addedTags.map((tag) =>

@@ -402,12 +402,11 @@ const styles = StyleSheet.create({
     padding: 10,
   },
   genderContainer: {
-    borderWidth: 1,
-    borderColor: "#E0E0E0",
     padding: 10,
     flexDirection: "row",
     gap: 20,
     alignItems: "center",
+    justifyContent: "space-between",
   },
   checkboxContainer: {
     flexDirection: "row",
@@ -419,6 +418,9 @@ const styles = StyleSheet.create({
     borderColor: "#E0E0E0",
     borderRadius: 5,
     backgroundColor: colors.brightWhite,
+    width: 100,
+    justifyContent: "center",
+    alignItems: "center",
   },
   selected: {
     backgroundColor: "#E0E0E0",
@@ -429,6 +431,8 @@ const styles = StyleSheet.create({
     borderColor: "#E0E0E0",
     borderRadius: 5,
     backgroundColor: colors.brightWhite,
+    width: 100,
+    alignItems: "center",
   },
   inputContainer: {
     flexDirection: "column",
