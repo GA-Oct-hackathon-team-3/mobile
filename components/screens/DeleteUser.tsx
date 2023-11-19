@@ -16,6 +16,8 @@ import TitleBack from "../TitleBack";
 import { colors } from "../../constants/Theme";
 import { useAuth } from "../providers/AuthContext";
 import { useRouter } from "expo-router";
+import { useMainContext } from "../providers/MainContext";
+import { useUser } from "../providers/UserContext";
 
 const DeleteUser = () => {
   const [confirmToken, setConfirmToken] = useState(null);
@@ -23,6 +25,8 @@ const DeleteUser = () => {
   const [feedback, setFeedback] = useState(""); // To handle feedback input
   const router = useRouter();
   const { userData, logout } = useAuth();
+  const { resetMainContext } = useMainContext();
+  const { resetUserContext } = useUser();
   const handleDelete = async () => {
     console.log(userData.id, "THIS IS THE USER DATA");
 
@@ -36,9 +40,11 @@ const DeleteUser = () => {
 
   const confirmDelete = async () => {
     await confirmDeleteUser(confirmToken);
-    await logout();
     setShowConfirmPopup(false);
-    router.replace("/landing");
+    await logout();
+    resetMainContext();
+    resetUserContext();
+    // router.replace("/landing");
     // Add logic to handle navigation or response after deletion
   };
 

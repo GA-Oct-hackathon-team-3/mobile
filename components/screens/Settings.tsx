@@ -14,6 +14,8 @@ import {
 import TitleBack from "../TitleBack";
 import * as WebBrowser from "expo-web-browser";
 import { useAuth } from "../providers/AuthContext";
+import { useUser } from "../providers/UserContext";
+import { useMainContext } from "../providers/MainContext";
 
 const SettingsScreen = () => {
   const [name, setName] = useState("");
@@ -22,6 +24,8 @@ const SettingsScreen = () => {
   const navigation = useNavigation();
   const router = useRouter();
   const { logout } = useAuth();
+  const { resetUserContext } = useUser();
+  const { resetMainContext } = useMainContext();
 
   const dismiss = () => {
     router.back();
@@ -30,6 +34,8 @@ const SettingsScreen = () => {
   const handleLogout = async () => {
     try {
       await logout();
+      resetUserContext();
+      resetMainContext();
     } catch (error) {
       console.error(error);
     }
@@ -55,10 +61,11 @@ const SettingsScreen = () => {
           justifyContent: "space-between",
           flex: 1,
           paddingBottom: 60,
+          marginTop: 20,
         }}
       >
         <View>
-          <View style={styles.filterContainer}>
+          {/* <View style={styles.filterContainer}>
             <Text style={{ fontFamily: "PilcrowMedium", fontSize: 18 }}>
               General
             </Text>
@@ -73,9 +80,9 @@ const SettingsScreen = () => {
               backgroundColor: "black",
               alignSelf: "center",
             }}
-          ></View>
+          ></View> */}
 
-          <View style={styles.filterContainer}>
+          {/* <View style={styles.filterContainer}>
             <Text style={{ fontFamily: "PilcrowMedium", fontSize: 18 }}>
               Terms of Service
             </Text>
@@ -90,7 +97,7 @@ const SettingsScreen = () => {
               backgroundColor: "black",
               alignSelf: "center",
             }}
-          ></View>
+          ></View> */}
 
           <View style={styles.filterContainer}>
             <Text style={{ fontFamily: "PilcrowMedium", fontSize: 18 }}>
@@ -134,12 +141,25 @@ const SettingsScreen = () => {
           </TouchableOpacity>
         </View>
 
-        <View style={{ alignItems: "center", justifyContent: "center" }}>
-          <Text>
+        <View
+          style={{
+            alignItems: "center",
+            justifyContent: "center",
+            height: "auto",
+          }}
+        >
+          <Text style={{ fontFamily: "PilcrowMedium", fontSize: 18 }}>
             Select imagery powered by{" "}
-            <TouchableOpacity onPress={handlePressIcons}>
-              <Text style={{ textDecorationLine: "underline" }}>Icons8</Text>
-            </TouchableOpacity>
+            <Text
+              onPress={handlePressIcons}
+              style={{
+                textDecorationLine: "underline",
+                fontSize: 18,
+                fontFamily: "PilcrowMedium",
+              }}
+            >
+              Icons8
+            </Text>
           </Text>
         </View>
       </View>

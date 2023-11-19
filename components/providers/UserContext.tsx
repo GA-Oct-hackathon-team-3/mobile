@@ -9,11 +9,13 @@ import * as friendsService from "../../utilities/friends-service";
 interface UserContextInterface {
   user: any | null;
   fetchFriend: () => void;
+  resetUserContext: () => void;
 }
 
 const initialState: UserContextInterface = {
   user: null,
   fetchFriend: () => {}, // No-op function for initial state
+  resetUserContext: () => {}, // No-op function for initial state
 };
 
 const UserContext = React.createContext<UserContextInterface>(initialState);
@@ -23,6 +25,10 @@ function UserProvider({ children }) {
   console.log("USER PROVIDER LOADED");
   const [user, setUser] = useState(null);
   const { id } = useGlobalSearchParams();
+
+  const resetUserContext = () => {
+    setUser(null);
+  };
 
   const fetchFriend = async () => {
     console.log("FETCHING FRIEND ID RIGHT NOW!!!!!", id);
@@ -53,7 +59,7 @@ function UserProvider({ children }) {
   }, [id]);
 
   return (
-    <UserContext.Provider value={{ user, fetchFriend }}>
+    <UserContext.Provider value={{ user, fetchFriend, resetUserContext }}>
       {children}
     </UserContext.Provider>
   );

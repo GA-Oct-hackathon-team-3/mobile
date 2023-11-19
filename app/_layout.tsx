@@ -82,6 +82,14 @@ function RootLayoutNav() {
                     header: () => <Header />,
                   }}
                 />
+                <Stack.Screen
+                  name="delete-user"
+                  options={{
+                    headerShown: true,
+                    headerTitle: "Delete Account",
+                    header: () => <Header />,
+                  }}
+                />
               </Stack>
             </UserProvider>
           </RecommendationProvider>

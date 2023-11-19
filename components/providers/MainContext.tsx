@@ -28,11 +28,20 @@ const MainProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(true);
   const { token } = useAuth();
 
+  const resetMainContext = () => {
+    setFriends([]);
+    setFilteredFriends([]);
+    setIsLoading(true);
+  };
+
   const fetchFriends = async () => {
     try {
       const friends = await friendsService.retrieveFriends();
       console.log(JSON.stringify(friends));
-      friends.sort((a, b) => a.daysUntilBirthday - b.daysUntilBirthday);
+
+      if (friends.length > 0) {
+        friends.sort((a, b) => a.daysUntilBirthday - b.daysUntilBirthday);
+      }
 
       setFilteredFriends(friends);
       setFriends(friends);
@@ -40,6 +49,7 @@ const MainProvider = ({ children }) => {
     } catch (error) {
       console.error("Error fetching friends: ", error);
       setFilteredFriends([]);
+      setFriends([]);
       setIsLoading(false);
     }
   };
@@ -58,6 +68,7 @@ const MainProvider = ({ children }) => {
         filteredFriends,
         isLoading,
         setFilteredFriends,
+        resetMainContext,
       }}
     >
       {children}

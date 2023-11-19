@@ -3,18 +3,7 @@ import Header from "../components/Header";
 import { Stack } from "expo-router";
 
 const Page = () => {
-  return (
-    <>
-      <Stack.Screen
-        options={{
-          headerShown: true,
-          headerTitle: "Delete Account",
-          header: () => <Header />,
-        }}
-      />
-      <DeleteUser />
-    </>
-  );
+  return <DeleteUser />;
 };
 
 export default Page;

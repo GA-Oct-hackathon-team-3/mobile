@@ -105,6 +105,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.log(error, "ERROR GETTING SHOW REMINDERS");
     }
+
     return;
   };
 
@@ -132,19 +133,27 @@ export const AuthProvider = ({ children }) => {
 
   useProtectedRoute(token);
 
-  const login = (dummyUser) => {};
+  const login = () => {};
 
   const logout = async () => {
-    setToken(null);
     if (Platform.OS === "web") {
       localStorage.removeItem("token");
       localStorage.removeItem("showReminders");
       localStorage.removeItem("onboarded");
     } else {
-      await SecureStore.deleteItemAsync("token");
-      await SecureStore.deleteItemAsync("showReminders");
-      await SecureStore.deleteItemAsync("onboarded");
+      try {
+        await SecureStore.deleteItemAsync("token");
+        await SecureStore.deleteItemAsync("showReminders");
+        await SecureStore.deleteItemAsync("onboarded");
+      } catch (error) {
+        console.log("ERROR REMOVING FROM SECURE STORE", error);
+      }
     }
+
+    setToken(null);
+    setOnboarded(false);
+    setShowReminders(true);
+    setUserData(null);
   };
 
   const dismissReminders = async () => {
