@@ -68,7 +68,7 @@ function EditCurrentUserProfile({}: Props) {
     dob: "",
     gender: "",
     location: "",
-    // tel: "",
+    tel: "",
     name: "",
   });
   const [selectedGender, setSelectedGender] = useState("");
@@ -76,7 +76,6 @@ function EditCurrentUserProfile({}: Props) {
   const [loading, setLoading] = useState(false);
   const { width, height } = useWindowDimensions();
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
-  const [friend, setFriend] = useState(null);
   const [uploadedPhoto, setUploadedPhoto] = useState(null);
 
   const showToasts = () => {
@@ -103,7 +102,6 @@ function EditCurrentUserProfile({}: Props) {
     console.log(JSON.stringify(formInput));
     const data = {
       ...formInput,
-      interests: ["test"],
     };
 
     try {
@@ -164,8 +162,8 @@ function EditCurrentUserProfile({}: Props) {
       // if (data.profile.tags.length > 0) setEnableRecs(true);
 
       setLoading(false);
+      console.log("PROFILE USER: ", data);
 
-      setFriend(data.profile);
       setSelectedGender(capitalizeFirstLetter(data.profile.gender));
       setFormInput(data.profile);
       setImage(data.profile.photo);
@@ -301,10 +299,19 @@ function EditCurrentUserProfile({}: Props) {
 
             <Text style={styles.text}>Bio</Text>
             <TextInput
-              placeholder="Location"
+              placeholder="Bio"
               style={styles.input}
               value={formInput.bio}
               onChangeText={(text) => handleChange("bio", text)}
+            />
+
+            <Text style={styles.text}>Phone Number</Text>
+            <TextInput
+              placeholder="Phone Number"
+              style={styles.input}
+              value={formInput.tel?.toString()}
+              keyboardType="numeric"
+              onChangeText={(text) => handleChange("tel", text)}
             />
           </View>
         </View>
