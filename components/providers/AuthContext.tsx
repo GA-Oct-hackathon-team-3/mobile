@@ -168,6 +168,7 @@ export const AuthProvider = ({ children }) => {
     setOnboarded(false);
     setShowReminders(true);
     setUserData(null);
+    setUserProfile(null);
   };
 
   const dismissReminders = async () => {
