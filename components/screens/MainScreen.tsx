@@ -70,7 +70,7 @@ export default function MainScreen() {
   };
 
   useEffect(() => {
-    if (filteredFriends) {
+    if (filteredFriends && filteredFriends.length > 0) {
       const hasBirthdayToday = filteredFriends.some(
         (person) => person.daysUntilBirthday === 0
       );
