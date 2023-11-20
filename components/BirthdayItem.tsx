@@ -7,6 +7,7 @@ import { formatDate } from "../utilities/helpers";
 
 import { colors } from "../constants/Theme";
 import { ScrollView } from "react-native-gesture-handler";
+import ConfettiCannon from "react-native-confetti-cannon";
 
 interface Props {
   name: string;

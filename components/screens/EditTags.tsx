@@ -21,7 +21,6 @@ import { FontAwesome } from "@expo/vector-icons";
 export default function EditTags() {
   const params = useLocalSearchParams();
   const [loading, setLoading] = useState(false);
-
   const [searchTag, setSearchTag] = useState("");
   const [addedTags, setAddedTags] = useState([]);
   const [friend, setFriend] = useState(null);
@@ -96,43 +95,54 @@ export default function EditTags() {
 
   const handleSubmit = async () => {
     setLoading(true);
-    console.log("addedTags and userTags", addedTags, "     ", userTags);
+    console.log("---------------------");
     const tagsToRemove = userTags.filter((obj) => !addedTags.includes(obj.tag));
+    const sortAdd = userTags.map((obj) => obj.tag);
+    console.log(sortAdd, "SORT ADD");
+    const tagsToAdd = addedTags.filter((tag) => !sortAdd.includes(tag));
     console.log(tagsToRemove, "TAGS TO REMOVE");
-    console.log(friend._id, "FRIEND ID");
+    console.log(tagsToAdd, "TAGS TO ADD");
+    console.log(`---------------------`);
 
     try {
-      const addTagPromises = addedTags.map((tag) =>
-        tagsService.addTag(friend._id, {
-          title: tag,
-          category: "Popular",
-        })
+      // Map to functions that return the addTag promise
+      const addTagPromises = tagsToAdd.map(
+        (tag) => () =>
+          tagsService.addTag(friend._id, {
+            title: tag,
+            category: "Popular",
+          })
       );
 
-      // Create an array of promises for removing tags
-      const removeTagPromises = tagsToRemove.map((tag) =>
-        tagsService.removeTag(friend._id, tag.id)
+      // Map to functions that return the removeTag promise
+      const removeTagPromises = tagsToRemove.map(
+        (tag) => () => tagsService.removeTag(friend._id, tag.id)
       );
-      if (addedTags.length === 0 && tagsToRemove.length > 0) {
+
+      console.log("RIGHT AFTER REMOVE TAG PROM");
+
+      if (tagsToAdd.length === 0 && tagsToRemove.length > 0) {
         console.log("JUST REMOVE TAGS");
-        await Promise.all([...removeTagPromises]);
-      } else if (addedTags.length > 0 && tagsToRemove.length === 0) {
+        await Promise.all(removeTagPromises.map((remove) => remove()));
+      } else if (tagsToAdd.length > 0 && tagsToRemove.length === 0) {
         console.log("JUST ADD TAGS");
-        await Promise.all([...addTagPromises]);
-      } else if (addedTags.length > 0 && tagsToRemove.length > 0) {
+        await Promise.all(addTagPromises.map((add) => add()));
+      } else if (tagsToAdd.length > 0 && tagsToRemove.length > 0) {
         console.log("ADD AND REMOVE TAGS");
-        await Promise.all([...addTagPromises, ...removeTagPromises]);
+        await Promise.all([
+          ...addTagPromises.map((add) => add()),
+          ...removeTagPromises.map((remove) => remove()),
+        ]);
       }
 
       fetchFriend();
-
       showToasts();
     } catch (err) {
       console.log("ERROR", err);
       setLoading(false);
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (

@@ -21,20 +21,23 @@ const ProfileContent = ({
   user,
   toggleFavorite,
   friendLocation,
+  isCurrUser = false,
 }) => {
   const router = useRouter();
   const params = useLocalSearchParams();
 
-  console.log(giftPreferences, "GIFT PREFERENCES");
-
   return (
     <View style={styles.container}>
       <View style={styles.giftTypeContainer}>
-        {/* Gift Type Top */}
         <View style={styles.giftTop}>
           <Text style={styles.text}>Gift Type</Text>
           <TouchableOpacity
-            onPress={() => router.push(`/users/${params.id}/update`)}
+            onPress={() =>
+              router.push({
+                pathname: `/users/${params.id}/update`,
+                params: { isCurrUser: isCurrUser },
+              })
+            }
           >
             <Image
               source={require("../assets/images/pencil.png")}

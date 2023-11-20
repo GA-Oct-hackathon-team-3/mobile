@@ -7,14 +7,14 @@ export async function getProfile() {
 }
 
 export async function updateUserProfile(userData) {
-  return await sendRequest(`${WEB_BASE_URL}/users/`, "PUT", userData);
+  return await sendRequest(`${WEB_BASE_URL}/users/profile`, "PUT", userData);
 }
 
 export async function uploadPhoto(file) {
   const { name, uri, type } = file;
   const formData = new FormData();
   formData.append("photo", { name, uri, type });
-  const token = getToken();
+  const token = await getToken();
 
   const response = await fetch(`${WEB_BASE_URL}/users/profile/upload`, {
     method: "POST",

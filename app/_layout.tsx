@@ -90,6 +90,22 @@ function RootLayoutNav() {
                     header: () => <Header />,
                   }}
                 />
+                <Stack.Screen
+                  name="edit-profile"
+                  options={{
+                    headerShown: true,
+                    headerTitle: "Delete Account",
+                    header: () => <Header />,
+                  }}
+                />
+                <Stack.Screen
+                  name="edit-interests"
+                  options={{
+                    headerShown: true,
+                    headerTitle: "Delete Account",
+                    header: () => <Header />,
+                  }}
+                />
               </Stack>
             </UserProvider>
           </RecommendationProvider>

@@ -1,69 +1,59 @@
-import { useLocalSearchParams, useNavigation, useRouter } from "expo-router";
 import React, { useEffect, useRef, useState } from "react";
+import { getProfile, updateUserProfile } from "../../utilities/profile-service";
 import {
-  ActivityIndicator,
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
   View,
-  useWindowDimensions,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Image,
+  TextInput,
+  ScrollView,
 } from "react-native";
 import { colors } from "../../constants/Theme";
-import * as friendsService from "../../utilities/friends-service";
-import * as tagsService from "../../utilities/tags-service";
 import TitleBack from "../TitleBack";
 import { FontAwesome } from "@expo/vector-icons";
 
-export default function AddTags() {
-  const params = useLocalSearchParams();
-  const navigation = useNavigation();
+type Props = {};
 
-  const [searchTag, setSearchTag] = useState("");
-  const [addedTags, setAddedTags] = useState([]);
-  const tagCategories = {
-    "Popular Tags": ["Movie Buff", "Minimal", "Quirky"],
-    Aesthetic: ["Grunge", "Minimal", "Quirky"],
-    Hobbies: [
-      "Reading",
-      "Outdoor Activities",
-      "Arts and Crafts",
-      "Socializing",
-      "Sports",
-      "Writing",
-      "Working Out",
-      "Cooking",
-      "Gaming",
-    ],
-  };
+function EditInterests({}: Props) {
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
+  const [interests, setInterests] = useState([]);
+  const [user, setUser] = useState(null);
+  const [searchInterest, setSearchInterest] = useState("");
+  const [addedInterests, setAddedInterests] = useState([]);
   const scrollViewRef = useRef<ScrollView>();
-  const [friend, setFriend] = useState(null);
-  const searchTagLower = searchTag.toLowerCase();
-  const includesTag = addedTags.some(
-    (tag) => tag.toLowerCase() === searchTagLower
+
+  const searchInterestLower = searchInterest.toLowerCase();
+
+  const includesInterest = addedInterests.some(
+    (interest) => interest.toLowerCase() === searchInterestLower
   );
 
-  const fetchTags = async () => {
-    const friendData = await friendsService.retrieveFriend(params.id);
-
-    setAddedTags(friendData.tags);
-    setFriend(friendData);
+  const fetchUser = async () => {
+    try {
+      const data = await getProfile();
+      setInterests(data.profile.interests);
+      setLoading(false);
+      setUser(data.profile);
+    } catch (error) {}
   };
 
-  useEffect(() => {
-    fetchTags();
-  }, []);
+  const handleSubmit = async () => {
+    const lowerCaseInterests = addedInterests.map((interest) =>
+      interest.toLowerCase()
+    );
 
-  useEffect(() => {}, [addedTags]);
+    try {
+      await updateUserProfile({ interests: lowerCaseInterests });
+    } catch (error) {
+      console.log(error, "UNABLE TO UPDATE INTERESTS");
+    }
+  };
 
   const handleSearchSubmit = () => {
-    if (!addedTags.includes(searchTag) && searchTag !== "") {
-      setAddedTags((prev) => [...prev, searchTag]);
-      setSearchTag("");
+    if (!addedInterests.includes(searchInterest) && searchInterest !== "") {
+      setAddedInterests((prev) => [...prev, searchInterest]);
+      setSearchInterest("");
     }
   };
 
@@ -72,55 +62,24 @@ export default function AddTags() {
     scrollViewRef.current?.scrollTo({ y: height, animated: true });
   }
 
-  const handleSubmit = async () => {
-    setLoading(true);
-
-    try {
-      addedTags.forEach(async (tag) => {
-        await tagsService.addTag(friend._id, {
-          title: tag,
-          category: "Popular",
-        });
-      });
-    } catch (err) {}
-    setTimeout(() => {
-      setLoading(false);
-      navigation.dispatch({ type: "POP_TO_TOP" });
-    }, 3000);
-  };
-
-  const handleTagPress = (tag) => {
-    if (!addedTags.includes(tag)) {
-      setAddedTags((prev) => [...prev, tag]);
+  const handleTagPress = (interest) => {
+    if (!addedInterests.includes(interest)) {
+      setAddedInterests((prev) => [...prev, interest]);
     } else {
-      setAddedTags((prev) => prev.filter((t) => t !== tag));
+      setAddedInterests((prev) => prev.filter((t) => t !== interest));
     }
   };
 
+  useEffect(() => {
+    fetchUser();
+  }, []);
+
   return (
     <View style={styles.container}>
-      {loading && (
-        <View
-          style={{
-            position: "absolute",
-            top: -40,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 99,
-            alignSelf: "center",
-          }}
-        >
-          <ActivityIndicator size="large" color={colors.orange} />
-        </View>
-      )}
       <View style={{ flexDirection: "column", gap: 8, maxHeight: 160 }}>
-        <TitleBack title={"Add Tags"} marginLeft={-100} />
+        <TitleBack title={"Edit Interests"} marginLeft={-100} />
         <Text style={{ textAlign: "center" }}>
-          What’s your friend into? Adding tags helps Presently give more
-          accurate gift suggestions.
+          What are your interests? Add as many as you want.
         </Text>
         <View
           style={{
@@ -156,21 +115,22 @@ export default function AddTags() {
           style={{
             flexDirection: "row",
             alignItems: "center",
-
             paddingBottom: 20,
           }}
         >
           <TextInput
-            placeholder="Type to create custom tag"
-            value={searchTag}
-            onChangeText={setSearchTag}
+            placeholder="Type an interest"
+            value={searchInterest}
+            onChangeText={setSearchInterest}
             onSubmitEditing={handleSearchSubmit}
             style={styles.input}
             placeholderTextColor={"gray"}
           />
           <TouchableOpacity
             onPress={handleSearchSubmit}
-            disabled={searchTag === "" || addedTags.includes(searchTag)}
+            disabled={
+              searchInterest === "" || addedInterests.includes(searchInterest)
+            }
             style={{
               position: "relative",
               right: 32,
@@ -184,13 +144,15 @@ export default function AddTags() {
               name={"plus-circle"}
               size={30}
               color={
-                !includesTag && searchTag !== "" ? colors.green : "lightgray"
+                !includesInterest && searchInterest !== ""
+                  ? colors.green
+                  : "lightgray"
               }
             />
           </TouchableOpacity>
         </View>
 
-        <Text>Added Tags</Text>
+        <Text>Added Interests</Text>
         <View style={{ maxHeight: 140 }}>
           <ScrollView
             ref={scrollViewRef}
@@ -199,13 +161,19 @@ export default function AddTags() {
             }}
           >
             <View style={styles.addedTagsContainer}>
-              {addedTags.map((tag, index) => (
+              {addedInterests.map((tag) => (
                 <TouchableOpacity
-                  key={index}
-                  style={styles.tagSelectButton}
+                  key={tag}
                   onPress={() => handleTagPress(tag)}
+                  style={styles.tagSelectButton}
                 >
-                  <Text style={{ fontFamily: "PilcrowMedium", color: "white" }}>
+                  <Text
+                    key={tag}
+                    style={{
+                      fontFamily: "PilcrowMedium",
+                      color: colors.brightWhite,
+                    }}
+                  >
                     {tag}
                   </Text>
                 </TouchableOpacity>
@@ -213,40 +181,18 @@ export default function AddTags() {
             </View>
           </ScrollView>
         </View>
-        <View style={{ maxHeight: 240 }}>
-          <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-            {Object.entries(tagCategories).map(([category, tags]) => (
-              <View key={category}>
-                <Text>{category}</Text>
-                <View style={styles.tagList}>
-                  {tags.map((tag) => (
-                    <TouchableOpacity
-                      key={tag}
-                      onPress={() => handleTagPress(tag)}
-                      style={styles.tagButton}
-                    >
-                      <Text style={{ fontFamily: "PilcrowRounded" }}>
-                        {tag} +
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </View>
-            ))}
-          </ScrollView>
+      </View>
+
+      <TouchableOpacity
+        onPress={() => {
+          handleSubmit();
+        }}
+        style={styles.submitButton}
+      >
+        <View style={styles.button}>
+          <Text style={styles.buttonText}>Confirm</Text>
         </View>
-      </View>
-      <View>
-        <TouchableOpacity
-          onPress={() => {
-            handleSubmit();
-          }}
-        >
-          <View style={styles.button}>
-            <Text style={styles.buttonText}>Complete Profile</Text>
-          </View>
-        </TouchableOpacity>
-      </View>
+      </TouchableOpacity>
     </View>
   );
 }
@@ -256,7 +202,7 @@ const styles = StyleSheet.create({
     flex: 1,
 
     flexDirection: "column",
-    justifyContent: "space-around",
+    justifyContent: "flex-start",
     backgroundColor: colors.cream,
   },
   topContainer: {
@@ -310,15 +256,20 @@ const styles = StyleSheet.create({
     backgroundColor: colors.brightWhite,
   },
   tagSelectButton: {
-    borderWidth: 1,
     padding: 15,
     borderRadius: 8,
     borderColor: "#D9D9D9",
     margin: 5,
-    backgroundColor: colors.purple,
+    backgroundColor: colors.green,
     color: colors.brightWhite,
-    fontFamily: "PilcrowMedium",
+
     opacity: 0.95,
+  },
+  tagSelectText: {
+    fontSize: 18,
+
+    color: colors.brightWhite,
+    fontFamily: "PilcrowBold",
   },
   button: {
     borderRadius: 20,
@@ -334,4 +285,19 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontFamily: "PilcrowRounded",
   },
+  submitButton: {
+    backgroundColor: colors.green,
+    borderRadius: 20,
+    height: 60,
+
+    position: "absolute",
+    left: 40,
+    right: 40,
+    bottom: 20,
+
+    alignItems: "center", // Center children horizontally
+    justifyContent: "center",
+  },
 });
+
+export default EditInterests;

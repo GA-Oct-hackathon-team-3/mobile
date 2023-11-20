@@ -19,7 +19,7 @@ import OnboardReminders from "../OnboardReminders";
 import Onboarding from "../Onboarding";
 import MainScreenSkeleton from "../skeletons/MainScreenSkeleton";
 import { useMainContext } from "../providers/MainContext";
-import { logOut } from "../../utilities/users-service";
+import Confetti from "../Confetti";
 
 export default function MainScreen() {
   const router = useRouter();
@@ -38,7 +38,10 @@ export default function MainScreen() {
     dismissReminders,
     onboarded,
     dismissOnboarding,
+    logout,
   } = useAuth();
+
+  const [showConfetti, setShowConfetti] = useState(false);
 
   const showToasts = () => {
     Toast.success("Friend Created");
@@ -66,8 +69,25 @@ export default function MainScreen() {
     router.push("/add-friend");
   };
 
+  useEffect(() => {
+    if (filteredFriends) {
+      const hasBirthdayToday = filteredFriends.some(
+        (person) => person.daysUntilBirthday === 0
+      );
+
+      if (hasBirthdayToday) {
+        setTimeout(() => {
+          setShowConfetti(true);
+        }, 1000);
+      } else {
+        setShowConfetti(false);
+      }
+    }
+  }, [filteredFriends]);
+
   return (
     <View style={styles.container}>
+      {showConfetti ? <Confetti /> : null}
       <ToastManager />
       {isLoading ? (
         <MainScreenSkeleton />

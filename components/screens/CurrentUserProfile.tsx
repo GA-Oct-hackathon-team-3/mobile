@@ -10,12 +10,23 @@ import { useAuth } from "../providers/AuthContext";
 import * as UserAPI from "../../utilities/users-api";
 import { useRouter } from "expo-router";
 import ProfileSkeleton from "../skeletons/ProfileSkeleton";
-
+import { getProfile } from "../../utilities/profile-service";
+import {
+  calculateAge,
+  daysUntilBirthday,
+  splitDOB,
+} from "../../utilities/helpers";
 export default function CurrentUserProfileScreen() {
   const [selected, setSelected] = useState("profile");
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [image, setImage] = useState(null);
+  const [dobObject, setDobObject] = useState({
+    year: "",
+    month: "",
+    day: "",
+  });
+  const [favorites, setFavorites] = useState([]);
 
   const [user, setUser] = useState(null);
 
@@ -29,11 +40,22 @@ export default function CurrentUserProfileScreen() {
 
   const fetchCurrentUser = async () => {
     try {
-      const data = await UserAPI.getCurrentUser();
+      const data = await getProfile();
+      console.log(data, "THIS IS THE CURRENT USER PROFILE");
+      const uniqueTimestamp = Date.now();
+      data.profile.photo = `${
+        data.profile.photo
+          ? data.profile.photo
+          : "https://i.imgur.com/hCwHtRc.png"
+      }?timestamp=${uniqueTimestamp}`;
 
-      console.log(data.user, "CURRENT USER");
+      setDobObject(splitDOB(data.profile.dob));
+      setFavorites(data.profile.favoriteGifts);
+      // if (data.profile.tags.length > 0) setEnableRecs(true);
 
-      setUser(data.user);
+      setLoading(false);
+
+      setUser(data.profile);
     } catch (error) {}
   };
 
@@ -81,14 +103,18 @@ export default function CurrentUserProfileScreen() {
           </View>
           <View style={styles.info}>
             <View style={styles.infoDescription}>
-              <Text style={styles.numberText}>10</Text>
-              <Text style={styles.subText}>January</Text>
+              <Text style={styles.numberText}>
+                {dobObject && dobObject.day}
+              </Text>
+              <Text style={styles.subText}>{dobObject && dobObject.month}</Text>
             </View>
             <View
               style={{ height: 30, width: 1, backgroundColor: "lightgray" }}
             ></View>
             <View style={styles.infoDescription}>
-              <Text style={styles.numberText}>180</Text>
+              <Text style={styles.numberText}>
+                {user && daysUntilBirthday(user.dob)}
+              </Text>
               <Text style={styles.subText}>Days left</Text>
             </View>
             <View
@@ -96,13 +122,17 @@ export default function CurrentUserProfileScreen() {
             ></View>
 
             <View style={styles.infoDescription}>
-              <Text style={styles.numberText}>27</Text>
+              <Text style={styles.numberText}>
+                {user && calculateAge(user.dob)}
+              </Text>
               <Text style={styles.subText}>Age</Text>
             </View>
-            <Image
-              source={require("../../assets/images/pencil.png")}
-              style={{ height: 20, width: 20, right: -40 }}
-            />
+            <TouchableOpacity onPress={() => router.push("/edit-profile")}>
+              <Image
+                source={require("../../assets/images/pencil.png")}
+                style={{ height: 20, width: 20, right: -40 }}
+              />
+            </TouchableOpacity>
           </View>
           <View style={styles.actionButtons}>
             <TouchableOpacity
@@ -133,7 +163,74 @@ export default function CurrentUserProfileScreen() {
 
           {selected == "profile" ? (
             <ScrollView>
-              <ProfileContent user={user} />
+              <View
+                style={{
+                  flexDirection: "column",
+
+                  borderColor: "lightgray",
+                  borderWidth: 1,
+                  borderRadius: 10,
+                  minHeight: 150,
+                  backgroundColor: colors.brightWhite,
+                }}
+              >
+                <View style={[styles.giftTop]}>
+                  <Text style={styles.text}>Bio</Text>
+                  <TouchableOpacity
+                    onPress={() => router.push(`/edit-profile`)}
+                  >
+                    <Image
+                      source={require("../../assets/images/pencil.png")}
+                      style={{ height: 20, width: 20 }}
+                    />
+                  </TouchableOpacity>
+                </View>
+                <View
+                  style={{ paddingLeft: 20, paddingRight: 20, paddingTop: 10 }}
+                >
+                  <Text style={styles.text}>{user && user.bio}</Text>
+                </View>
+              </View>
+
+              <View
+                style={{
+                  borderColor: "lightgray",
+                  borderWidth: 1,
+                  borderRadius: 10,
+                  minHeight: 150,
+                  backgroundColor: colors.brightWhite,
+                  marginTop: 20,
+                }}
+              >
+                <View style={styles.giftTop}>
+                  <Text style={styles.text}>Interests</Text>
+                  <TouchableOpacity
+                    onPress={() => router.push(`/edit-interests`)}
+                  >
+                    <Image
+                      source={require("../../assets/images/pencil.png")}
+                      style={{ height: 20, width: 20 }}
+                    />
+                  </TouchableOpacity>
+                </View>
+
+                <ScrollView contentContainerStyle={styles.tagsSection}>
+                  {user.interests.map((interest, idx) => (
+                    <View style={styles.tag} key={idx}>
+                      <Text
+                        key={idx}
+                        style={{
+                          fontFamily: "PilcrowMedium",
+                          fontSize: 16,
+                          color: colors.brightWhite,
+                        }}
+                      >
+                        {interest}
+                      </Text>
+                    </View>
+                  ))}
+                </ScrollView>
+              </View>
             </ScrollView>
           ) : (
             <Gifts isExplore={true} />
@@ -161,6 +258,10 @@ const styles = StyleSheet.create({
     height: 60,
     borderRadius: 30,
   },
+  text: {
+    fontFamily: "PilcrowMedium",
+    fontSize: 16,
+  },
   info: {
     flexDirection: "row",
     justifyContent: "center",
@@ -178,6 +279,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     marginVertical: 10,
+  },
+  giftTop: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingLeft: 20,
+    paddingRight: 20,
+    paddingTop: 20,
   },
   tags: {
     flexDirection: "row",
@@ -227,5 +335,21 @@ const styles = StyleSheet.create({
     fontFamily: "PilcrowRounded",
     fontSize: 18,
     color: colors.orange,
+  },
+  tag: {
+    flexDirection: "row",
+    height: 40,
+    borderRadius: 10,
+    padding: 12,
+    alignItems: "center",
+    backgroundColor: colors.green,
+  },
+  tagsSection: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    maxHeight: 100,
+    padding: 10,
+    alignItems: "center",
+    gap: 12,
   },
 });

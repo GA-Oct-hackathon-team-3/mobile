@@ -13,6 +13,8 @@ export default async function sendRequest(url, method = "GET", payload = null) {
     options.headers.Authorization = `Bearer ${token}`;
   }
 
+  console.log(url, "REQUEST URL", url);
+
   const res = await fetch(url, options);
 
   if (res.ok) {
@@ -22,6 +24,8 @@ export default async function sendRequest(url, method = "GET", payload = null) {
     }
     return res.json();
   }
+
+  console.log("BAD REQUEST", res.status);
 
   throw new Error("Bad Request");
 }
