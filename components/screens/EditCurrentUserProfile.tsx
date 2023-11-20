@@ -1,35 +1,28 @@
+import * as ImagePicker from "expo-image-picker";
 import React, { useEffect, useState } from "react";
 import {
-  View,
-  TextInput,
-  Button,
+  ActivityIndicator,
+  Image,
   StyleSheet,
   Text,
+  TextInput,
   TouchableOpacity,
+  View,
   useWindowDimensions,
-  Image,
-  ActivityIndicator,
-  Platform,
 } from "react-native";
-import * as ImagePicker from "expo-image-picker";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { colors } from "../../constants/Theme";
-import TitleBack from "../TitleBack";
-import { UserProfile } from "../../constants/interfaces";
-import ToastManager, { Toast } from "toastify-react-native";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import ToastManager, { Toast } from "toastify-react-native";
+import { colors } from "../../constants/Theme";
 import {
   getProfile,
   updateUserProfile,
   uploadPhoto,
 } from "../../utilities/profile-service";
-
-import * as friendsService from "../../utilities/friends-service";
+import TitleBack from "../TitleBack";
 
 import { FontAwesome } from "@expo/vector-icons";
-import { useUser } from "../providers/UserContext";
-import { useMainContext } from "../providers/MainContext";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { useAuth } from "../providers/AuthContext";
 
 export interface IUserProfileForm {
   interests?: string[];
@@ -63,7 +56,7 @@ type Props = {};
 
 function EditCurrentUserProfile({}: Props) {
   const [formInput, setFormInput] = useState<IUserProfileForm>({
-    interests: ["test"],
+    interests: [],
     bio: "",
     dob: "",
     gender: "",
@@ -77,6 +70,7 @@ function EditCurrentUserProfile({}: Props) {
   const { width, height } = useWindowDimensions();
   const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
   const [uploadedPhoto, setUploadedPhoto] = useState(null);
+  const { fetchUserProfile } = useAuth();
 
   const showToasts = () => {
     Toast.success("Profile Updated");
@@ -109,6 +103,7 @@ function EditCurrentUserProfile({}: Props) {
       if (uploadedPhoto) {
         await uploadPhoto(uploadedPhoto);
       }
+      await fetchUserProfile();
     } catch (error) {
       console.error("Error updating friend: ", error);
     } finally {

@@ -3,6 +3,7 @@ import * as SecureStore from "expo-secure-store";
 import React, { useContext, useEffect, useState } from "react";
 import { Platform } from "react-native";
 import { getToken, getUser } from "../../utilities/users-service";
+import { getProfile } from "../../utilities/profile-service";
 
 interface AuthContextInterface {
   token: string | null;
@@ -66,6 +67,7 @@ export const AuthProvider = ({ children }) => {
   const [onboarded, setOnboarded] = useState(false);
   const [userData, setUserData] = useState(null);
   const [showReminders, setShowReminders] = useState(true);
+  const [userProfile, setUserProfile] = useState(null);
 
   useEffect(() => {
     setupUserData();
@@ -106,7 +108,19 @@ export const AuthProvider = ({ children }) => {
       console.log(error, "ERROR GETTING SHOW REMINDERS");
     }
 
+    try {
+      await fetchUserProfile();
+    } catch (error) {
+      console.log(error, "ERROR FETCHING USER PROFILE");
+    }
+
     return;
+  };
+
+  const fetchUserProfile = async () => {
+    const data = await getProfile();
+
+    setUserProfile(data.profile);
   };
 
   const getOnboarded = async () => {
@@ -194,6 +208,8 @@ export const AuthProvider = ({ children }) => {
         showReminders,
         dismissReminders,
         dismissOnboarding,
+        userProfile,
+        fetchUserProfile,
       }}
     >
       {children}

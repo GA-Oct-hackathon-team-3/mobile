@@ -27,6 +27,7 @@ export default function CurrentUserProfileScreen() {
     day: "",
   });
   const [favorites, setFavorites] = useState([]);
+  const { userProfile } = useAuth();
 
   const [user, setUser] = useState(null);
 
@@ -34,30 +35,7 @@ export default function CurrentUserProfileScreen() {
     setSelected(value);
   };
 
-  useEffect(() => {
-    fetchCurrentUser();
-  }, []);
-
-  const fetchCurrentUser = async () => {
-    try {
-      const data = await getProfile();
-      console.log(data, "THIS IS THE CURRENT USER PROFILE");
-      const uniqueTimestamp = Date.now();
-      data.profile.photo = `${
-        data.profile.photo
-          ? data.profile.photo
-          : "https://i.imgur.com/hCwHtRc.png"
-      }?timestamp=${uniqueTimestamp}`;
-
-      setDobObject(splitDOB(data.profile.dob));
-      setFavorites(data.profile.favoriteGifts);
-      // if (data.profile.tags.length > 0) setEnableRecs(true);
-
-      setLoading(false);
-
-      setUser(data.profile);
-    } catch (error) {}
-  };
+  useEffect(() => {}, []);
 
   const goToSettings = () => {
     router.push("/settings");
@@ -68,7 +46,7 @@ export default function CurrentUserProfileScreen() {
   };
   return (
     <View style={styles.container}>
-      {!user ? (
+      {!userProfile ? (
         <ProfileSkeleton isCurrUser={true} />
       ) : (
         <>
@@ -87,33 +65,35 @@ export default function CurrentUserProfileScreen() {
           </TouchableOpacity>
           <View style={styles.backgroundCover}></View>
           <View style={styles.header}>
-            {user && (
+            {userProfile && (
               <Image
                 source={{
-                  uri: user.photo
-                    ? user.photo
+                  uri: userProfile.photo
+                    ? userProfile.photo
                     : "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
                 }}
                 style={styles.avatar}
                 onLoadEnd={onLoad}
               />
             )}
-            <Text style={styles.name}>{user && user.name}</Text>
+            <Text style={styles.name}>{userProfile && userProfile.name}</Text>
             <Text style={styles.subText}>Friend</Text>
           </View>
           <View style={styles.info}>
             <View style={styles.infoDescription}>
               <Text style={styles.numberText}>
-                {dobObject && dobObject.day}
+                {splitDOB(userProfile.dob).day}
               </Text>
-              <Text style={styles.subText}>{dobObject && dobObject.month}</Text>
+              <Text style={styles.subText}>
+                {splitDOB(userProfile.dob).month}
+              </Text>
             </View>
             <View
               style={{ height: 30, width: 1, backgroundColor: "lightgray" }}
             ></View>
             <View style={styles.infoDescription}>
               <Text style={styles.numberText}>
-                {user && daysUntilBirthday(user.dob)}
+                {userProfile && daysUntilBirthday(userProfile.dob)}
               </Text>
               <Text style={styles.subText}>Days left</Text>
             </View>
@@ -123,7 +103,7 @@ export default function CurrentUserProfileScreen() {
 
             <View style={styles.infoDescription}>
               <Text style={styles.numberText}>
-                {user && calculateAge(user.dob)}
+                {userProfile && calculateAge(userProfile.dob)}
               </Text>
               <Text style={styles.subText}>Age</Text>
             </View>
@@ -188,7 +168,9 @@ export default function CurrentUserProfileScreen() {
                 <View
                   style={{ paddingLeft: 20, paddingRight: 20, paddingTop: 10 }}
                 >
-                  <Text style={styles.text}>{user && user.bio}</Text>
+                  <Text style={styles.text}>
+                    {userProfile && userProfile.bio}
+                  </Text>
                 </View>
               </View>
 
@@ -215,7 +197,7 @@ export default function CurrentUserProfileScreen() {
                 </View>
 
                 <ScrollView contentContainerStyle={styles.tagsSection}>
-                  {user.interests.map((interest, idx) => (
+                  {userProfile.interests.map((interest, idx) => (
                     <View style={styles.tag} key={idx}>
                       <Text
                         key={idx}
