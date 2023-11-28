@@ -112,3 +112,9 @@ export function profileDobValidation(dateOfBirth) {
 export function capitalizeFirstLetter(str) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
+
+export const friendsFilter = (friends, query) => {
+    return friends.filter((friend) =>
+      friend.name.toLowerCase().includes(query.toLowerCase())
+    );
+  };
