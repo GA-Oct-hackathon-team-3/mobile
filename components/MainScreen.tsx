@@ -13,7 +13,7 @@ import {
 } from "react-native";
 import { colors } from "../constants/Theme";
 import * as friendsService from "../utilities/friends-service";
-import { formatDate } from "../utilities/helpers";
+import { formatDate, friendsFilter } from "../utilities/helpers";
 import { useAuth } from "./AuthContext";
 // import { Skeleton } from "moti/skeleton";
 import { Skeleton } from "moti/skeleton";
@@ -45,30 +45,28 @@ const itemColors = [
   "#53CF85",
 ];
 
+
 export default function MainScreen() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState("");
-  const [filteredData, setFilteredData] = useState([]);
-  const [upcomingBirthdays, setUpcomingBirthdays] = useState([]);
-  const [laterBirthdays, setLaterBirthdays] = useState([]);
-  const [birthdays, setBirthdays] = useState([]);
+  const [filteredData, setFilteredData] = useState({ today: [], thisWeek: [], thisMonth: [], upcoming: [] });
+  const [friendsData, setFriendsData] = useState({ today: [], thisWeek: [], thisMonth: [], upcoming: [] });
   const { onboarded } = useAuth();
   const [showTutorial, setShowTutorial] = useState(false);
   const { width, height } = useWindowDimensions();
   const [showNext, setShowNext] = useState(false);
   const [showReminders, setShowReminders] = useState(true);
-  const [data, setData] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchFriends = async () => {
       try {
         const friends = await friendsService.retrieveFriends();
+        setFriendsData(friends);
         setFilteredData(friends);
-        setData(friends);
       } catch (error) {
         console.error("Error fetching friends: ", error);
-        setFilteredData(null);
+        setFilteredData({});
       }
     };
     fetchFriends();
@@ -94,18 +92,47 @@ export default function MainScreen() {
     Toast.success("Friend Created");
   };
 
-  const handleSearch = (query) => {
+  const handleSearch = (query : string) => {
     setSearchQuery(query);
-    if (query && data.length > 0) {
-      setFilteredData(
-        data.filter((item) =>
-          item.name.toLowerCase().includes(query.toLowerCase())
-        )
-      );
+    if (query && friendsData) {
+      setFilteredData({
+        today: friendsFilter(friendsData.today, query),
+        thisWeek: friendsFilter(friendsData.thisWeek, query),
+        thisMonth: friendsFilter(friendsData.thisMonth, query),
+        upcoming: friendsFilter(friendsData.upcoming, query),
+    });
     } else {
-      setFilteredData(data);
+      setFilteredData(friendsData);
     }
   };
+
+  const Section = ({ sectionTitle, friends }) => {
+    if (friends.length === 0) return null; // skip empty sections
+    
+    const transformText = (input : string) => {
+        // Split camelCase into separate words
+        return input.replace(/([a-z])([A-Z])/g, '$1 $2');
+      };
+
+    return (
+        <View>
+          <Text
+            style={{
+            fontFamily: "Helvetica Neue",
+            fontSize: 24,
+            paddingTop: showReminders ? 40 : 20,
+            textTransform: 'capitalize',
+         }}
+          
+          >{transformText(sectionTitle)}</Text>
+          <FlatList
+            data={friends}
+            renderItem={({ item }) => <Item {...item} />} // rendering each friend item
+            keyExtractor={(item) => item._id}
+          />
+        </View>
+      );
+    };
 
   const Item = ({ name, dob, _id, daysUntilBirthday, index }) => {
     const [collapse, setCollapse] = useState(false);
@@ -331,14 +358,7 @@ export default function MainScreen() {
             />
           </View>
         ) : (
-          <Text
-            style={{
-              fontFamily: "Helvetica Neue",
-              fontSize: 24,
-              paddingTop: showReminders ? 40 : 20,
-            }}
-          >
-            Upcoming
+          <Text>
           </Text>
         )}
       </View>
@@ -349,12 +369,12 @@ export default function MainScreen() {
           <BirthdaySkeleton />
           <BirthdaySkeleton />
         </>
-      ) : filteredData && filteredData.length > 0 ? (
+      ) : filteredData ? (
         <FlatList
           style={{ zIndex: 99 }}
-          data={filteredData}
-          renderItem={({ item, index }) => <Item {...item} index={index} />}
-          keyExtractor={(item) => item._id}
+          data={Object.keys(filteredData)}
+          renderItem={({ item }) => <Section sectionTitle={item} friends={filteredData[item]} />}
+          keyExtractor={(item) => item}
         />
       ) : (
         <View

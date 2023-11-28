@@ -109,3 +109,9 @@ export function profileDobValidation(dateOfBirth) {
   if (dob > currentDate) return false;
   else return true;
 }
+
+export const friendsFilter = (friends, query) => {
+    return friends.filter((friend) =>
+      friend.name.toLowerCase().includes(query.toLowerCase())
+    );
+  };
