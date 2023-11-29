@@ -1,26 +1,3 @@
-export function daysUntilBirthday(dob) {
-  const birthday = new Date(dob);
-  const currentDate = new Date();
-
-  const nextBirthday = new Date(
-    currentDate.getFullYear(),
-    birthday.getMonth(),
-    birthday.getDate()
-  );
-
-  // If the next birthday is before the current date, set it to next year
-  if (nextBirthday < currentDate) {
-    nextBirthday.setFullYear(currentDate.getFullYear() + 1);
-  }
-
-  // Calculate the time difference in milliseconds
-  const timeDifference = nextBirthday - currentDate;
-
-  // Convert milliseconds to days
-  const days = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
-  return days;
-}
-
 export function formatDate(dateString) {
   const months = [
     "January",
@@ -45,38 +22,15 @@ export function formatDate(dateString) {
 }
 
 export function splitDOB(dob) {
-  const array = dob.split("-");
-  if (array[2].charAt(0) === "0") array[2] = array[2].substring(1);
-  const dobObject = {
-    year: array[0],
-    month: numericMonthToString([array[1]]),
-    day: array[2],
-  };
-  return dobObject;
-}
-
-function numericMonthToString(month) {
-  const monthString = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-
-  if (month >= 1 && month <= 12) {
-    return monthString[month - 1];
-  } else {
-    return "Invalid Month";
+    const formattedDob = formatDate(dob);
+    const array = formattedDob.split(' ');
+    const dobObject = {
+      day: array[0],
+      month: array[1],
+      year: array[2],
+    };
+    return dobObject;
   }
-}
 
 export function calculateAge(dateOfBirth) {
   const dob = new Date(dateOfBirth);

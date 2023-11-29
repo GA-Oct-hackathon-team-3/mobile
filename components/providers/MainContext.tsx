@@ -5,16 +5,16 @@ import { useAuth } from "./AuthContext";
 type Props = {};
 
 interface MainContextInterface {
-  friends: { today: any[], thisWeek: any[], thisMonth: any[], upcoming: any[] },
-  filteredFriends: { today: any[], thisWeek: any[], thisMonth: any[], upcoming: any[] },
+  friends: { today: any[], thisWeek: any[], thisMonth: any[], laterOn: any[] },
+  filteredFriends: { today: any[], thisWeek: any[], thisMonth: any[], laterOn: any[] },
   isLoading: boolean;
   fetchFriends: () => void;
-  setFilteredFriends: (friends: { today: any[], thisWeek: any[], thisMonth: any[], upcoming: any[] }) => void;
+  setFilteredFriends: (friends: { today: any[], thisWeek: any[], thisMonth: any[], laterOn: any[] }) => void;
 }
 
 const initialState = {
-    friends: { today: [], thisWeek: [], thisMonth: [], upcoming: [] },
-  filteredFriends: { today: [], thisWeek: [], thisMonth: [], upcoming: [] },
+    friends: { today: [], thisWeek: [], thisMonth: [], laterOn: [] },
+  filteredFriends: { today: [], thisWeek: [], thisMonth: [], laterOn: [] },
   isLoading: true,
   fetchFriends: () => {},
   setFilteredFriends: () => {},
@@ -29,8 +29,8 @@ const MainProvider = ({ children }) => {
   const { token } = useAuth();
 
   const resetMainContext = () => {
-    setFriends({ today: [], thisWeek: [], thisMonth: [], upcoming: [] });
-    setFilteredFriends({ today: [], thisWeek: [], thisMonth: [], upcoming: [] });
+    setFriends({ today: [], thisWeek: [], thisMonth: [], laterOn: [] });
+    setFilteredFriends({ today: [], thisWeek: [], thisMonth: [], laterOn: [] });
     setIsLoading(true);
   };
 
@@ -42,8 +42,8 @@ const MainProvider = ({ children }) => {
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching friends: ", error);
-      setFilteredFriends({today: [], thisWeek: [], thisMonth: [], upcoming: []});
-      setFriends({today: [], thisWeek: [], thisMonth: [], upcoming: []});
+      setFilteredFriends({today: [], thisWeek: [], thisMonth: [], laterOn: []});
+      setFriends({today: [], thisWeek: [], thisMonth: [], laterOn: []});
       setIsLoading(false);
     }
   };
