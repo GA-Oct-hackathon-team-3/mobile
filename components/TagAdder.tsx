@@ -80,16 +80,24 @@ export default function TagAdder({ tags, setTags, defaultTags }) {
     );
   };
 
-  const handleSubmit = async () => {
-    showToasts();
-    const pathData = { path: location.pathname };
+  const handleTagPress = async () => {
+    if (inputValue && !tagExists(tags, inputValue)) {
+        setTags((prevTags) => [...prevTags, inputValue]); // adds string tag
+        setInputValue('');
+      }
+  }
 
-    const response = await tagsService.updateTags(id, tags);
-    if (response.message === 'Tags updated successfully') {
-      setTimeout(() => {
-        navigate(`/friend/${id}`, { state: pathData });
-      }, 2000);
-    }
+  const handleSubmit = async () => {
+    console.log(tags);
+    // showToasts();
+    // const pathData = { path: location.pathname };
+
+    // const response = await tagsService.updateTags(id, tags);
+    // if (response.message === 'Tags updated successfully') {
+    //   setTimeout(() => {
+    //     navigate(`/friend/${id}`, { state: pathData });
+    //   }, 2000);
+    // }
   };
 
   return (
@@ -144,12 +152,12 @@ export default function TagAdder({ tags, setTags, defaultTags }) {
             placeholder="Type to create custom tag"
             value={inputValue}
             onChangeText={handleInputChange}
-            onSubmitEditing={handleSubmit}
+            onSubmitEditing={handleTagPress}
             style={styles.input}
             placeholderTextColor={'gray'}
           />
           <TouchableOpacity
-            onPress={handleSubmit}
+            onPress={handleTagPress}
             disabled={inputValue === '' || tags.includes(inputValue)}
             style={{
               position: 'relative',
@@ -173,9 +181,9 @@ export default function TagAdder({ tags, setTags, defaultTags }) {
             }}
           >
             <View style={styles.tagList}>
-              {suggestedTags && suggestedTags.map((tag) => (
+              {suggestedTags && suggestedTags.length > 0 && suggestedTags.map((tag) => (
                 <TouchableOpacity
-                  key={tag}
+                  key={tag.title}
                   onPress={() => handleSugguestionPress(tag)}
                   style={styles.tagButton}
                 >
@@ -203,7 +211,7 @@ export default function TagAdder({ tags, setTags, defaultTags }) {
             <View style={styles.addedTagsContainer}>
               {tags.map((tag) => (
                 <TouchableOpacity
-                  key={tag}
+                  key={typeof tag === 'object' ? tag.title : tag}
                   onPress={() => handleRemoveTag(tag)}
                   style={styles.tagSelectButton}
                 >
