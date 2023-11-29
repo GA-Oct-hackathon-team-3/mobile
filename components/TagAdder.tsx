@@ -1,5 +1,5 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import React, { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'expo-router';
+import React, { useRef, useState } from 'react';
 import {
   Image,
   ScrollView,
@@ -16,13 +16,14 @@ import { capitalizeFirstLetter } from "../utilities/helpers";
 import TitleBack from './TitleBack';
 import { FontAwesome } from '@expo/vector-icons';
 
-export default function TagAdder({ tags, setTags, defaultTags }) {
+export default function TagAdder({ title, tags, setTags, defaultTags, friendId }) {
+    const router = useRouter();
   const scrollViewRef = useRef<ScrollView>();
 
   const [inputValue, setInputValue] = useState('');
   const [suggestedTags, setSuggestedTags] = useState([]);
 
-  let suggestionTimeout : ReturnType<typeof setTimeout>;
+  let suggestionTimeout : ReturnType <typeof setTimeout>; // timeout for call to fetch suggestions
 
   const showToasts = () => {
     Toast.success('Tags Updated');
@@ -32,15 +33,6 @@ export default function TagAdder({ tags, setTags, defaultTags }) {
     // y since we want to scroll vertically, use x and the width-value if you want to scroll horizontally
     scrollViewRef.current?.scrollTo({ y: height, animated: true });
   }
-
-  const fetchSuggestions = async (value : string) => {
-    if (value === '' || value.length < 3)
-      return setSuggestedTags([]); // requires search term of 3 => characters
-    else {
-      const suggestions = await tagsService.getSuggestions(value);
-      setSuggestedTags(suggestions);
-    }
-  };
 
   const tagExists = (tags, newTag) => {
     // to check if tag exists, handles cases where tag is object or string
@@ -52,14 +44,23 @@ export default function TagAdder({ tags, setTags, defaultTags }) {
     });
   };
 
+  const fetchSuggestions = async (value : string) => {
+    if (value === '' || value.length < 3)
+      return setSuggestedTags([]); // requires search term of 3 => characters
+    else {
+      const suggestions = await tagsService.getSuggestions(value);
+      setSuggestedTags(suggestions);
+    }
+  };
+
   const handleInputChange = async (input) => {
     setInputValue(input.trim());
 
-    clearTimeout(suggestionTimeout)
+    clearTimeout(suggestionTimeout); // clears timeout if user changes input again before fetch 
 
     suggestionTimeout = setTimeout(() => {
         fetchSuggestions(input.trim());
-    }, 1000);
+    }, 1000); // timeout of 1 second before input gets used for suggestions
   };
 
   const handleSugguestionPress = async (suggestion) => {
@@ -88,16 +89,14 @@ export default function TagAdder({ tags, setTags, defaultTags }) {
   }
 
   const handleSubmit = async () => {
-    console.log(tags);
-    // showToasts();
-    // const pathData = { path: location.pathname };
+    showToasts();
 
-    // const response = await tagsService.updateTags(id, tags);
-    // if (response.message === 'Tags updated successfully') {
-    //   setTimeout(() => {
-    //     navigate(`/friend/${id}`, { state: pathData });
-    //   }, 2000);
-    // }
+    const response = await tagsService.updateTags(friendId, tags);
+    if (response.message === 'Tags updated successfully') {
+      setTimeout(() => {
+        router.push(`/users/${friendId}`);
+      }, 2000);
+    }
   };
 
   return (
@@ -105,7 +104,7 @@ export default function TagAdder({ tags, setTags, defaultTags }) {
       <ToastManager />
 
       <View style={{ flexDirection: 'column', gap: 8, maxHeight: 160 }}>
-        <TitleBack title={'Edit Tags'} marginLeft={-100} />
+        <TitleBack title={title} marginLeft={-100} />
         <Text style={{ textAlign: 'center' }}>
           What’s your friend into? Adding tags helps Presently give more
           accurate gift suggestions.
