@@ -19,10 +19,10 @@ import { FontAwesome } from '@expo/vector-icons';
 export default function TagAdder({ tags, setTags, defaultTags }) {
   const scrollViewRef = useRef<ScrollView>();
 
-  console.log(defaultTags);
-
   const [inputValue, setInputValue] = useState('');
   const [suggestedTags, setSuggestedTags] = useState([]);
+
+  let suggestionTimeout : ReturnType<typeof setTimeout>;
 
   const showToasts = () => {
     Toast.success('Tags Updated');
@@ -33,7 +33,7 @@ export default function TagAdder({ tags, setTags, defaultTags }) {
     scrollViewRef.current?.scrollTo({ y: height, animated: true });
   }
 
-  const fetchSuggestions = async (value) => {
+  const fetchSuggestions = async (value : string) => {
     if (value === '' || value.length < 3)
       return setSuggestedTags([]); // requires search term of 3 => characters
     else {
@@ -52,16 +52,17 @@ export default function TagAdder({ tags, setTags, defaultTags }) {
     });
   };
 
-  const handleInputChange = async (e) => {
-    setInputValue(e.target.value);
-    // const delayedFetch = debounce(
-    //   () => fetchSuggestions(e.target.value.trim()),
-    //   300
-    // ); // uses debounce to delay calls to backend (makes sure user has stopped typing)...
-    // delayedFetch(); // then makes call to backend
+  const handleInputChange = async (input) => {
+    setInputValue(input.trim());
+
+    clearTimeout(suggestionTimeout)
+
+    suggestionTimeout = setTimeout(() => {
+        fetchSuggestions(input.trim());
+    }, 1000);
   };
 
-  const handleSuggestionClick = async (suggestion) => {
+  const handleSugguestionPress = async (suggestion) => {
     if (!tagExists(tags, suggestion)) {
       setTags((prevTags) => [...prevTags, suggestion]); // adds tag object
       setInputValue('');
@@ -142,7 +143,7 @@ export default function TagAdder({ tags, setTags, defaultTags }) {
           <TextInput
             placeholder="Type to create custom tag"
             value={inputValue}
-            onChangeText={setInputValue}
+            onChangeText={handleInputChange}
             onSubmitEditing={handleSubmit}
             style={styles.input}
             placeholderTextColor={'gray'}
@@ -162,6 +163,34 @@ export default function TagAdder({ tags, setTags, defaultTags }) {
             <FontAwesome name={'plus-circle'} size={30} color={colors.green} />
           </TouchableOpacity>
         </View>
+
+        <Text>Suggested Tags</Text>
+        <View style={{ maxHeight: 140 }}>
+          <ScrollView
+            ref={scrollViewRef}
+            onContentSizeChange={(width, height) => {
+              scrollViewSizeChanged(height);
+            }}
+          >
+            <View style={styles.tagList}>
+              {suggestedTags && suggestedTags.map((tag) => (
+                <TouchableOpacity
+                  key={tag}
+                  onPress={() => handleSugguestionPress(tag)}
+                  style={styles.tagButton}
+                >
+                  <Text
+                    key={tag.title}
+                    style={{ fontFamily: 'PilcrowMedium' }}
+                  >
+                    {capitalizeFirstLetter(tag.title)} +
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </ScrollView>
+        </View>
+
 
         <Text>Added Tags</Text>
         <View style={{ maxHeight: 140 }}>
