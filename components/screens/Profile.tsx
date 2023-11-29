@@ -150,7 +150,7 @@ export default function UserProfileScreen() {
             ></View>
             <View style={styles.infoDescription}>
               <Text style={{ color: "#804C46", fontWeight: "bold" }}>
-                {user && daysUntilBirthday(user.dob)}
+                {user && user.daysUntilBirthday}
               </Text>
               <Text>Days left</Text>
             </View>

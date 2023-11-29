@@ -5,16 +5,16 @@ import { useAuth } from "./AuthContext";
 type Props = {};
 
 interface MainContextInterface {
-  friends: any[];
-  filteredFriends: any[];
+  friends: { today: any[], thisWeek: any[], thisMonth: any[], laterOn: any[] },
+  filteredFriends: { today: any[], thisWeek: any[], thisMonth: any[], laterOn: any[] },
   isLoading: boolean;
   fetchFriends: () => void;
-  setFilteredFriends: (friends: any[]) => void;
+  setFilteredFriends: (friends: { today: any[], thisWeek: any[], thisMonth: any[], laterOn: any[] }) => void;
 }
 
 const initialState = {
-  friends: [],
-  filteredFriends: [],
+    friends: { today: [], thisWeek: [], thisMonth: [], laterOn: [] },
+  filteredFriends: { today: [], thisWeek: [], thisMonth: [], laterOn: [] },
   isLoading: true,
   fetchFriends: () => {},
   setFilteredFriends: () => {},
@@ -23,33 +23,27 @@ const initialState = {
 const MainContext = React.createContext<MainContextInterface>(initialState);
 
 const MainProvider = ({ children }) => {
-  const [friends, setFriends] = useState([]);
-  const [filteredFriends, setFilteredFriends] = useState([]);
+  const [friends, setFriends] = useState({});
+  const [filteredFriends, setFilteredFriends] = useState({});
   const [isLoading, setIsLoading] = useState(true);
   const { token } = useAuth();
 
   const resetMainContext = () => {
-    setFriends([]);
-    setFilteredFriends([]);
+    setFriends({ today: [], thisWeek: [], thisMonth: [], laterOn: [] });
+    setFilteredFriends({ today: [], thisWeek: [], thisMonth: [], laterOn: [] });
     setIsLoading(true);
   };
 
   const fetchFriends = async () => {
     try {
       const friends = await friendsService.retrieveFriends();
-      console.log(JSON.stringify(friends));
-
-      if (friends.length > 0) {
-        friends.sort((a, b) => a.daysUntilBirthday - b.daysUntilBirthday);
-      }
-
       setFilteredFriends(friends);
       setFriends(friends);
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching friends: ", error);
-      setFilteredFriends([]);
-      setFriends([]);
+      setFilteredFriends({today: [], thisWeek: [], thisMonth: [], laterOn: []});
+      setFriends({today: [], thisWeek: [], thisMonth: [], laterOn: []});
       setIsLoading(false);
     }
   };

@@ -3,27 +3,17 @@ import { WEB_BASE_URL } from "./constants";
 
 const BASE_URL = `${WEB_BASE_URL}/`;
 
-export async function addTag(id, tag) {
-  console.log("ID AND TAG", id, tag);
-  const friend = await sendRequest(
-    BASE_URL + `friends/${id}/tags`,
-    "POST",
-    tag
-  );
-  return friend;
-}
-
 export async function getTags() {
-  const friend = await sendRequest(BASE_URL + `tags`, "GET", null);
-  return friend;
+  const tags = await sendRequest(BASE_URL + `tags`, "GET", null);
+  return tags;
 }
 
-export async function removeTag(id, tagId) {
-  console.log("ID AND TAG", id, tagId);
-  const friend = await sendRequest(
-    BASE_URL + `friends/${id}/tags/${tagId}`,
-    "DELETE",
-    null
-  );
-  return friend;
+export async function updateTags (id, tags) {
+    const response = await sendRequest(`${BASE_URL}friends/${id}/tags`, 'POST', tags);
+    return response;
+}
+
+export async function getSuggestions (query) {
+    const suggestions = await sendRequest(`${BASE_URL}tags/suggestions?search=${query}`, 'GET', null);
+    return suggestions;
 }
