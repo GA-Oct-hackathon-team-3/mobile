@@ -49,7 +49,6 @@ const Explore = ({
   const [budget, setBudget] = useState(null);
 
   const getRecommendations = async () => {
-    setRefresh(true);
     const requestBody = {
       giftTypes: filteredGiftTypes,
       tags: filteredTags,
@@ -99,12 +98,12 @@ const Explore = ({
         <View style={styles.textRec}>
           <Text>Personalized Recommendations</Text>
         </View>
-        <TouchableOpacity onPress={getRecommendations} disabled={!enableRecs}>
+        <TouchableOpacity onPress={getRecommendations} disabled={!enableRecs || isRecommending}>
           <FontAwesome name="refresh" size={20} color="black" />
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => router.push(`/users/${friend._id}/filters`)}
-          disabled={!enableRecs}
+          disabled={!enableRecs || isRecommending}
         >
           <FontAwesome name="filter" size={20} color="black" />
         </TouchableOpacity>
