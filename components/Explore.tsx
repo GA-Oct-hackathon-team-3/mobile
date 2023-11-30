@@ -35,6 +35,8 @@ const Explore = ({
   id,
   friend,
   friendLocation,
+  bgColor,
+  paramFilters
 }) => {
   const router = useRouter();
 
@@ -45,7 +47,7 @@ const Explore = ({
   const [showError, setShowError] = useState(false);
   const [refresh, setRefresh] = useState(false);
   const [filteredGiftTypes, setFilteredGiftTypes] = useState(giftPreferences);
-  const [filteredTags, setFilteredTags] = useState(tags);
+  const [filteredTags, setFilteredTags] = useState(tags.map((tag : any) => tag.title));
   const [budget, setBudget] = useState(null);
 
   const getRecommendations = async () => {
@@ -70,6 +72,16 @@ const Explore = ({
   };
 
   useEffect(() => {
+    const urlBudget = paramFilters.budget;
+    const urlTags = paramFilters.tags ? paramFilters.tags.split(',') : [];
+    const urlGiftTypes = paramFilters.giftTypes ? paramFilters.giftTypes.split(',') : [];
+    setFilteredGiftTypes((prev) => urlGiftTypes && urlGiftTypes.length ? urlGiftTypes : prev);
+    setFilteredTags((prev) => (urlTags && urlTags.length ? urlTags : prev));
+    setBudget((prev) => (urlBudget && urlBudget > 0 ? urlBudget : prev));
+    setRefresh(true);
+  }, [paramFilters]);
+
+  useEffect(() => {
     if (enableRecs && (!recs.length || refresh)) {
       if (!refresh) {
         if (cache[id] && cache[id].length) setRecs(cache[id]);
@@ -90,6 +102,7 @@ const Explore = ({
     tags,
     cache,
     updateCache,
+    paramFilters
   ]);
 
   return (
@@ -102,7 +115,7 @@ const Explore = ({
           <FontAwesome name="refresh" size={20} color="black" />
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() => router.push(`/users/${friend._id}/filters`)}
+          onPress={() => router.push({ pathname: `/users/${friend._id}/filters`, params: { bgColor }})}
           disabled={!enableRecs || isRecommending}
         >
           <FontAwesome name="filter" size={20} color="black" />
