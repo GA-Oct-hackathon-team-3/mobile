@@ -1,19 +1,19 @@
-import { FontAwesome } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import React, { useEffect, useState } from "react";
+import { FontAwesome } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import {
   FlatList,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
-} from "react-native";
-import * as friendsService from "../utilities/friends-service";
+} from 'react-native';
+import * as friendsService from '../utilities/friends-service';
 
-import GiftItem from "./Gift";
-import { useRecommendation } from "./providers/RecommendationContext";
-import GiftItemSkeleton from "./skeletons/GiftItemSkeleton";
-import { colors } from "../constants/Theme";
+import GiftItem from './Gift';
+import { useRecommendation } from './providers/RecommendationContext';
+import GiftItemSkeleton from './skeletons/GiftItemSkeleton';
+import { colors } from '../constants/Theme';
 
 interface Explore {
   isExplore: boolean;
@@ -58,7 +58,6 @@ const Explore = ({
     setIsRecommending(true);
     try {
       const recom = await friendsService.getRecommendations(id, requestBody);
-      console.log(recom);
       setRefresh(false);
       setRecs(recom.recommendations);
       updateCache(id, recom.recommendations);
@@ -100,11 +99,12 @@ const Explore = ({
         <View style={styles.textRec}>
           <Text>Personalized Recommendations</Text>
         </View>
-        <TouchableOpacity onPress={getRecommendations}>
+        <TouchableOpacity onPress={getRecommendations} disabled={!enableRecs}>
           <FontAwesome name="refresh" size={20} color="black" />
         </TouchableOpacity>
         <TouchableOpacity
           onPress={() => router.push(`/users/${friend._id}/filters`)}
+          disabled={!enableRecs}
         >
           <FontAwesome name="filter" size={20} color="black" />
         </TouchableOpacity>
@@ -113,12 +113,12 @@ const Explore = ({
         {!showError ? (
           <>
             {refresh || (!recs.length && tags.length) ? (
-              <View style={{ flex: 1, flexDirection: "column" }}>
-                <View style={{ flexDirection: "row", gap: 4 }}>
+              <View style={{ flex: 1, flexDirection: 'column' }}>
+                <View style={{ flexDirection: 'row', gap: 4 }}>
                   <GiftItemSkeleton />
                   <GiftItemSkeleton />
                 </View>
-                <View style={{ flexDirection: "row", gap: 4 }}>
+                <View style={{ flexDirection: 'row', gap: 4 }}>
                   <GiftItemSkeleton />
                   <GiftItemSkeleton />
                 </View>
@@ -145,8 +145,8 @@ const Explore = ({
           <View
             style={{
               flex: 1,
-              alignItems: "center",
-              justifyContent: "flex-start",
+              alignItems: 'center',
+              justifyContent: 'flex-start',
               gap: 20,
               height: 400,
               paddingTop: 40,
@@ -154,7 +154,7 @@ const Explore = ({
             }}
           >
             <FontAwesome
-              name={"exclamation-triangle"}
+              name={'exclamation-triangle'}
               size={60}
               color={colors.green}
             />
@@ -167,15 +167,15 @@ const Explore = ({
           <View
             style={{
               flex: 1,
-              alignItems: "center",
-              justifyContent: "flex-start",
+              alignItems: 'center',
+              justifyContent: 'flex-start',
               gap: 20,
               height: 400,
               paddingTop: 40,
               paddingHorizontal: 40,
             }}
           >
-            <FontAwesome name={"tags"} size={60} color={"lightgray"} />
+            <FontAwesome name={'tags'} size={60} color={'lightgray'} />
             <Text style={styles.text}>
               Add tags to get personalized gift recommendations
             </Text>
@@ -196,32 +196,32 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: "bold",
-    textAlign: "center",
+    fontWeight: 'bold',
+    textAlign: 'center',
     marginBottom: 20,
   },
   exploreHeader: {
-    flexDirection: "row",
+    flexDirection: 'row',
     paddingLeft: 20,
     paddingRight: 20,
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
   },
   textRec: {
     maxWidth: 120,
   },
   giftTop: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     paddingLeft: 20,
     paddingRight: 20,
     paddingTop: 20,
   },
   text: {
-    fontFamily: "PilcrowRounded",
+    fontFamily: 'PilcrowRounded',
     fontSize: 18,
   },
   headerText: {
-    fontFamily: "PilcrowMedium",
+    fontFamily: 'PilcrowMedium',
     fontSize: 16,
   },
 });
