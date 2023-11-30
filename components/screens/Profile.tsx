@@ -51,7 +51,6 @@ export default function UserProfileScreen() {
   const { user, fetchFriend } = useUser();
 
   const { id, bgColor } = useLocalSearchParams();
-  const { fetchFriends } = useMainContext();
 
   useEffect(() => {
     if (user) {
@@ -69,10 +68,10 @@ export default function UserProfileScreen() {
   }, [user]);
 
   const toggleFavorite = async ({ recommendation }: ToggleFavoriteProps) => {
-    // e.preventDefault();
     const idx = favorites.findIndex(
       (fav) => fav.title.toLowerCase() === recommendation.title.toLowerCase()
     );
+
     if (idx > -1) {
       // remove from favorites
       try {
