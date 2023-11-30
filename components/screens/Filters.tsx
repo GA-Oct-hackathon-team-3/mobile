@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useRouter } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
   View,
   Text,
@@ -12,7 +12,6 @@ import {
 import { colors } from '../../constants/Theme';
 import TitleBack from '../TitleBack';
 import { Slider } from '@miblanchard/react-native-slider';
-import { useLocalSearchParams } from 'expo-router';
 import { capitalizeFirstLetter } from './EditFriendProfile.web';
 import { useUser } from '../providers/UserContext';
 
@@ -26,7 +25,7 @@ const Filters = () => {
   const router = useRouter();
   const { width } = useWindowDimensions();
   const [show, setShow] = useState('');
-  const { id } = useLocalSearchParams();
+  const { bgColor } = useLocalSearchParams();
   const { user, fetchFriend } = useUser();
   const [sliderMarks, setSliderMarks] = useState([50, 250, 500, 750, 1000]);
   const [giftTypes, setGiftTypes] = useState([
@@ -88,6 +87,22 @@ const Filters = () => {
     });
     setShow('');
   };
+
+  const handleSave = () => {
+    const budget = filters.budget.toString();
+    const tags = filters.tags.join(',');
+    const giftTypes = filters.giftType.join(',');
+
+    router.push({
+        pathname: `/users/${user._id}`, 
+        params: { 
+            budget,
+            tags,
+            giftTypes,
+            bgColor
+        }
+    });
+  }
   return (
     <View style={styles.container}>
       <TitleBack title="Filters" marginLeft={-80} paddingRight={100} />
@@ -287,9 +302,7 @@ const Filters = () => {
           </View>
         </TouchableOpacity>
         <TouchableOpacity
-          onPress={() =>
-            router.push({ pathname: `/users/${user._id}`, params: filters })
-          }
+          onPress={handleSave}
           disabled={filters.tags.length === 0}
         >
           <View
