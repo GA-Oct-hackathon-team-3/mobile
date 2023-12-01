@@ -8,10 +8,14 @@ import {
   Image,
   TextInput,
   ScrollView,
+  ActivityIndicator,
+  useWindowDimensions,
 } from "react-native";
 import { colors } from "../../constants/Theme";
 import TitleBack from "../TitleBack";
 import { FontAwesome } from "@expo/vector-icons";
+import { useAuth } from "../providers/AuthContext";
+import ToastManager, { Toast } from "toastify-react-native";
 
 type Props = {};
 
@@ -22,6 +26,8 @@ function EditInterests({}: Props) {
   const [searchInterest, setSearchInterest] = useState("");
   const [addedInterests, setAddedInterests] = useState([]);
   const scrollViewRef = useRef<ScrollView>();
+  const { height, width } = useWindowDimensions();
+  const { fetchUserProfile } = useAuth();
 
   const searchInterestLower = searchInterest.toLowerCase();
 
@@ -29,25 +35,34 @@ function EditInterests({}: Props) {
     (interest) => interest.toLowerCase() === searchInterestLower
   );
 
+  const showToasts = () => {
+    Toast.success("Interests Updated");
+  };
+
   const fetchUser = async () => {
     try {
       const data = await getProfile();
       setInterests(data.profile.interests);
+      setAddedInterests(data.profile.interests);
       setLoading(false);
       setUser(data.profile);
     } catch (error) {}
   };
 
   const handleSubmit = async () => {
+    setLoading(true);
     const lowerCaseInterests = addedInterests.map((interest) =>
       interest.toLowerCase()
     );
 
     try {
       await updateUserProfile({ interests: lowerCaseInterests });
+      await fetchUserProfile();
     } catch (error) {
       console.log(error, "UNABLE TO UPDATE INTERESTS");
     }
+    setLoading(false);
+    showToasts();
   };
 
   const handleSearchSubmit = () => {
@@ -76,6 +91,20 @@ function EditInterests({}: Props) {
 
   return (
     <View style={styles.container}>
+      <ToastManager />
+      {loading && (
+        <View
+          style={{
+            position: "absolute",
+            height: height,
+            width: width,
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
+          <ActivityIndicator size="large" color={colors.orange} />
+        </View>
+      )}
       <View style={{ flexDirection: "column", gap: 8, maxHeight: 160 }}>
         <TitleBack title={"Edit Interests"} marginLeft={-100} />
         <Text style={{ textAlign: "center" }}>

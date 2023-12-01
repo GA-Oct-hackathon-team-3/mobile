@@ -73,6 +73,29 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="reminders"
+        options={{
+          headerShown: false,
+          title: "Reminders",
+          tabBarIcon: ({ color }) => (
+            <View>
+              <Image
+                source={require("../../assets/images/Reminders.png")}
+                style={{ width: 30, height: 30, resizeMode: "contain" }}
+              />
+            </View>
+          ),
+        }}
+      />
+
+      {/* <Tabs.Screen
+        name="reminders/edit-reminders"
+        options={{
+          headerShown: false,
+          tabBarButton: () => null,
+        }}
+      /> */}
 
       <Tabs.Screen
         name="profile"

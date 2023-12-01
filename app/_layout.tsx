@@ -106,6 +106,14 @@ function RootLayoutNav() {
                     header: () => <Header />,
                   }}
                 />
+
+                <Stack.Screen
+                  name="edit-reminders"
+                  options={{
+                    headerShown: false,
+                    headerTitle: "Edit Reminders",
+                  }}
+                />
               </Stack>
             </UserProvider>
           </RecommendationProvider>

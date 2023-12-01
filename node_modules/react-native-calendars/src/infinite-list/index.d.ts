@@ -13,6 +13,7 @@ export interface InfiniteListProps extends Omit<RecyclerListViewProps, 'dataProv
     onReachNearEdge?: (pageIndex: number) => void;
     onReachNearEdgeThreshold?: number;
     initialPageIndex?: number;
+    initialOffset?: number;
     scrollViewProps?: ScrollViewProps;
     reloadPages?: (pageIndex: number) => void;
     positionIndex?: number;

@@ -12,7 +12,7 @@ const LandingPage = () => {
   const { height, width } = useWindowDimensions();
   const router = useRouter();
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { height: height }]}>
       <View
         style={{
           position: "absolute",
@@ -39,7 +39,7 @@ const LandingPage = () => {
       <View>
         <Image
           source={require("../../assets/images/landingpage.png")}
-          style={[{ height: height * 0.6, width: width }]}
+          style={[{ height: height * 0.54, width: width }]}
         />
 
         <View style={styles.bottomContainer}>
@@ -83,7 +83,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: "column",
-    height: "100%",
 
     backgroundColor: "#FDF7ED",
   },
