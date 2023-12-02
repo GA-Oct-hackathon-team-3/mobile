@@ -68,21 +68,26 @@ function Reminders({}: Props) {
         </TouchableOpacity>
       </View>
 
-      {activeTab == "Manage" ? <ManageReminders /> : <PastReminders />}
+      {activeTab == "Manage" ? (
+        <>
+          <ManageReminders />
+          <TouchableOpacity onPress={handleEdit} style={styles.submitButton}>
+            <Text
+              style={{
+                color: "white",
+                fontSize: 24,
+                fontFamily: "PilcrowMedium",
 
-      <TouchableOpacity onPress={handleEdit} style={styles.submitButton}>
-        <Text
-          style={{
-            color: "white",
-            fontSize: 24,
-            fontFamily: "PilcrowMedium",
-
-            textAlign: "center",
-          }}
-        >
-          Edit
-        </Text>
-      </TouchableOpacity>
+                textAlign: "center",
+              }}
+            >
+              Edit
+            </Text>
+          </TouchableOpacity>
+        </>
+      ) : (
+        <PastReminders />
+      )}
     </View>
   );
 }
