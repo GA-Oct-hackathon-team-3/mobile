@@ -18,7 +18,6 @@ const ProfileContent = ({
   giftPreferences,
   tags,
   favorites,
-  user,
   toggleFavorite,
   friendLocation,
   isCurrUser = false,

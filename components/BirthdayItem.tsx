@@ -18,6 +18,7 @@ interface Props {
   favoriteGifts: any[];
   id: string;
   photo: string;
+  cardColor: string;
 }
 
 const BirthdayItem = ({
@@ -29,6 +30,7 @@ const BirthdayItem = ({
   favoriteGifts,
   id,
   photo,
+  cardColor
 }: Props) => {
   const [collapse, setCollapse] = useState(false);
   const router = useRouter();
@@ -41,7 +43,7 @@ const BirthdayItem = ({
           onPress={() => {
             router.push({
               pathname: `/users/${_id}`,
-              params: { bgColor: itemColors[index] },
+              params: { bgColor: cardColor },
             });
           }}
         >
@@ -64,7 +66,7 @@ const BirthdayItem = ({
                 <FontAwesome
                   name="birthday-cake"
                   size={30}
-                  color={itemColors[index]}
+                  color={cardColor}
                 />
               )}
               <View style={{ flexDirection: "column" }}>
@@ -75,7 +77,7 @@ const BirthdayItem = ({
           </View>
           <View style={styles.card}>
             <View style={styles.content}>
-              <Text style={[styles.days, { color: itemColors[index] }]}>
+              <Text style={[styles.days, { color: cardColor }]}>
                 {daysUntilBirthday}
               </Text>
               <Text style={styles.label}>Days Left</Text>
@@ -91,7 +93,7 @@ const BirthdayItem = ({
             borderBottomLeftRadius: collapse ? 0 : 10,
             flexDirection: "row",
             padding: 10,
-            backgroundColor: itemColors[index],
+            backgroundColor: cardColor,
             justifyContent: "flex-end",
             alignItems: "center",
             gap: 10,

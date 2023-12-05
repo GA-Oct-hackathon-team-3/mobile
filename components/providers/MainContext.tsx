@@ -37,8 +37,11 @@ const MainProvider = ({ children }) => {
   const fetchFriends = async () => {
     try {
       const friends = await friendsService.retrieveFriends();
-      setFilteredFriends(friends);
-      setFriends(friends);
+      if (friends && !friends.message) {
+          setFilteredFriends(friends);
+          setFriends(friends);
+      }
+      else setFilteredFriends(null);
       setIsLoading(false);
     } catch (error) {
       console.error("Error fetching friends: ", error);

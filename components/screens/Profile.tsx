@@ -1,20 +1,15 @@
-import { Image } from "expo-image";
-import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { ScrollView } from "react-native-gesture-handler";
-import { colors } from "../../constants/Theme";
-import * as friendsService from "../../utilities/friends-service";
-import {
-  calculateAge,
-  daysUntilBirthday,
-  splitDOB,
-} from "../../utilities/helpers";
-import Explore from "../Explore";
-import ProfileContent from "../ProfileContent";
-import ProfileSkeleton from "../skeletons/ProfileSkeleton";
-import { useUser } from "../providers/UserContext";
-import { useMainContext } from "../providers/MainContext";
+import { Image } from 'expo-image';
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { ScrollView } from 'react-native-gesture-handler';
+import { colors } from '../../constants/Theme';
+import * as friendsService from '../../utilities/friends-service';
+import { calculateAge, splitDOB } from '../../utilities/helpers';
+import Explore from '../Explore';
+import ProfileContent from '../ProfileContent';
+import ProfileSkeleton from '../skeletons/ProfileSkeleton';
+import { useUser } from '../providers/UserContext';
 
 interface Friend {
   name: string;
@@ -36,28 +31,37 @@ interface ToggleFavoriteProps {
 
 export default function UserProfileScreen() {
   const router = useRouter();
-  const [activeTab, setActiveTab] = useState("profile");
-  // const [user, setUser] = useState<Friend | null>(null);
+  const [activeTab, setActiveTab] = useState('profile');
   const [image, setImage] = useState(null);
   const [dobObject, setDobObject] = useState({
-    year: "",
-    month: "",
-    day: "",
+    year: '',
+    month: '',
+    day: '',
   });
   const [favorites, setFavorites] = useState([]);
   const [enableRecs, setEnableRecs] = useState<boolean>(false);
-  const [favError, setFavError] = useState("");
+  const [paramFilters, setParamFilters] = useState({});
+  const [favError, setFavError] = useState('');
   const [loading, setLoading] = useState(true);
   const { user, fetchFriend } = useUser();
 
-  const { id, bgColor } = useLocalSearchParams();
-  const { fetchFriends } = useMainContext();
+  const { id, bgColor, budget, tags, giftTypes } = useLocalSearchParams();
+
+  useEffect(() => {
+    if (budget || tags || giftTypes) {
+        setParamFilters({
+            budget,
+            tags,
+            giftTypes
+        });
+    }
+  }, [budget, tags, giftTypes]);
 
   useEffect(() => {
     if (user) {
       const uniqueTimestamp = Date.now();
       user.photo = `${
-        user.photo ? user.photo : "https://i.imgur.com/hCwHtRc.png"
+        user.photo ? user.photo : 'https://i.imgur.com/hCwHtRc.png'
       }?timestamp=${uniqueTimestamp}`;
 
       setDobObject(splitDOB(user.dob));
@@ -69,10 +73,10 @@ export default function UserProfileScreen() {
   }, [user]);
 
   const toggleFavorite = async ({ recommendation }: ToggleFavoriteProps) => {
-    // e.preventDefault();
     const idx = favorites.findIndex(
       (fav) => fav.title.toLowerCase() === recommendation.title.toLowerCase()
     );
+
     if (idx > -1) {
       // remove from favorites
       try {
@@ -90,7 +94,6 @@ export default function UserProfileScreen() {
       try {
         const res = await friendsService.addToFavorites(id, recommendation);
         setFavorites([...favorites, res.recommendation]);
-        fetchFriends();
       } catch (error) {
         setFavError(error.message);
       }
@@ -98,6 +101,13 @@ export default function UserProfileScreen() {
   };
 
   const handleSelect = (value: string) => {
+    if (value === 'profile') {
+        setParamFilters({});
+        router.replace({
+            pathname: `/users/${id}`,
+            params: { bgColor }
+        });
+    }
     setActiveTab(value);
   };
 
@@ -118,11 +128,11 @@ export default function UserProfileScreen() {
           ></View>
           <View style={styles.header}>
             <TouchableOpacity
-              style={{ position: "absolute", left: 0, top: 40 }}
+              style={{ position: 'absolute', left: 0, top: 40 }}
               onPress={() => router.back()}
             >
               <Image
-                source={require("../../assets/images/arrow-left.png")}
+                source={require('../../assets/images/arrow-left.png')}
                 style={{ height: 24, width: 24 }}
               />
             </TouchableOpacity>
@@ -130,7 +140,7 @@ export default function UserProfileScreen() {
               source={{
                 uri: user.photo
                   ? user.photo
-                  : "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png",
+                  : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
               }}
               onLoad={onLoad}
               style={styles.avatar}
@@ -140,25 +150,25 @@ export default function UserProfileScreen() {
           </View>
           <View style={styles.info}>
             <View style={styles.infoDescription}>
-              <Text style={{ color: "#804C46", fontWeight: "bold" }}>
+              <Text style={{ color: '#804C46', fontWeight: 'bold' }}>
                 {dobObject && dobObject.day}
               </Text>
               <Text>{dobObject && dobObject.month}</Text>
             </View>
             <View
-              style={{ height: 30, width: 1, backgroundColor: "lightgray" }}
+              style={{ height: 30, width: 1, backgroundColor: 'lightgray' }}
             ></View>
             <View style={styles.infoDescription}>
-              <Text style={{ color: "#804C46", fontWeight: "bold" }}>
+              <Text style={{ color: '#804C46', fontWeight: 'bold' }}>
                 {user && user.daysUntilBirthday}
               </Text>
               <Text>Days left</Text>
             </View>
             <View
-              style={{ height: 30, width: 1, backgroundColor: "lightgray" }}
+              style={{ height: 30, width: 1, backgroundColor: 'lightgray' }}
             ></View>
             <View style={styles.infoDescription}>
-              <Text style={{ color: "#804C46", fontWeight: "bold" }}>
+              <Text style={{ color: '#804C46', fontWeight: 'bold' }}>
                 {user && calculateAge(user.dob)}
               </Text>
               <Text>Age</Text>
@@ -167,7 +177,7 @@ export default function UserProfileScreen() {
               onPress={() => router.push(`/users/${id}/update`)}
             >
               <Image
-                source={require("../../assets/images/pencil.png")}
+                source={require('../../assets/images/pencil.png')}
                 style={{ height: 20, width: 20, right: -40 }}
               />
             </TouchableOpacity>
@@ -175,11 +185,11 @@ export default function UserProfileScreen() {
           <View style={styles.actionButtons}>
             <TouchableOpacity
               style={styles.button}
-              onPress={() => handleSelect("profile")}
+              onPress={() => handleSelect('profile')}
             >
               <Text
                 style={
-                  activeTab == "profile" ? styles.selected : styles.unselected
+                  activeTab == 'profile' ? styles.selected : styles.unselected
                 }
               >
                 Profile
@@ -187,11 +197,11 @@ export default function UserProfileScreen() {
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.button}
-              onPress={() => handleSelect("explore")}
+              onPress={() => handleSelect('explore')}
             >
               <Text
                 style={
-                  activeTab == "profile" ? styles.unselected : styles.selected
+                  activeTab == 'profile' ? styles.unselected : styles.selected
                 }
               >
                 Explore Gifts
@@ -199,7 +209,7 @@ export default function UserProfileScreen() {
             </TouchableOpacity>
           </View>
 
-          {user && activeTab === "profile" && (
+          {user && activeTab === 'profile' && (
             <ScrollView>
               <ProfileContent
                 favorites={favorites}
@@ -210,7 +220,7 @@ export default function UserProfileScreen() {
               />
             </ScrollView>
           )}
-          {user && activeTab === "explore" && (
+          {user && activeTab === 'explore' && (
             <ScrollView>
               <Explore
                 enableRecs={enableRecs}
@@ -220,6 +230,8 @@ export default function UserProfileScreen() {
                 tags={user.tags}
                 id={id}
                 friendLocation={user.location}
+                bgColor={bgColor}
+                paramFilters={paramFilters}
               />
             </ScrollView>
           )}
@@ -237,8 +249,8 @@ const styles = StyleSheet.create({
     paddingTop: 120,
   },
   header: {
-    flexDirection: "column",
-    alignItems: "center",
+    flexDirection: 'column',
+    alignItems: 'center',
     gap: 4,
   },
   avatar: {
@@ -247,26 +259,26 @@ const styles = StyleSheet.create({
     borderRadius: 30,
   },
   info: {
-    flexDirection: "row",
-    justifyContent: "center",
+    flexDirection: 'row',
+    justifyContent: 'center',
     gap: 20,
     marginVertical: 10,
   },
   actionButtons: {
-    flexDirection: "row",
-    justifyContent: "center",
+    flexDirection: 'row',
+    justifyContent: 'center',
     gap: 30,
     marginVertical: 10,
     paddingTop: 10,
   },
   giftType: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginVertical: 10,
   },
   tags: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     marginVertical: 10,
   },
   button: {
@@ -274,24 +286,24 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   infoDescription: {
-    flexDirection: "column",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   selected: {
-    color: "black",
-    textDecorationLine: "underline",
-    fontFamily: "PilcrowMedium",
+    color: 'black',
+    textDecorationLine: 'underline',
+    fontFamily: 'PilcrowMedium',
     fontSize: 20,
   },
 
   unselected: {
-    color: "gray",
-    fontFamily: "PilcrowRounded",
+    color: 'gray',
+    fontFamily: 'PilcrowRounded',
     fontSize: 18,
   },
   backgroundCover: {
-    position: "absolute",
+    position: 'absolute',
     left: 0,
     height: 140,
     right: 0,
@@ -300,15 +312,15 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 8,
   },
   name: {
-    fontFamily: "PilcrowMedium",
+    fontFamily: 'PilcrowMedium',
     fontSize: 24,
   },
   subText: {
-    fontFamily: "PilcrowRounded",
+    fontFamily: 'PilcrowRounded',
     fontSize: 16,
   },
   numberText: {
-    fontFamily: "PilcrowRounded",
+    fontFamily: 'PilcrowRounded',
     fontSize: 18,
     color: colors.orange,
   },

@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-
+import React, { useState } from 'react';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import {
   View,
   Text,
@@ -8,141 +8,101 @@ import {
   TouchableOpacity,
   useWindowDimensions,
   ScrollView,
-} from "react-native";
-import { colors } from "../../constants/Theme";
-import TitleBack from "../TitleBack";
-import { Slider } from "@miblanchard/react-native-slider";
-import { useLocalSearchParams } from "expo-router";
-import { capitalizeFirstLetter } from "./EditFriendProfile.web";
-import * as friendsService from "../../utilities/friends-service";
+} from 'react-native';
+import { colors } from '../../constants/Theme';
+import TitleBack from '../TitleBack';
+import { Slider } from '@miblanchard/react-native-slider';
+import { capitalizeFirstLetter } from './EditFriendProfile.web';
+import { useUser } from '../providers/UserContext';
 
-const marks = [
-  {
-    value: 0,
-    label: "$0",
-  },
-  {
-    value: 250,
-    label: "$250",
-  },
-  {
-    value: 500,
-    label: "$500",
-  },
-  {
-    value: 750,
-    label: "$750",
-  },
-  {
-    value: 1000,
-    label: "$1000",
-  },
-];
+interface Filters {
+  budget: number;
+  tags: string[];
+  giftType: string[];
+}
 
 const Filters = () => {
+  const router = useRouter();
   const { width } = useWindowDimensions();
-  const [show, setShow] = useState(null);
-
-  const { id } = useLocalSearchParams();
-
+  const [show, setShow] = useState('');
+  const { bgColor } = useLocalSearchParams();
+  const { user, fetchFriend } = useUser();
+  const [sliderMarks, setSliderMarks] = useState([50, 250, 500, 750, 1000]);
+  const [giftTypes, setGiftTypes] = useState([
+    'Experience',
+    'Present',
+    'Donation',
+  ]);
   const [filters, setFilters] = useState({
-    budget: "",
-    tags: { selected: [], unselected: [] },
-    giftType: [],
+    budget: 0,
+    tags: user.tags.map((tag : any) => tag.title),
+    giftType: user.giftPreferences,
   });
 
-  const [selectedGiftTypes, setSelectedGiftTypes] = useState([]);
-  const [unselectedGiftTypes, setUnselectedGiftTypes] = useState([]);
-  const [giftTypes, setGiftTypes] = useState([
-    "Experience",
-    "Present",
-    "Donation",
-  ]);
-
-  const [selectedTags, setSelectedTags] = useState([]);
-  const [unselectedTags, setUnselectedTags] = useState([]);
-  const [tags, setTags] = useState([]);
-  const [budget, setBudget] = useState(0);
-  const [sliderMarks, setSliderMarks] = useState([50, 250, 500, 750, 1000]);
-
-  useEffect(() => {
-    fetchTags();
-  }, []);
-
-  const handlePress = (string) => {
-    if (show === string) {
-      setShow(null);
+  const handlePress = (section: string) => {
+    if (show === section) {
+      setShow('');
       return;
     }
-    setShow(string);
+    setShow(section);
   };
 
-  function valuetext(value) {
-    return `${value}°C`;
-  }
-
-  const fetchTags = async () => {
-    let friendData = await friendsService.retrieveFriend(id);
-
-    setSelectedTags(
-      friendData.tags.map((tag) => capitalizeFirstLetter(tag.title))
-    );
-
-    setTags(friendData.tags.map((tag) => capitalizeFirstLetter(tag.title)));
-
-    setSelectedGiftTypes(
-      friendData.giftPreferences.map((gift) => capitalizeFirstLetter(gift))
-    );
+  const handleChangeTag = (tag: any) => {
+    setFilters((prev) => ({
+      ...prev,
+      tags: prev.tags.includes(tag)
+        ? prev.tags.filter((t: any) => t !== tag)
+        : [...prev.tags, tag],
+    }));
   };
 
-  const handleRemoveGiftType = (giftType) => {
-    let newGiftTypes = filters.giftType.filter((t) => t !== giftType);
-    setFilters({ ...filters, giftType: newGiftTypes });
+  const handleChangeGiftType = (giftType: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      giftType: prev.giftType.includes(giftType)
+        ? prev.giftType.filter((type: string) => type !== giftType)
+        : [...prev.giftType, giftType],
+    }));
   };
 
-  const handleAddTag = (tag) => {
-    setUnselectedTags((prev) => prev.filter((t) => t !== tag));
-    setSelectedTags((prev) => [...prev, tag]);
-  };
-
-  const handleChangeTag = (tag) => {
-    if (selectedTags.includes(tag)) {
-      setSelectedTags((prev) => prev.filter((t) => t !== tag));
-      setUnselectedTags((prev) => [...prev, tag]);
-    } else {
-      setUnselectedTags((prev) => prev.filter((t) => t !== tag));
-      setSelectedTags((prev) => [...prev, tag]);
-    }
-  };
-
-  const handleChangeGiftType = (giftType) => {
-    if (selectedGiftTypes.includes(giftType)) {
-      setSelectedGiftTypes((prev) => prev.filter((t) => t !== giftType));
-    } else {
-      setSelectedGiftTypes((prev) => [...prev, giftType]);
-    }
-  };
-
-  const TopTrackMark = (index) => {
-    const value = sliderMarks[index];
+  const TopTrackMark = (index: any) => {
+    const value = sliderMarks[index.index];
 
     return (
       <View style={{ paddingTop: 20 }}>
         <Text
-          style={{ fontFamily: "PilcrowBold", fontSize: 16, marginTop: 20 }}
+          style={{ fontFamily: 'PilcrowBold', fontSize: 16, marginTop: 20 }}
         >
-          {sliderMarks[index.index]}
+          {value}
         </Text>
       </View>
     );
   };
 
-  useEffect(() => {}, [budget]);
-
   const handleClear = () => {
-    setFilters({ budget: "", tags: [], giftType: [] });
-    setShow(null);
+    setFilters({
+      budget: 0,
+      tags: user.tags.map((tag : any) => tag.title),
+      giftType: user.giftPreferences,
+    });
+    setShow('');
   };
+
+  const handleSave = () => {
+    const budget = filters.budget.toString();
+    const tags = filters.tags.join(',');
+    const giftTypes = filters.giftType.join(',');
+
+    router.push({
+        pathname: `/users/${user._id}`, 
+        params: { 
+            budget,
+            tags,
+            giftTypes,
+            bgColor
+        }
+    });
+  }
   return (
     <View style={styles.container}>
       <TitleBack title="Filters" marginLeft={-80} paddingRight={100} />
@@ -150,40 +110,40 @@ const Filters = () => {
       <View
         style={{
           flex: 1,
-          flexDirection: "column",
+          flexDirection: 'column',
         }}
       >
         <View style={styles.filterContainer}>
-          <Text style={{ fontFamily: "PilcrowMedium", fontSize: 18 }}>
+          <Text style={{ fontFamily: 'PilcrowMedium', fontSize: 18 }}>
             Budget
           </Text>
-          <TouchableOpacity onPress={() => handlePress("budget")}>
-            {show === "budget" ? (
+          <TouchableOpacity onPress={() => handlePress('budget')}>
+            {show === 'budget' ? (
               <Image
-                source={require("../../assets/images/minus.png")}
+                source={require('../../assets/images/minus.png')}
                 style={{ height: 30, width: 30 }}
               />
             ) : (
               <Image
-                source={require("../../assets/images/blackplus.png")}
+                source={require('../../assets/images/blackplus.png')}
                 style={{ height: 30, width: 30 }}
               />
             )}
           </TouchableOpacity>
         </View>
 
-        {show === "budget" && (
+        {show === 'budget' && (
           <View style={styles.sliderContainer}>
             <View
               style={{
-                width: "auto",
-                justifyContent: "center",
-                alignItems: "center",
+                width: 'auto',
+                justifyContent: 'center',
+                alignItems: 'center',
                 paddingVertical: 5,
               }}
             >
-              <Text style={{ fontFamily: "PilcrowBold", fontSize: 20 }}>
-                ${budget}
+              <Text style={{ fontFamily: 'PilcrowBold', fontSize: 20 }}>
+                ${filters.budget}
               </Text>
             </View>
             <Slider
@@ -191,9 +151,11 @@ const Filters = () => {
               minimumValue={0}
               step={50}
               trackMarks={[50, 250, 500, 750, 1000]}
-              trackStyle={{ width: "100%" }}
-              value={budget}
-              onValueChange={(value) => setBudget(value)}
+              trackStyle={{ width: '100%' }}
+              value={filters.budget}
+              onValueChange={(value) =>
+                setFilters((prev) => ({ ...prev, budget: value[0] }))
+              }
               renderTrackMarkComponent={(index) => (
                 <TopTrackMark index={index} />
               )}
@@ -206,48 +168,50 @@ const Filters = () => {
         <View
           style={{
             height: 1,
-            width: "80%",
-            backgroundColor: "black",
-            alignSelf: "center",
+            width: '80%',
+            backgroundColor: 'black',
+            alignSelf: 'center',
           }}
         ></View>
 
         <View style={styles.filterContainer}>
-          <Text style={{ fontFamily: "PilcrowMedium", fontSize: 18 }}>
+          <Text style={{ fontFamily: 'PilcrowMedium', fontSize: 18 }}>
             Tags
           </Text>
-          <TouchableOpacity onPress={() => handlePress("tags")}>
-            {show === "tags" ? (
+          <TouchableOpacity onPress={() => handlePress('tags')}>
+            {show === 'tags' ? (
               <Image
-                source={require("../../assets/images/minus.png")}
+                source={require('../../assets/images/minus.png')}
                 style={{ height: 30, width: 30 }}
               />
             ) : (
               <Image
-                source={require("../../assets/images/blackplus.png")}
+                source={require('../../assets/images/blackplus.png')}
                 style={{ height: 30, width: 30 }}
               />
             )}
           </TouchableOpacity>
         </View>
 
-        {show === "tags" && (
+        {show === 'tags' && (
           <ScrollView style={{ maxHeight: 200 }}>
             <View style={styles.tagsSection}>
-              {tags.map((tag, idx) => (
+              {user.tags.map((tag, idx) => (
                 <TouchableOpacity
                   style={[
                     styles.tag,
                     {
-                      backgroundColor: selectedTags.includes(tag)
+                      backgroundColor: filters.tags.includes(tag.title)
                         ? colors.green
-                        : "lightgray",
+                        : 'lightgray',
                     },
                   ]}
                   key={idx}
-                  onPress={() => handleChangeTag(tag)}
+                  onPress={() => handleChangeTag(tag.title)}
                 >
-                  <Text style={styles.selectTagText}>{tag}</Text>
+                  <Text style={styles.selectTagText}>
+                    {capitalizeFirstLetter(tag.title)}
+                  </Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -257,45 +221,47 @@ const Filters = () => {
         <View
           style={{
             height: 1,
-            width: "80%",
-            backgroundColor: "black",
-            alignSelf: "center",
+            width: '80%',
+            backgroundColor: 'black',
+            alignSelf: 'center',
           }}
         ></View>
 
         <View style={styles.filterContainer}>
-          <Text style={{ fontFamily: "PilcrowMedium", fontSize: 18 }}>
+          <Text style={{ fontFamily: 'PilcrowMedium', fontSize: 18 }}>
             Gift Type
           </Text>
-          <TouchableOpacity onPress={() => handlePress("gifttype")}>
-            {show === "gifttype" ? (
+          <TouchableOpacity onPress={() => handlePress('gifttype')}>
+            {show === 'gifttype' ? (
               <Image
-                source={require("../../assets/images/minus.png")}
+                source={require('../../assets/images/minus.png')}
                 style={{ height: 30, width: 30 }}
               />
             ) : (
               <Image
-                source={require("../../assets/images/blackplus.png")}
+                source={require('../../assets/images/blackplus.png')}
                 style={{ height: 30, width: 30 }}
               />
             )}
           </TouchableOpacity>
         </View>
 
-        {show === "gifttype" && (
+        {show === 'gifttype' && (
           <View style={styles.tagsSection}>
             {giftTypes.map((giftType, idx) => (
               <TouchableOpacity
                 style={[
                   styles.tag,
                   {
-                    backgroundColor: selectedGiftTypes.includes(giftType)
+                    backgroundColor: filters.giftType.includes(
+                      giftType.toLowerCase()
+                    )
                       ? colors.green
-                      : "lightgray",
+                      : 'lightgray',
                   },
                 ]}
                 key={idx}
-                onPress={() => handleChangeGiftType(giftType)}
+                onPress={() => handleChangeGiftType(giftType.toLowerCase())}
               >
                 <Text style={styles.selectTagText}>{giftType}</Text>
               </TouchableOpacity>
@@ -306,28 +272,28 @@ const Filters = () => {
         <View
           style={{
             height: 1,
-            width: "80%",
-            backgroundColor: "black",
-            alignSelf: "center",
+            width: '80%',
+            backgroundColor: 'black',
+            alignSelf: 'center',
           }}
         ></View>
       </View>
 
-      <View style={{ flexDirection: "row" }}>
+      <View style={{ flexDirection: 'row' }}>
         <TouchableOpacity onPress={handleClear}>
           <View
             style={{
               width: width / 2,
-              justifyContent: "center",
-              alignItems: "center",
+              justifyContent: 'center',
+              alignItems: 'center',
               backgroundColor: colors.brightWhite,
               height: 60,
             }}
           >
             <Text
               style={{
-                color: "black",
-                fontFamily: "PilcrowBold",
+                color: 'black',
+                fontFamily: 'PilcrowBold',
                 fontSize: 18,
               }}
             >
@@ -335,12 +301,15 @@ const Filters = () => {
             </Text>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={handleSave}
+          disabled={filters.tags.length === 0}
+        >
           <View
             style={{
               width: width / 2,
-              justifyContent: "center",
-              alignItems: "center",
+              justifyContent: 'center',
+              alignItems: 'center',
               backgroundColor: colors.green,
               height: 60,
             }}
@@ -348,7 +317,7 @@ const Filters = () => {
             <Text
               style={{
                 color: colors.brightWhite,
-                fontFamily: "PilcrowBold",
+                fontFamily: 'PilcrowBold',
                 fontSize: 18,
               }}
             >
@@ -369,49 +338,49 @@ const styles = StyleSheet.create({
   sliderContainer: {
     marginLeft: 20,
     marginRight: 20,
-    alignItems: "stretch",
-    justifyContent: "center",
+    alignItems: 'stretch',
+    justifyContent: 'center',
     paddingBottom: 30,
   },
   filterContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     paddingHorizontal: 40,
-    alignItems: "center",
+    alignItems: 'center',
     paddingVertical: 20,
   },
   selectTagText: {
     fontSize: 16,
-    fontFamily: "PilcrowBold",
+    fontFamily: 'PilcrowBold',
     color: colors.brightWhite,
   },
   unselectedTagText: {
     fontSize: 16,
-    fontFamily: "PilcrowBold",
+    fontFamily: 'PilcrowBold',
     color: colors.brightWhite,
   },
   tag: {
-    flexDirection: "row",
+    flexDirection: 'row',
     height: 40,
     borderRadius: 10,
     padding: 12,
-    alignItems: "center",
+    alignItems: 'center',
     backgroundColor: colors.green,
   },
   unselectedTag: {
-    flexDirection: "row",
+    flexDirection: 'row',
     height: 40,
     borderRadius: 10,
     padding: 12,
-    alignItems: "center",
-    backgroundColor: "lightgray",
+    alignItems: 'center',
+    backgroundColor: 'lightgray',
   },
   tagsSection: {
-    flexDirection: "row",
-    flexWrap: "wrap",
+    flexDirection: 'row',
+    flexWrap: 'wrap',
 
     paddingHorizontal: 40,
-    alignItems: "center",
+    alignItems: 'center',
     gap: 12,
     paddingBottom: 10,
   },

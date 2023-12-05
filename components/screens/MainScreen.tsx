@@ -55,7 +55,7 @@ export default function MainScreen() {
         today: friendsFilter(friends.today, query),
         thisWeek: friendsFilter(friends.thisWeek, query),
         thisMonth: friendsFilter(friends.thisMonth, query),
-        upcoming: friendsFilter(friends.laterOn, query),
+        laterOn: friendsFilter(friends.laterOn, query),
       });
     } else {
       setFilteredFriends(friends);

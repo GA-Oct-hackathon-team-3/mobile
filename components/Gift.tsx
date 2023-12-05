@@ -43,7 +43,7 @@ const GiftItem = ({
         />
         <TouchableOpacity
           onPress={(e) => {
-            toggleFavorite(gift, e);
+            toggleFavorite({ recommendation: gift });
             setFillHeart(!fillHeart);
           }}
           style={{ position: "absolute", right: 40, bottom: 12 }}

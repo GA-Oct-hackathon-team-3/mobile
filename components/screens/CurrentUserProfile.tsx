@@ -77,7 +77,7 @@ export default function CurrentUserProfileScreen() {
               />
             )}
             <Text style={styles.name}>{userProfile && userProfile.name}</Text>
-            <Text style={styles.subText}>Friend</Text>
+            <Text style={styles.subText}>User</Text>
           </View>
           <View style={styles.info}>
             <View style={styles.infoDescription}>
@@ -93,7 +93,7 @@ export default function CurrentUserProfileScreen() {
             ></View>
             <View style={styles.infoDescription}>
               <Text style={styles.numberText}>
-                {userProfile && daysUntilBirthday(userProfile.dob)}
+                {userProfile && userProfile.daysUntilBirthday}
               </Text>
               <Text style={styles.subText}>Days left</Text>
             </View>
@@ -127,7 +127,7 @@ export default function CurrentUserProfileScreen() {
                 Profile
               </Text>
             </TouchableOpacity>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               style={styles.button}
               onPress={() => handleSelect("gifts")}
             >
@@ -138,7 +138,7 @@ export default function CurrentUserProfileScreen() {
               >
                 Explore Gifts
               </Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
 
           {selected == "profile" ? (
