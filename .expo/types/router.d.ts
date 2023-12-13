@@ -7,7 +7,7 @@ declare module "expo-router" {
   export * from 'expo-router/build';
 
   // prettier-ignore
-  type StaticRoutes = `/` | `/(auth)/_layout` | `/_layout` | `/(auth)/landing` | `/landing` | `/(auth)/login` | `/login` | `/(auth)/signup` | `/signup` | `/(tabs)/_layout` | `/(tabs)/` | `/(tabs)` | `/(tabs)/profile` | `/profile` | `/(tabs)/reminders/_layout` | `/reminders/_layout` | `/(tabs)/reminders/edit-reminders` | `/reminders/edit-reminders` | `/+html` | `/__tests__/app.test` | `/add-friend` | `/delete-user` | `/edit-interests` | `/edit-profile` | `/settings` | `/(tabs)/reminders/` | `/reminders/` | `/(tabs)/reminders`;
+  type StaticRoutes = `/` | `/(auth)/_layout` | `/_layout` | `/(auth)/landing` | `/landing` | `/(auth)/login` | `/login` | `/(auth)/signup` | `/signup` | `/(tabs)/_layout` | `/(tabs)/` | `/(tabs)` | `/(tabs)/profile` | `/profile` | `/(tabs)/reminders/_layout` | `/reminders/_layout` | `/(tabs)/reminders/edit-reminders` | `/reminders/edit-reminders` | `/(tabs)/reminders/` | `/reminders/` | `/(tabs)/reminders` | `/+html` | `/__tests__/app.test` | `/add-friend` | `/delete-user` | `/edit-interests` | `/edit-profile` | `/settings`;
   // prettier-ignore
   type DynamicRoutes<T extends string> = `/${CatchAllRoutePart<T>}` | `/users/${SingleRoutePart<T>}/add-tags` | `/users/${SingleRoutePart<T>}/edit-tags` | `/users/${SingleRoutePart<T>}/filters` | `/users/${SingleRoutePart<T>}/` | `/users/${SingleRoutePart<T>}/update`;
   // prettier-ignore

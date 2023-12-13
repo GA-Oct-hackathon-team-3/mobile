@@ -39,7 +39,7 @@ const LandingPage = () => {
       <View>
         <Image
           source={require("../../assets/images/landingpage.png")}
-          style={[{ height: height * 0.54, width: width }]}
+          style={[{ height: height * 0.45, width: width }]}
         />
 
         <View style={styles.bottomContainer}>
