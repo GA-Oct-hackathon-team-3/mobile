@@ -7,15 +7,19 @@ import {
   FlatList,
   useWindowDimensions,
   StyleSheet,
+  Modal,
 } from "react-native";
 import { colors } from "../constants/Theme";
 import { FontAwesome } from "@expo/vector-icons";
 import { TouchableOpacity } from "react-native-gesture-handler";
 import Time from "./Time";
+import TimePicker from "./TimePicker";
 type Props = {};
 
 function ManageReminders({}: Props) {
   const [isEnabled, setIsEnabled] = useState(false);
+  const [showTimer, setShowTimer] = useState(false);
+  const { width, height } = useWindowDimensions();
 
   const data = [{ id: 1 }, { id: 2 }];
 
@@ -32,7 +36,9 @@ function ManageReminders({}: Props) {
       <Text style={styles.text}>
         Choose the time you'd prefer to be reminded
       </Text>
-      <Time />
+      <TouchableOpacity onPress={() => setShowTimer(true)}>
+        <Time />
+      </TouchableOpacity>
 
       <View
         style={{
@@ -74,6 +80,14 @@ function ManageReminders({}: Props) {
         preferences for:
       </Text>
       <FlatList data={data} renderItem={({ item }) => <Item />} />
+
+      <Modal visible={showTimer} animationType="slide" transparent>
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <TimePicker hour={9} minutes={0} />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -147,6 +161,46 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: "PilcrowRounded",
     textAlign: "center",
+  },
+  modalBackground: {
+    opacity: 0.1,
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 1,
+  },
+
+  modalContainer: {
+    backgroundColor: colors.brightWhite,
+    borderRadius: 10,
+    padding: 20,
+    width: "90%",
+    zIndex: 1,
+    marginTop: -80,
+
+    alignItems: "center",
+  },
+  centeredView: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22,
+    height: 400,
+    width: 500,
+    alignSelf: "center",
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
 });
 

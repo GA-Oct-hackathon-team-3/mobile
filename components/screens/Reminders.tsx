@@ -5,6 +5,7 @@ import {
   Text,
   StyleSheet,
   TextInput,
+  Modal,
 } from "react-native";
 import { colors } from "../../constants/Theme";
 import { FontAwesome } from "@expo/vector-icons";
@@ -13,6 +14,7 @@ import PastReminders from "../PastReminders";
 import EditReminders from "./EditReminders";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import TimePicker from "../TimePicker";
 
 type Props = {};
 
@@ -88,6 +90,14 @@ function Reminders({}: Props) {
       ) : (
         <PastReminders />
       )}
+
+      <Modal visible={false} animationType="slide" transparent>
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <TimePicker hour={9} minutes={0} />
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 }
@@ -202,6 +212,29 @@ const styles = StyleSheet.create({
     right: 0,
     top: 0,
     bottom: 0,
+  },
+  centeredView: {
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22,
+    height: 400,
+    width: 500,
+    alignSelf: "center",
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: "white",
+    borderRadius: 20,
+    padding: 35,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
   },
 });
 
