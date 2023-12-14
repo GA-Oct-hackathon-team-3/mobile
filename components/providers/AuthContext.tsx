@@ -4,6 +4,8 @@ import React, { useContext, useEffect, useState } from "react";
 import { Platform } from "react-native";
 import { getToken, getUser } from "../../utilities/users-service";
 import { getProfile } from "../../utilities/profile-service";
+import { registerForPushNotificationsAsync } from '../../utilities/device-token-service';
+import { acceptNotifications } from '../../utilities/notification-service';
 
 interface AuthContextInterface {
   token: string | null;
@@ -72,6 +74,19 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     setupUserData();
   }, [token]);
+
+  useEffect( () => {
+    const registerPushNotifications = async () => {
+        if (onboarded) {
+            const token = await registerForPushNotificationsAsync();
+            if (token) {
+                const data = { token: token.data }
+                const response = await acceptNotifications(data);
+            }
+        }
+    }
+    registerPushNotifications();
+  }, [onboarded]);
 
   const getUserToken = async () => {
     if (Platform.OS === "web") {
