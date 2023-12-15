@@ -10,7 +10,7 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
-import { getNotifications } from '../utilities/notification-service';
+import { getNotifications, markAsRead } from '../utilities/notification-service';
 import { colors } from "../constants/Theme";
 import { capitalizeFirstLetter, getAgeAndSuffix } from "../utilities/helpers";
 type Props = {};
@@ -46,7 +46,19 @@ function PastReminders({}: Props) {
             const notificationData = await getNotifications();
             if (notificationData && !notificationData.message) setNotifications(notificationData);
         }
+
+        const readNotifications = async () => {
+            const ids = notifications.current.map(notif => notif._id);
+            const response = await markAsRead(ids); // sends ids to backend to mark as read
+          }
+
         fetchNotifications();
+
+        setTimeout(() => {
+            // if there are no current notifications (i.e isRead: false), then don't run call to backend
+            if (notifications.current.length > 0) readNotifications();
+         }, 3000); // slight delay
+
     }, []);
 
   return (

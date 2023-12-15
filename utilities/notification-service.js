@@ -12,3 +12,8 @@ export async function getNotifications () {
     const response = await sendRequest(WEB_BASE_URL + '/notifications', 'GET', null);
     return response;
 }
+
+export async function markAsRead (notificationIds) {
+    const response = await sendRequest(WEB_BASE_URL + '/notifications/read', 'PUT', { notificationIds });
+    return response;
+}
