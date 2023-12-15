@@ -1,10 +1,14 @@
 import sendRequest from "./send-request";
-
-const BASE_URL = "http://localhost:3010/api/device";
+import { WEB_BASE_URL } from "./constants";
 
 export async function acceptNotifications(tokenObj) {
-  const res = await sendRequest(BASE_URL, "POST", tokenObj);
+  const res = await sendRequest(WEB_BASE_URL + '/device', "POST", tokenObj);
 
   console.log("res", res);
   return res;
+}
+
+export async function getNotifications () {
+    const response = await sendRequest(WEB_BASE_URL + '/notifications', 'GET', null);
+    return response;
 }
