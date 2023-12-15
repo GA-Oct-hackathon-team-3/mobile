@@ -1,5 +1,5 @@
 import { FontAwesome } from "@expo/vector-icons";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Image,
   SectionList,
@@ -10,26 +10,65 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
+import { getNotifications, markAsRead } from '../utilities/notification-service';
 import { colors } from "../constants/Theme";
+import { capitalizeFirstLetter, getAgeAndSuffix } from "../utilities/helpers";
 type Props = {};
 
+type ItemProps = {
+    id: string;
+    name: string;
+    dob: string;
+    daysUntilBirthday: number;
+  };
+
+type INotification = {
+    _id: string;
+    friendId: {
+        _id: string;
+        name: string;
+        dob: string;
+        daysUntilBirthday: number;
+    },
+    isRead: boolean;
+}
+
+type Reminders = {
+    current: INotification[],
+    past: INotification[],
+}
+
 function PastReminders({}: Props) {
-  const DATA = [
-    {
-      title: "This Week",
-      data: ["1", "2"],
-    },
-    {
-      title: "Past",
-      data: ["1", "2"],
-    },
-  ];
+    const [notifications, setNotifications] = useState <Reminders> ({ current: [], past: [] });
+
+    useEffect(() => {
+        const fetchNotifications = async () => {
+            const notificationData = await getNotifications();
+            if (notificationData && !notificationData.message) setNotifications(notificationData);
+        }
+
+        const readNotifications = async () => {
+            const ids = notifications.current.map(notif => notif._id);
+            const response = await markAsRead(ids); // sends ids to backend to mark as read
+          }
+
+        fetchNotifications();
+
+        setTimeout(() => {
+            // if there are no current notifications (i.e isRead: false), then don't run call to backend
+            if (notifications.current.length > 0) readNotifications();
+         }, 3000); // slight delay
+
+    }, []);
 
   return (
     <SectionList
-      sections={DATA}
-      keyExtractor={(item, index) => item + index}
-      renderItem={({ item }) => <Item />}
+      sections={[
+        { title: 'Current', data: notifications!.current },
+        { title: 'Past', data: notifications!.past },
+      ]}
+      keyExtractor={(item) => item._id.toString()}
+      renderItem={({ item }) => <Item id={item._id.toString()} name={item.friendId.name} dob={item.friendId.dob} daysUntilBirthday={item.friendId.daysUntilBirthday} />}
       renderSectionHeader={({ section: { title } }) => (
         <Text
           style={[styles.header, { paddingTop: title === "Past" ? 20 : 0 }]}
@@ -41,13 +80,14 @@ function PastReminders({}: Props) {
   );
 }
 
-const Item = () => {
+const Item : React.FC<ItemProps> = ({ id, name, dob, daysUntilBirthday }) => {
   const [checked, setChecked] = useState(false);
   const { width } = useWindowDimensions();
 
-  const removeReminder = () => {
-    console.log("remove");
+  const removeReminder = async () => {
+    console.log(`remove ${id}`);
   };
+
   return (
     <View style={{ width: width - 40 }}>
       <View
@@ -68,8 +108,8 @@ const Item = () => {
           style={{ width: 40, height: 40, borderRadius: 20 }}
         />
         <View>
-          <Text style={styles.text}>Molly Rosenthal's</Text>
-          <Text style={styles.text}>28th birthday</Text>
+          <Text style={styles.text}>{name && capitalizeFirstLetter(name)}'s</Text>
+          <Text style={styles.text}>{dob && getAgeAndSuffix(dob)} birthday</Text>
         </View>
         <View style={{ alignItems: "center" }}>
           <Text
@@ -79,7 +119,7 @@ const Item = () => {
               fontSize: 32,
             }}
           >
-            2
+            {daysUntilBirthday && daysUntilBirthday}
           </Text>
           <Text style={styles.text}>Days Left</Text>
         </View>

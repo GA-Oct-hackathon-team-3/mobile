@@ -72,3 +72,18 @@ export const friendsFilter = (friends, query) => {
       friend.name.toLowerCase().includes(query.toLowerCase())
     );
   };
+
+export function getAgeAndSuffix (dob) {
+    const age = calculateAge(dob); // calculates age
+
+    // if age is between 10 and 20 (inclusive) returns 'th'
+    if (age >= 10 && age <= 20) return `${age}th`;
+
+    // finds last digit
+    const lastDigit = age % 10;
+    // reference of alternate suffixes
+    const suffixes = { 1: 'st', 2: 'nd', 3: 'rd' }
+
+    // returns age with the corresponding value to the last digit key, if no match, returns 'th' by default
+    return `${age}${suffixes[lastDigit] || 'th'}`
+}
