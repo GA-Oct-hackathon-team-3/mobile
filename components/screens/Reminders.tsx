@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   TouchableOpacity,
@@ -13,22 +13,45 @@ import PastReminders from "../PastReminders";
 import EditReminders from "./EditReminders";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useMainContext } from "../providers/MainContext";
+// import * as notifService from '../../utilities/notification-service';
+// import * as deviceTokenService from '../../utilities/device-token-service';
 
 type Props = {};
 
 function Reminders({}: Props) {
-  const [activeTab, setActiveTab] = useState("Manage");
+    const { friends } = useMainContext();
+  const [activeTab, setActiveTab] = useState("Reminders");
   const [editMode, setEditMode] = useState(false);
+  const [friendsList, setFriendsList] = useState([]);
+  const [selectedFriends, setSelectedFriends] = useState([]);
   const router = useRouter();
   const insets = useSafeAreaInsets();
+
+  const formatFriends = () => {
+    if (friends) {
+        const flattenedArray = friends.today.concat(friends.thisWeek, friends.thisMonth, friends.laterOn);
+        setFriendsList(flattenedArray);
+    }
+}
+
+
+  useEffect(() => {
+    formatFriends();
+  }, []);
+
 
   const handleSelect = (value: string) => {
     setActiveTab(value);
   };
 
   const handleEdit = () => {
-    router.push("/reminders/edit-reminders");
+    console.log(selectedFriends);
+    router.push({
+        pathname: "/reminders/edit-reminders",
+    });
   };
+
   return (
     <View style={[{ paddingTop: insets.top + 8 }, styles.container]}>
       <View
@@ -46,6 +69,16 @@ function Reminders({}: Props) {
       </View>
 
       <View style={styles.actionButtons}>
+      <TouchableOpacity
+          style={styles.button}
+          onPress={() => handleSelect("Reminders")}
+        >
+          <Text
+            style={activeTab == "Manage" ? styles.unselected : styles.selected}
+          >
+            Reminders
+          </Text>
+        </TouchableOpacity>
         <TouchableOpacity
           style={styles.button}
           onPress={() => handleSelect("Manage")}
@@ -56,21 +89,11 @@ function Reminders({}: Props) {
             Manage Reminders
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.button}
-          onPress={() => handleSelect("Past")}
-        >
-          <Text
-            style={activeTab == "Manage" ? styles.unselected : styles.selected}
-          >
-            Past Reminders
-          </Text>
-        </TouchableOpacity>
       </View>
 
       {activeTab == "Manage" ? (
         <>
-          <ManageReminders />
+          <ManageReminders friends={friendsList} setSelectedFriends={setSelectedFriends} />
           <TouchableOpacity onPress={handleEdit} style={styles.submitButton}>
             <Text
               style={{
