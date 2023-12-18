@@ -24,7 +24,6 @@ function Reminders({}: Props) {
   const [activeTab, setActiveTab] = useState("Reminders");
   const [editMode, setEditMode] = useState(false);
   const [friendsList, setFriendsList] = useState([]);
-  const [selectedFriends, setSelectedFriends] = useState([]);
   const router = useRouter();
   const insets = useSafeAreaInsets();
 
@@ -45,12 +44,12 @@ function Reminders({}: Props) {
     setActiveTab(value);
   };
 
-  const handleEdit = () => {
-    console.log(selectedFriends);
-    router.push({
-        pathname: "/reminders/edit-reminders",
-    });
-  };
+//   const handleEdit = () => {
+//     console.log(selectedFriends);
+//     router.push({
+//         pathname: "/reminders/edit-reminders",
+//     });
+//   };
 
   return (
     <View style={[{ paddingTop: insets.top + 8 }, styles.container]}>
@@ -93,8 +92,8 @@ function Reminders({}: Props) {
 
       {activeTab == "Manage" ? (
         <>
-          <ManageReminders friends={friendsList} setSelectedFriends={setSelectedFriends} />
-          <TouchableOpacity onPress={handleEdit} style={styles.submitButton}>
+          <ManageReminders friends={friendsList} />
+          {/* <TouchableOpacity onPress={handleEdit} style={styles.submitButton}>
             <Text
               style={{
                 color: "white",
@@ -106,7 +105,7 @@ function Reminders({}: Props) {
             >
               Edit
             </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </>
       ) : (
         <PastReminders />

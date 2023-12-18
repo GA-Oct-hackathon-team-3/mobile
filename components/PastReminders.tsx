@@ -10,7 +10,7 @@ import {
   View,
   useWindowDimensions,
 } from "react-native";
-import { getNotifications, markAsRead } from '../utilities/notification-service';
+import { deleteNotification, getNotifications, markAsRead } from '../utilities/notification-service';
 import { colors } from "../constants/Theme";
 import { capitalizeFirstLetter, getAgeAndSuffix } from "../utilities/helpers";
 type Props = {};
@@ -20,11 +20,12 @@ type ItemProps = {
     name: string;
     dob: string;
     daysUntilBirthday: number;
+    setNotifications: React.Dispatch<React.SetStateAction<Reminders>>;
   };
 
 type INotification = {
     _id: string;
-    friendId: {
+    friend: {
         _id: string;
         name: string;
         dob: string;
@@ -68,7 +69,7 @@ function PastReminders({}: Props) {
         { title: 'Past', data: notifications!.past },
       ]}
       keyExtractor={(item) => item._id.toString()}
-      renderItem={({ item }) => <Item id={item._id.toString()} name={item.friendId.name} dob={item.friendId.dob} daysUntilBirthday={item.friendId.daysUntilBirthday} />}
+      renderItem={({ item }) => <Item id={item._id.toString()} name={item.friend.name} dob={item.friend.dob} daysUntilBirthday={item.friend.daysUntilBirthday} setNotifications={setNotifications} />}
       renderSectionHeader={({ section: { title } }) => (
         <Text
           style={[styles.header, { paddingTop: title === "Past" ? 20 : 0 }]}
@@ -80,12 +81,19 @@ function PastReminders({}: Props) {
   );
 }
 
-const Item : React.FC<ItemProps> = ({ id, name, dob, daysUntilBirthday }) => {
+const Item : React.FC<ItemProps> = ({ id, name, dob, daysUntilBirthday, setNotifications }) => {
   const [checked, setChecked] = useState(false);
   const { width } = useWindowDimensions();
 
   const removeReminder = async () => {
-    console.log(`remove ${id}`);
+    const response = await deleteNotification(id);
+    if (response && response.message === 'Notification deleted successfully') {
+        setNotifications((prev) => ({
+            ...prev,
+            current: prev.current.filter(notif => notif._id !== id),
+            past: prev.past.filter(notif => notif._id !== id),
+        }));
+    }
   };
 
   return (
