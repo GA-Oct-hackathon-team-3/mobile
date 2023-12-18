@@ -30,6 +30,11 @@ export async function updateFriend(id, friendInput) {
   return response;
 }
 
+export async function updateFriendNotification (friendIds) {
+    const response = await sendRequest(`${BASE_URL}/update-notification-inclusion`, 'PUT', { friendIds });
+    return response;
+}
+
 export async function uploadPhoto(id, file) {
 
   const formData = new FormData();
