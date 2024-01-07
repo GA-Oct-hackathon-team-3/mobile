@@ -3,6 +3,7 @@ import {
   View,
   ScrollView,
   Text,
+  TextInput,
   Switch,
   Image,
   FlatList,
@@ -63,6 +64,20 @@ function ManageReminders() {
       await updateUserProfile(userData);
     }
   };
+
+  const handleSearch  = (queryInput : string) => {
+    setQuery(queryInput);
+
+    if (queryInput) {
+        // if query, filter and return filtered results
+        setFilteredFriends(
+            flattenedFriendsList.filter((friend) =>
+            friend.name.toLowerCase().includes(queryInput.toLowerCase())
+        )
+        );
+    } else setFilteredFriends(flattenedFriendsList);  // else revert to original
+
+  }
 
   const handleSelectFriend = (id: string, includeInNotifications: boolean) => {
     // if if is a key in object, set to opposite value, otherwise set to !includeNotifications
@@ -247,6 +262,21 @@ function ManageReminders() {
         <Text style={styles.text}>
           Enable or disable notifications for each friend and confirm below:
         </Text>
+        <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          backgroundColor: colors.brightWhite,
+        }}
+      >
+        <TextInput
+                      value={query}
+                      onChangeText={handleSearch}
+          placeholder="Search by name, date, month..."
+          placeholderTextColor={"gray"}
+          style={styles.input}
+        />
+      </View>
         <FlatList
           data={filteredFriends}
           renderItem={({ item }) => (
@@ -342,6 +372,22 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'PilcrowRounded',
     textAlign: 'center',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+    padding: 10,
+    paddingRight: 20,
+    paddingLeft: 20,
+
+    backgroundColor: colors.brightWhite,
+    borderRadius: 10,
+    width: "100%",
+    position: "relative",
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
   },
   submitButton: {
     backgroundColor: colors.green,

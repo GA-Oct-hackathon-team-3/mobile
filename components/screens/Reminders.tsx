@@ -38,19 +38,6 @@ function Reminders({}: Props) {
 
   return (
     <View style={[{ paddingTop: insets.top + 8 }, styles.container]}>
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          backgroundColor: colors.brightWhite,
-        }}
-      >
-        <TextInput
-          placeholder="Search by name, date, month..."
-          placeholderTextColor={"gray"}
-          style={styles.input}
-        />
-      </View>
 
       <View style={styles.actionButtons}>
       <TouchableOpacity
@@ -193,22 +180,6 @@ const styles = StyleSheet.create({
 
     alignItems: "center", // Center children horizontally
     justifyContent: "center",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#E0E0E0",
-    padding: 10,
-    paddingRight: 20,
-    paddingLeft: 20,
-
-    backgroundColor: colors.brightWhite,
-    borderRadius: 10,
-    width: "100%",
-    position: "relative",
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
   },
 });
 
