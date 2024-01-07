@@ -13,31 +13,16 @@ import PastReminders from "../PastReminders";
 import EditReminders from "./EditReminders";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useMainContext } from "../providers/MainContext";
 // import * as notifService from '../../utilities/notification-service';
 // import * as deviceTokenService from '../../utilities/device-token-service';
 
 type Props = {};
 
 function Reminders({}: Props) {
-    const { friends } = useMainContext();
   const [activeTab, setActiveTab] = useState("Reminders");
   const [editMode, setEditMode] = useState(false);
-  const [friendsList, setFriendsList] = useState([]);
   const router = useRouter();
   const insets = useSafeAreaInsets();
-
-  const formatFriends = () => {
-    if (friends) {
-        const flattenedArray = friends.today.concat(friends.thisWeek, friends.thisMonth, friends.laterOn);
-        setFriendsList(flattenedArray);
-    }
-}
-
-
-  useEffect(() => {
-    formatFriends();
-  }, []);
 
 
   const handleSelect = (value: string) => {
@@ -92,7 +77,7 @@ function Reminders({}: Props) {
 
       {activeTab == "Manage" ? (
         <>
-          <ManageReminders friends={friendsList} />
+          <ManageReminders />
           {/* <TouchableOpacity onPress={handleEdit} style={styles.submitButton}>
             <Text
               style={{
