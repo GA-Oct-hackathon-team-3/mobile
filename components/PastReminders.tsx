@@ -1,5 +1,5 @@
-import { FontAwesome } from "@expo/vector-icons";
-import React, { useState, useEffect } from "react";
+import { FontAwesome } from '@expo/vector-icons';
+import React, { useState, useEffect } from 'react';
 import {
   Image,
   SectionList,
@@ -9,70 +9,84 @@ import {
   TouchableOpacity,
   View,
   useWindowDimensions,
-} from "react-native";
-import { deleteNotification, getNotifications, markAsRead } from '../utilities/notification-service';
-import { colors } from "../constants/Theme";
-import { capitalizeFirstLetter, getAgeAndSuffix } from "../utilities/helpers";
+} from 'react-native';
+import {
+  deleteReminder,
+  getReminders,
+  markAsRead,
+} from '../utilities/notification-service';
+import { colors } from '../constants/Theme';
+import { capitalizeFirstLetter, getAgeAndSuffix } from '../utilities/helpers';
 type Props = {};
 
 type ItemProps = {
-    id: string;
-    name: string;
-    dob: string;
-    daysUntilBirthday: number;
-    setNotifications: React.Dispatch<React.SetStateAction<Reminders>>;
-  };
+  id: string;
+  name: string;
+  dob: string;
+  photo: string;
+  daysUntilBirthday: number;
+  setReminders: React.Dispatch<React.SetStateAction<Reminders>>;
+};
 
 type INotification = {
+  _id: string;
+  friend: {
     _id: string;
-    friend: {
-        _id: string;
-        name: string;
-        dob: string;
-        daysUntilBirthday: number;
-    },
-    isRead: boolean;
-}
+    name: string;
+    dob: string;
+    photo: string;
+    daysUntilBirthday: number;
+  };
+  isRead: boolean;
+};
 
 type Reminders = {
-    current: INotification[],
-    past: INotification[],
-}
+  current: INotification[];
+  past: INotification[];
+};
 
 function PastReminders({}: Props) {
-    const [notifications, setNotifications] = useState <Reminders> ({ current: [], past: [] });
+  const [reminders, setReminders] = useState<Reminders>({
+    current: [],
+    past: [],
+  });
 
-    useEffect(() => {
-        const fetchNotifications = async () => {
-            const notificationData = await getNotifications();
-            if (notificationData && !notificationData.message) setNotifications(notificationData);
-        }
+  useEffect(() => {
+    const fetchReminders = async () => {
+      const reminderData = await getReminders();
+      if (reminderData && !reminderData.message) setReminders(reminderData);
+    };
 
-        const readNotifications = async () => {
-            const ids = notifications.current.map(notif => notif._id);
-            const response = await markAsRead(ids); // sends ids to backend to mark as read
-          }
+    const readNotifications = async () => {
+      if (!reminders.current.length) return;
+      const ids = reminders.current.map((notif) => notif._id);
+      const response = await markAsRead(ids); // sends ids to backend to mark as read
+    };
 
-        fetchNotifications();
-
-        setTimeout(() => {
-            // if there are no current notifications (i.e isRead: false), then don't run call to backend
-            if (notifications.current.length > 0) readNotifications();
-         }, 3000); // slight delay
-
-    }, []);
+    fetchReminders();
+    readNotifications();
+  }, []);
 
   return (
     <SectionList
       sections={[
-        { title: 'Current', data: notifications!.current },
-        { title: 'Past', data: notifications!.past },
+        { title: 'Current', data: reminders!.current },
+        { title: 'Past', data: reminders!.past },
       ]}
       keyExtractor={(item) => item._id.toString()}
-      renderItem={({ item }) => <Item id={item._id.toString()} name={item.friend.name} dob={item.friend.dob} daysUntilBirthday={item.friend.daysUntilBirthday} setNotifications={setNotifications} />}
+      renderItem={({ item }) => (
+        <Item
+          id={item._id.toString()}
+          name={item.friend.name}
+          dob={item.friend.dob}
+          photo={item.friend.photo}
+          daysUntilBirthday={item.friend.daysUntilBirthday}
+          setReminders={setReminders}
+        />
+      )}
       renderSectionHeader={({ section: { title } }) => (
         <Text
-          style={[styles.header, { paddingTop: title === "Past" ? 20 : 0 }]}
+          style={[styles.header, { paddingTop: title === 'Past' ? 20 : 0 }]}
         >
           {title}
         </Text>
@@ -81,18 +95,25 @@ function PastReminders({}: Props) {
   );
 }
 
-const Item : React.FC<ItemProps> = ({ id, name, dob, daysUntilBirthday, setNotifications }) => {
+const Item: React.FC<ItemProps> = ({
+  id,
+  name,
+  dob,
+  photo,
+  daysUntilBirthday,
+  setReminders,
+}) => {
   const [checked, setChecked] = useState(false);
   const { width } = useWindowDimensions();
 
   const removeReminder = async () => {
-    const response = await deleteNotification(id);
-    if (response && response.message === 'Notification deleted successfully') {
-        setNotifications((prev) => ({
-            ...prev,
-            current: prev.current.filter(notif => notif._id !== id),
-            past: prev.past.filter(notif => notif._id !== id),
-        }));
+    const response = await deleteReminder(id);
+    if (response && response.message === 'Reminder deleted successfully') {
+      setReminders((prev) => ({
+        ...prev,
+        current: prev.current.filter((notif) => notif._id !== id),
+        past: prev.past.filter((notif) => notif._id !== id),
+      }));
     }
   };
 
@@ -100,38 +121,48 @@ const Item : React.FC<ItemProps> = ({ id, name, dob, daysUntilBirthday, setNotif
     <View style={{ width: width - 40 }}>
       <View
         style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
+          flexDirection: 'row',
+          justifyContent: 'space-between',
           backgroundColor: colors.brightWhite,
           padding: 10,
-          alignItems: "center",
+          alignItems: 'center',
           marginTop: 10,
           borderWidth: 1,
-          borderColor: "lightgray",
-          borderRadius: "10%",
+          borderColor: 'lightgray',
+          borderRadius: '10%',
         }}
       >
         <Image
-          source={require("../assets/images/alex.jpg")}
+          source={{
+            uri: photo
+              ? photo
+              : 'https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png',
+          }}
           style={{ width: 40, height: 40, borderRadius: 20 }}
         />
         <View>
-          <Text style={styles.text}>{name && capitalizeFirstLetter(name)}'s</Text>
-          <Text style={styles.text}>{dob && getAgeAndSuffix(dob)} birthday</Text>
+          <Text style={styles.text}>
+            {name && capitalizeFirstLetter(name)}'s
+          </Text>
+          <Text style={styles.text}>
+            {dob && getAgeAndSuffix(dob)} birthday
+          </Text>
         </View>
-        <View style={{ alignItems: "center" }}>
+        <View style={{ alignItems: 'center' }}>
           <Text
             style={{
               color: colors.pink,
-              fontFamily: "PilcrowBold",
+              fontFamily: 'PilcrowBold',
               fontSize: 32,
             }}
           >
-            {daysUntilBirthday && daysUntilBirthday}
+            {daysUntilBirthday && Math.abs(daysUntilBirthday)}
           </Text>
-          <Text style={styles.text}>Days Left</Text>
+          <Text style={styles.text}>
+            {daysUntilBirthday >= 0 ? 'Days Left' : 'Days Ago'}
+          </Text>
         </View>
-        <View style={{ flexDirection: "column", gap: 4 }}>
+        <View style={{ flexDirection: 'column', gap: 4 }}>
           <TouchableOpacity
             onPress={() => setChecked(!checked)}
             style={
@@ -140,16 +171,16 @@ const Item : React.FC<ItemProps> = ({ id, name, dob, daysUntilBirthday, setNotif
                     height: 30,
                     width: 30,
                     backgroundColor: colors.green,
-                    alignItems: "center",
-                    justifyContent: "center",
+                    alignItems: 'center',
+                    justifyContent: 'center',
                     borderRadius: 8,
                   }
                 : {
                     height: 30,
                     width: 30,
                     backgroundColor: colors.brightWhite,
-                    alignItems: "center",
-                    justifyContent: "center",
+                    alignItems: 'center',
+                    justifyContent: 'center',
                     borderRadius: 8,
                     borderColor: colors.green,
                     borderWidth: 2,
@@ -157,7 +188,7 @@ const Item : React.FC<ItemProps> = ({ id, name, dob, daysUntilBirthday, setNotif
             }
           >
             {checked ? (
-              <FontAwesome name={"check"} size={20} color={"white"} />
+              <FontAwesome name={'check'} size={20} color={'white'} />
             ) : null}
           </TouchableOpacity>
           <Text style={styles.text}>Gift?</Text>
@@ -166,19 +197,19 @@ const Item : React.FC<ItemProps> = ({ id, name, dob, daysUntilBirthday, setNotif
       <TouchableOpacity
         onPress={removeReminder}
         style={{
-          position: "absolute",
+          position: 'absolute',
           right: -10,
           top: 0,
           height: 20,
           width: 20,
           backgroundColor: colors.green,
-          alignItems: "center",
-          justifyContent: "center",
+          alignItems: 'center',
+          justifyContent: 'center',
           borderRadius: 10,
           zIndex: 99,
         }}
       >
-        <FontAwesome name={"close"} size={14} color={"white"} />
+        <FontAwesome name={'close'} size={14} color={'white'} />
       </TouchableOpacity>
     </View>
   );
@@ -191,12 +222,12 @@ const styles = StyleSheet.create({
     marginHorizontal: 16,
   },
   item: {
-    backgroundColor: "#f9c2ff",
+    backgroundColor: '#f9c2ff',
     padding: 20,
     marginVertical: 8,
   },
   header: {
-    fontFamily: "PilcrowRounded",
+    fontFamily: 'PilcrowRounded',
     fontSize: 22,
   },
   title: {
@@ -204,7 +235,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 16,
-    fontFamily: "PilcrowRounded",
+    fontFamily: 'PilcrowRounded',
   },
 });
 

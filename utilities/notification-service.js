@@ -8,17 +8,17 @@ export async function acceptNotifications(tokenObj) {
   return res;
 }
 
-export async function getNotifications () {
-    const response = await sendRequest(WEB_BASE_URL + '/notifications', 'GET', null);
+export async function getReminders () {
+    const response = await sendRequest(WEB_BASE_URL + '/reminders', 'GET', null);
     return response;
 }
 
 export async function markAsRead (notificationIds) {
-    const response = await sendRequest(WEB_BASE_URL + '/notifications/read', 'PUT', { notificationIds });
+    const response = await sendRequest(WEB_BASE_URL + '/reminders/read', 'PUT', { notificationIds });
     return response;
 }
 
-export async function deleteNotification (id) {
-    const response = await sendRequest(WEB_BASE_URL + `/notifications/${id}/delete`, 'DELETE');
+export async function deleteReminder (id) {
+    const response = await sendRequest(WEB_BASE_URL + `/reminders/${id}/delete`, 'DELETE');
     return response;
 }
