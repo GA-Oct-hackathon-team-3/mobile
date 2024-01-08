@@ -26,8 +26,8 @@ type IUpdatedFriends = {
 function ManageReminders() {
   const { userProfile } = useAuth();
   const { friends, fetchFriends } = useMainContext();
-  const [flattenedFriendsList, setFlattenedFriendsList] = useState([]); // use to reset filter
-  const [filteredFriends, setFilteredFriends] = useState([]); // use to render
+  const [flattenedFriendsList, setFlattenedFriendsList] = useState<any[]>([]); // use to reset filter
+  const [filteredFriends, setFilteredFriends] = useState<any[]>([]); // use to render
   const [updatedFriends, setUpdatedFriends] = useState<IUpdatedFriends>({}); // accumulates changes to includeInNotifications per friend
   const [query, setQuery] = useState('');
   const [frequency, setFrequency] = useState<number[]>(
@@ -54,6 +54,8 @@ function ManageReminders() {
         ? prev.filter((prevDays) => prevDays !== days)
         : [...prev, days]
     );
+    // call submit right after to reduce number of forms on page
+    handleFrequencySubmit();
   };
 
   const handleFrequencySubmit = async () => {
@@ -61,23 +63,23 @@ function ManageReminders() {
       const userData = {
         notificationSchedule: [...frequency],
       };
+      // update frequency preferences on user profile
       await updateUserProfile(userData);
     }
   };
 
-  const handleSearch  = (queryInput : string) => {
+  const handleSearch = (queryInput: string) => {
     setQuery(queryInput);
 
     if (queryInput) {
-        // if query, filter and return filtered results
-        setFilteredFriends(
-            flattenedFriendsList.filter((friend) =>
-            friend.name.toLowerCase().includes(queryInput.toLowerCase())
+      // if query, filter and return filtered results
+      setFilteredFriends(
+        flattenedFriendsList.filter((friend) =>
+          friend.name.toLowerCase().includes(queryInput.toLowerCase())
         )
-        );
-    } else setFilteredFriends(flattenedFriendsList);  // else revert to original
-
-  }
+      );
+    } else setFilteredFriends(flattenedFriendsList); // else revert to original
+  };
 
   const handleSelectFriend = (id: string, includeInNotifications: boolean) => {
     // if if is a key in object, set to opposite value, otherwise set to !includeNotifications
@@ -110,7 +112,33 @@ function ManageReminders() {
       response.message === 'Updated friend notification preference successfully'
     ) {
       setUpdatedFriends({} as IUpdatedFriends); // resets state
-      fetchFriends();
+      fetchFriends(); // re-fetches friends to retrieve updated friend data
+    }
+  };
+
+  const handleEnableDisableAll = async (action: string) => {
+    const friendIds = flattenedFriendsList.reduce((ids, friend) => {
+      let checkValue: boolean;
+      // if action is enable, needs to only accumulate ids for which includeInNotifications is false
+      if (action === 'enable') checkValue = false;
+      // else the action is disable, and need to accumulate ids for which includeInNotifations is true
+      else checkValue = true;
+      if (friend.includeInNotifications === checkValue) ids.push(friend._id);
+      return ids;
+    }, []);
+
+    // if no changes, return
+    if (friendIds.length === 0) return;
+
+    // sends ids to backend to toggle
+    const response = await updateFriendNotification(friendIds);
+
+    if (
+      response &&
+      response.message === 'Updated friend notification preference successfully'
+    ) {
+      setUpdatedFriends({} as IUpdatedFriends); // resets state
+      fetchFriends(); // re-fetches friends to retrieve updated friend data
     }
   };
 
@@ -233,24 +261,6 @@ function ManageReminders() {
           <Text style={styles.text}>Day of</Text>
         </View>
       </View>
-      <View>
-        <TouchableOpacity
-          onPress={handleFrequencySubmit}
-          style={styles.submitButton}
-        >
-          <Text
-            style={{
-              color: 'white',
-              fontSize: 24,
-              fontFamily: 'PilcrowMedium',
-
-              textAlign: 'center',
-            }}
-          >
-            Confirm Updates
-          </Text>
-        </TouchableOpacity>
-      </View>
       <View
         style={{
           alignItems: 'center',
@@ -263,20 +273,28 @@ function ManageReminders() {
           Enable or disable notifications for each friend and confirm below:
         </Text>
         <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          backgroundColor: colors.brightWhite,
-        }}
-      >
-        <TextInput
-                      value={query}
-                      onChangeText={handleSearch}
-          placeholder="Search by name, date, month..."
-          placeholderTextColor={"gray"}
-          style={styles.input}
-        />
-      </View>
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}
+        >
+          <TextInput
+            value={query}
+            onChangeText={handleSearch}
+            placeholder="Search by name, date, month..."
+            placeholderTextColor={'gray'}
+            style={styles.input}
+          />
+          <View>
+            <TouchableOpacity onPress={() => handleEnableDisableAll('enable')}>
+              <Text>Enable All</Text>
+            </TouchableOpacity>
+            <Text> | </Text>
+            <TouchableOpacity onPress={() => handleEnableDisableAll('disable')}>
+              <Text>Disable All</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
         <FlatList
           data={filteredFriends}
           renderItem={({ item }) => (
@@ -375,15 +393,15 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: "#E0E0E0",
+    borderColor: '#E0E0E0',
     padding: 10,
     paddingRight: 20,
     paddingLeft: 20,
 
     backgroundColor: colors.brightWhite,
     borderRadius: 10,
-    width: "100%",
-    position: "relative",
+    width: '70%',
+    position: 'relative',
     left: 0,
     right: 0,
     top: 0,
