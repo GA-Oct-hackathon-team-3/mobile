@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   ScrollView,
   Text,
+  TextInput,
   Switch,
   Image,
   FlatList,
@@ -16,36 +17,128 @@ import { formatDate, capitalizeFirstLetter } from '../utilities/helpers';
 import { updateFriendNotification } from '../utilities/friends-service';
 import { updateUserProfile } from '../utilities/profile-service';
 import { useAuth } from './providers/AuthContext';
-type Props = {};
+import { useMainContext } from './providers/MainContext';
 
-function ManageReminders({ friends }: Props) {
+type IUpdatedFriends = {
+  [id: string]: boolean;
+};
+
+function ManageReminders() {
   const { userProfile } = useAuth();
-  const [selectedFriendIds, setSelectedFriendIds] = useState([]);
-  const [frequency, setFrequency] = useState(userProfile.notificationSchedule);
+  const { friends, fetchFriends } = useMainContext();
+  const [flattenedFriendsList, setFlattenedFriendsList] = useState<any[]>([]); // use to reset filter
+  const [filteredFriends, setFilteredFriends] = useState<any[]>([]); // use to render
+  const [updatedFriends, setUpdatedFriends] = useState<IUpdatedFriends>({}); // accumulates changes to includeInNotifications per friend
+  const [query, setQuery] = useState('');
+  const [frequency, setFrequency] = useState<number[]>(
+    userProfile.notificationSchedule
+  );
 
-  const handleChange = (days: number) => {
-    setFrequency((prev) =>
+  useEffect(() => {
+    if (friends) {
+      // friends comes in { today: [], thisWeek: [], thisMonth: [], laterOn: [] } structure
+      // use concat to flatten into single array
+      const flattenedFriendArray = friends.today.concat(
+        friends.thisWeek,
+        friends.thisMonth,
+        friends.laterOn
+      );
+      setFlattenedFriendsList(flattenedFriendArray); // maintains all friends (to revert changes from query)
+      setFilteredFriends(flattenedFriendArray); // displays data (is updated with query)
+    }
+  }, []);
+
+  const handleFrequencyChange = (days: number) => {
+    setFrequency((prev: number[]) =>
       prev.includes(days)
         ? prev.filter((prevDays) => prevDays !== days)
         : [...prev, days]
     );
+    // call submit right after to reduce number of forms on page
+    handleFrequencySubmit();
   };
 
-  const handleSubmit = async () => {
-    if (selectedFriendIds) {
-      const friendIds = [...selectedFriendIds];
-      const response = await updateFriendNotification(friendIds);
-      if (
-        response.message ===
-        'Updated friend notification preference successfully'
-      )
-        setSelectedFriendIds([]);
-      if (frequency) {
-        const userData = {
-          notificationSchedule: [...frequency],
-        };
-        const response = await updateUserProfile(userData);
+  const handleFrequencySubmit = async () => {
+    if (frequency && frequency.length > 0) {
+      const userData = {
+        notificationSchedule: [...frequency],
+      };
+      // update frequency preferences on user profile
+      await updateUserProfile(userData);
+    }
+  };
+
+  const handleSearch = (queryInput: string) => {
+    setQuery(queryInput);
+
+    if (queryInput) {
+      // if query, filter and return filtered results
+      setFilteredFriends(
+        flattenedFriendsList.filter((friend) =>
+          friend.name.toLowerCase().includes(queryInput.toLowerCase())
+        )
+      );
+    } else setFilteredFriends(flattenedFriendsList); // else revert to original
+  };
+
+  const handleSelectFriend = (id: string, includeInNotifications: boolean) => {
+    // if if is a key in object, set to opposite value, otherwise set to !includeNotifications
+    const updatedNotificationValue = updatedFriends.hasOwnProperty(id)
+      ? !updatedFriends[id]
+      : !includeInNotifications;
+
+    // maintains object of key with ids of friends were who updated, and the boolean value to which includeInNotifications should be updated to
+    // ids for submission to backend, value to update render
+    setUpdatedFriends((prev) => {
+      if (updatedNotificationValue === includeInNotifications) {
+        // if the value to update is equal to original value (i.e if toggled twice)...
+        const { [id]: omit, ...rest } = prev; // remove id key from state to prevent submission of id to backend
+        return rest;
       }
+
+      return {
+        ...prev,
+        [id]: updatedNotificationValue,
+      };
+    });
+  };
+
+  const handleFriendSubmit = async () => {
+    const friendIds = Object.keys(updatedFriends);
+    if (friendIds.length === 0) return;
+    const response = await updateFriendNotification(friendIds);
+    if (
+      response &&
+      response.message === 'Updated friend notification preference successfully'
+    ) {
+      setUpdatedFriends({} as IUpdatedFriends); // resets state
+      fetchFriends(); // re-fetches friends to retrieve updated friend data
+    }
+  };
+
+  const handleEnableDisableAll = async (action: string) => {
+    const friendIds = flattenedFriendsList.reduce((ids, friend) => {
+      let checkValue: boolean;
+      // if action is enable, needs to only accumulate ids for which includeInNotifications is false
+      if (action === 'enable') checkValue = false;
+      // else the action is disable, and need to accumulate ids for which includeInNotifations is true
+      else checkValue = true;
+      if (friend.includeInNotifications === checkValue) ids.push(friend._id);
+      return ids;
+    }, []);
+
+    // if no changes, return
+    if (friendIds.length === 0) return;
+
+    // sends ids to backend to toggle
+    const response = await updateFriendNotification(friendIds);
+
+    if (
+      response &&
+      response.message === 'Updated friend notification preference successfully'
+    ) {
+      setUpdatedFriends({} as IUpdatedFriends); // resets state
+      fetchFriends(); // re-fetches friends to retrieve updated friend data
     }
   };
 
@@ -65,13 +158,13 @@ function ManageReminders({ friends }: Props) {
       >
         <Text>Reminder Preferences</Text>
         <Text>
-          Choose how many days before a firend's birthday that you would like to
-          receive a notification. You must choose at least one option.
+          Select the number of days in advance you want to receive a
+          notification. Please choose at least one option.
         </Text>
 
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <TouchableOpacity
-            onPress={() => handleChange(30)}
+            onPress={() => handleFrequencyChange(30)}
             style={
               frequency.includes(30)
                 ? {
@@ -104,7 +197,7 @@ function ManageReminders({ friends }: Props) {
 
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <TouchableOpacity
-            onPress={() => handleChange(7)}
+            onPress={() => handleFrequencyChange(7)}
             style={
               frequency.includes(7)
                 ? {
@@ -137,7 +230,7 @@ function ManageReminders({ friends }: Props) {
 
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
           <TouchableOpacity
-            onPress={() => handleChange(0)}
+            onPress={() => handleFrequencyChange(0)}
             style={
               frequency.includes(0)
                 ? {
@@ -177,17 +270,47 @@ function ManageReminders({ friends }: Props) {
         }}
       >
         <Text style={styles.text}>
-          Choose which friends you'd like to toggle notifications for:
+          Enable or disable notifications for each friend and confirm below:
         </Text>
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+          }}
+        >
+          <TextInput
+            value={query}
+            onChangeText={handleSearch}
+            placeholder="Search by name, date, month..."
+            placeholderTextColor={'gray'}
+            style={styles.input}
+          />
+          <View>
+            <TouchableOpacity onPress={() => handleEnableDisableAll('enable')}>
+              <Text>Enable All</Text>
+            </TouchableOpacity>
+            <Text> | </Text>
+            <TouchableOpacity onPress={() => handleEnableDisableAll('disable')}>
+              <Text>Disable All</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
         <FlatList
-          data={friends}
+          data={filteredFriends}
           renderItem={({ item }) => (
-            <Item {...item} setSelectedFriendIds={setSelectedFriendIds} />
+            <Item
+              {...item}
+              handleSelectFriend={handleSelectFriend}
+              updatedFriends={updatedFriends}
+            />
           )}
         />
       </View>
       <View>
-        <TouchableOpacity onPress={handleSubmit} style={styles.submitButton}>
+        <TouchableOpacity
+          onPress={handleFriendSubmit}
+          style={styles.submitButton}
+        >
           <Text
             style={{
               color: 'white',
@@ -211,17 +334,11 @@ const Item = ({
   dob,
   _id,
   includeInNotifications,
-  setSelectedFriendIds,
+  handleSelectFriend,
+  updatedFriends,
 }) => {
   const [checked, setChecked] = useState(includeInNotifications);
   const { width } = useWindowDimensions();
-
-  const handleSelectFriend = (id) => {
-    setChecked(!checked);
-    setSelectedFriendIds((prev) =>
-      prev.includes(id) ? prev.filter((prevId) => prevId !== id) : [...prev, id]
-    );
-  };
 
   return (
     <View
@@ -250,12 +367,18 @@ const Item = ({
           | {formatDate(dob)}
         </Text>
       </Text>
-      <TouchableOpacity onPress={() => handleSelectFriend(_id)}>
-        {checked ? (
-          <FontAwesome name={'toggle-on'} size={30} color={colors.green} />
-        ) : (
-          <FontAwesome name={'toggle-off'} size={30} color={colors.purple} />
-        )}
+      <TouchableOpacity
+        onPress={() => handleSelectFriend(_id, includeInNotifications)}
+      >
+        {
+          // if friend is in updatedFriends object, display the new value within updatedFriends
+          // else display the includeInNotifications value
+          updatedFriends[_id] ?? includeInNotifications ? (
+            <FontAwesome name={'toggle-on'} size={30} color={colors.green} />
+          ) : (
+            <FontAwesome name={'toggle-off'} size={30} color={colors.purple} />
+          )
+        }
       </TouchableOpacity>
     </View>
   );
@@ -267,6 +390,22 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'PilcrowRounded',
     textAlign: 'center',
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    padding: 10,
+    paddingRight: 20,
+    paddingLeft: 20,
+
+    backgroundColor: colors.brightWhite,
+    borderRadius: 10,
+    width: '70%',
+    position: 'relative',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
   },
   submitButton: {
     backgroundColor: colors.green,

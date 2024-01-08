@@ -13,31 +13,16 @@ import PastReminders from "../PastReminders";
 import EditReminders from "./EditReminders";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useMainContext } from "../providers/MainContext";
 // import * as notifService from '../../utilities/notification-service';
 // import * as deviceTokenService from '../../utilities/device-token-service';
 
 type Props = {};
 
 function Reminders({}: Props) {
-    const { friends } = useMainContext();
   const [activeTab, setActiveTab] = useState("Reminders");
   const [editMode, setEditMode] = useState(false);
-  const [friendsList, setFriendsList] = useState([]);
   const router = useRouter();
   const insets = useSafeAreaInsets();
-
-  const formatFriends = () => {
-    if (friends) {
-        const flattenedArray = friends.today.concat(friends.thisWeek, friends.thisMonth, friends.laterOn);
-        setFriendsList(flattenedArray);
-    }
-}
-
-
-  useEffect(() => {
-    formatFriends();
-  }, []);
 
 
   const handleSelect = (value: string) => {
@@ -53,19 +38,6 @@ function Reminders({}: Props) {
 
   return (
     <View style={[{ paddingTop: insets.top + 8 }, styles.container]}>
-      <View
-        style={{
-          flexDirection: "row",
-          alignItems: "center",
-          backgroundColor: colors.brightWhite,
-        }}
-      >
-        <TextInput
-          placeholder="Search by name, date, month..."
-          placeholderTextColor={"gray"}
-          style={styles.input}
-        />
-      </View>
 
       <View style={styles.actionButtons}>
       <TouchableOpacity
@@ -92,7 +64,7 @@ function Reminders({}: Props) {
 
       {activeTab == "Manage" ? (
         <>
-          <ManageReminders friends={friendsList} />
+          <ManageReminders />
           {/* <TouchableOpacity onPress={handleEdit} style={styles.submitButton}>
             <Text
               style={{
@@ -208,22 +180,6 @@ const styles = StyleSheet.create({
 
     alignItems: "center", // Center children horizontally
     justifyContent: "center",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#E0E0E0",
-    padding: 10,
-    paddingRight: 20,
-    paddingLeft: 20,
-
-    backgroundColor: colors.brightWhite,
-    borderRadius: 10,
-    width: "100%",
-    position: "relative",
-    left: 0,
-    right: 0,
-    top: 0,
-    bottom: 0,
   },
 });
 
