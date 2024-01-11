@@ -15,15 +15,18 @@ import {
   getReminders,
   markAsRead,
 } from '../utilities/notification-service';
+import { updateFriend } from '../utilities/friends-service';
 import { colors } from '../constants/Theme';
 import { capitalizeFirstLetter, getAgeAndSuffix } from '../utilities/helpers';
 type Props = {};
 
 type ItemProps = {
   id: string;
+  friendId: string;
   name: string;
   dob: string;
   photo: string;
+  hasGift: boolean;
   daysUntilBirthday: number;
   setReminders: React.Dispatch<React.SetStateAction<Reminders>>;
 };
@@ -35,6 +38,7 @@ type INotification = {
     name: string;
     dob: string;
     photo: string;
+    hasGift: boolean;
     daysUntilBirthday: number;
   };
   isRead: boolean;
@@ -77,10 +81,12 @@ function PastReminders({}: Props) {
       renderItem={({ item }) => (
         <Item
           id={item._id.toString()}
+          friendId={item.friend._id}
           name={item.friend.name}
           dob={item.friend.dob}
           photo={item.friend.photo}
           daysUntilBirthday={item.friend.daysUntilBirthday}
+          hasGift={item.friend.hasGift}
           setReminders={setReminders}
         />
       )}
@@ -97,14 +103,22 @@ function PastReminders({}: Props) {
 
 const Item: React.FC<ItemProps> = ({
   id,
+  friendId,
   name,
   dob,
   photo,
+  hasGift,
   daysUntilBirthday,
   setReminders,
 }) => {
-  const [checked, setChecked] = useState(false);
+  const [checked, setChecked] = useState(hasGift);
   const { width } = useWindowDimensions();
+
+  const handleCheckGift = async (id: string) => {
+    const friendInput = { hasGift: !checked };
+    const response = await updateFriend(id, friendInput);
+    if (response && response.message === 'Friend updated') setChecked(!checked);
+  };
 
   const removeReminder = async () => {
     const response = await deleteReminder(id);
@@ -164,7 +178,7 @@ const Item: React.FC<ItemProps> = ({
         </View>
         <View style={{ flexDirection: 'column', gap: 4 }}>
           <TouchableOpacity
-            onPress={() => setChecked(!checked)}
+            onPress={() => handleCheckGift(friendId)}
             style={
               checked
                 ? {
