@@ -3,6 +3,7 @@ import * as SecureStore from "expo-secure-store";
 import React, { useContext, useEffect, useState } from "react";
 import { Platform } from "react-native";
 import { getToken, getUser } from "../../utilities/users-service";
+import * as usersAPI from "../../utilities/users-api";
 import { getProfile } from "../../utilities/profile-service";
 import { registerForPushNotificationsAsync } from '../../utilities/device-token-service';
 import { acceptNotifications } from '../../utilities/notification-service';
@@ -10,6 +11,8 @@ import { acceptNotifications } from '../../utilities/notification-service';
 interface AuthContextInterface {
   token: string | null;
   setToken: React.Dispatch<React.SetStateAction<string | null>>;
+  refreshToken: string | null;
+  setRefreshToken: React.Dispatch<React.SetStateAction<string | null>>;
   login: (dummyUser: any) => void;
   logout: () => Promise<void>;
   onboarded: boolean;
@@ -25,6 +28,8 @@ interface AuthContextInterface {
 const initialState: AuthContextInterface = {
   token: null,
   setToken: () => {}, // No-op function for initial state
+  refreshToken: null,
+  setRefreshToken: () => {},
   login: () => {}, // Replace with actual login logic
   logout: async () => {}, // Replace with actual logout logic
   onboarded: false,
@@ -65,7 +70,8 @@ export function useProtectedRoute(token) {
 }
 
 export const AuthProvider = ({ children }) => {
-  const [token, setToken] = useState(null);
+  const [token, setToken] = useState<string | null>(null);
+  const [refreshToken, setRefreshToken] = useState<string | null>(null);
   const [onboarded, setOnboarded] = useState(false);
   const [userData, setUserData] = useState(null);
   const [showReminders, setShowReminders] = useState(true);
@@ -165,13 +171,16 @@ export const AuthProvider = ({ children }) => {
   const login = () => {};
 
   const logout = async () => {
+    await usersAPI.logout();
     if (Platform.OS === "web") {
       localStorage.removeItem("token");
+      localStorage.removeItem("refresh");
       localStorage.removeItem("showReminders");
       localStorage.removeItem("onboarded");
     } else {
       try {
         await SecureStore.deleteItemAsync("token");
+        await SecureStore.deleteItemAsync("refresh");
         await SecureStore.deleteItemAsync("showReminders");
         await SecureStore.deleteItemAsync("onboarded");
       } catch (error) {
@@ -180,6 +189,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     setToken(null);
+    setRefreshToken(null);
     setOnboarded(false);
     setShowReminders(true);
     setUserData(null);
@@ -214,6 +224,8 @@ export const AuthProvider = ({ children }) => {
       value={{
         token,
         setToken,
+        refreshToken,
+        setRefreshToken,
         login,
         logout,
         onboarded,
