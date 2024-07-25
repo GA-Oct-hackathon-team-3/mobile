@@ -1,38 +1,33 @@
-import { useState, useEffect, useRef } from 'react';
-import * as Device from 'expo-device';
-import * as Notifications from 'expo-notifications';
-import Constants from 'expo-constants';
-import { Platform } from 'react-native';
-
+import Constants from "expo-constants";
+import * as Notifications from "expo-notifications";
 
 Notifications.setNotificationHandler({
-    handleNotification: async () => ({
-        shouldShowAlert: true,
-        shouldPlaySound: false,
-        shouldSetBadge: false,
-    }),
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
 });
 
+export async function registerForPushNotificationsAsync() {
+  let token;
 
-export async function registerForPushNotificationsAsync ()  {
-    let token;
+  const { status: existingStatus } = await Notifications.getPermissionsAsync(); // check status
+  let finalStatus = existingStatus;
+  if (existingStatus !== "granted") {
+    // if status isn't granted
+    const { status } = await Notifications.requestPermissionsAsync(); // request status
+    finalStatus = status;
+  }
+  if (finalStatus !== "granted") return; // if denied, return
 
-        const { status: existingStatus } = await Notifications.getPermissionsAsync(); // check status
-        let finalStatus = existingStatus;
-        if (existingStatus !== 'granted') { // if status isn't granted
-            const { status } = await Notifications.requestPermissionsAsync(); // request status
-            finalStatus = status;
-        }
-        if (finalStatus !== 'granted') return; // if denied, return
+  token = await Notifications.getExpoPushTokenAsync({
+    // get expo push token
+    projectId: Constants.expoConfig.extra.eas.projectId,
+  });
 
-        token = await Notifications.getExpoPushTokenAsync({ // get expo push token
-            projectId: Constants.expoConfig.extra.eas.projectId,
-        });
-
-    return token;
+  return token;
 }
-
-
 
 // listener to handle redirect when user clicks on notification
 
